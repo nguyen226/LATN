@@ -1,0 +1,125 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    var tableCanLamSang;
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (tableCanLamSang) !== 'undefined') {
+                tableCanLamSang.columns.adjust();
+            }
+        });
+        khoiTaoDatatableCanLamSang();
+
+        $("#btnRefreshDataCanLamSang").click(function () {
+            tableCanLamSang.draw();
+        });
+
+        $("#quickSearchDonCanLamSang").change(function () {
+            tableCanLamSang.draw();
+        });
+    });
+
+    function khoiTaoDatatableCanLamSang() {
+        let selectedFields = "Id, MA_DICH_VU,TEN_CHI_SO, MA_LK, GIA_TRI, KET_LUAN, MO_TA, NGAY_KQ, STRNGAY_KQ, XML4_01";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "XML4", new { area = "Member" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearchDonCanLamSang').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(TEN_CHI_SO LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%' OR GIA_TRI LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%' OR KET_LUAN LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%' OR MO_TA LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+                stringFilter += "MA_LK=N'" + (xML1Data != null ? xML1Data.id : -1) + "'";
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableCanLamSang.columns.adjust();
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [3,6],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [7],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "MA_DICH_VU", "name": "MA_DICH_VU", "autoWidth": true, "title": "Mã dịch vụ" },
+            { "data": "TEN_CHI_SO", "name": "TEN_CHI_SO", "autoWidth": true, "title": "Chỉ số" },
+            { "data": "GIA_TRI", "name": "GIA_TRI", "autoWidth": true, "title": "Giá trị" },
+            { "data": "STRNGAY_KQ", "name": "NGAY_KQ", "autoWidth": true, "title": "Ngày" },
+            { "data": "MO_TA", "name": "MO_TA", "autoWidth": true, "title": "Mô tả" },
+            { "data": "KET_LUAN", "name": "KET_LUAN", "autoWidth": true, "title": "Kết luận" },
+            {
+                "data": "XML4_01", "name": "XML4_01", "autoWidth": true, "title": "FPD đơn", "render": function (data, type, full, meta) {
+                    return !isNullOrEmpty(data) ? '<a target="_blank" href="' + data + '">Tải file</a>' : '';
+                }
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<button class="btn menu-icon vd_bg-green btnViewXML4"> <i class="fa fa-eye"></i> </button>';
+                    return html;
+                }, width: "30px"
+            }
+        ]
+
+        tableCanLamSang = $('#dtTableCanLamSang').DataTable(datatableOption);
+
+        $('#dtTableCanLamSang tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableCanLamSang.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        
+    }
+
+</script>
+<div class="panel widget light-widget">
+    <div class="panel-heading no-title">
+        <div class="vd_menu-search table-search input-group input-border">
+            <input type="text" id="quickSearchDonCanLamSang"  class="form-control" placeholder="Tìm kiếm">
+            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+        </div>
+        <div class="vd_panel-menu themChiTietXML1">
+            <div id="btnRefreshDataCanLamSang" class="menu entypo-icon largerFont" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới"> <i class="icon-cycle"></i> </div>
+            <div id="btnThemMoiRowDataCanLamSang" class="menu entypo-icon largerFont vd_green" data-placement="bottom" data-toggle="tooltip" data-original-title="Thêm"> <i class="icon-plus3"></i> </div>
+        </div>
+    </div>
+    <div class="panel-body" id="panelBody">
+        <div class="row">
+            <table id="dtTableCanLamSang" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,396 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.UsersViewModels
+@{
+    ViewBag.Title = "Khám sức khỏe";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "KSK_ID, MA_LK, MA_BN, HO_TEN, NGAY_SINH, CMND, DIENTHOAI";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetListKhamSucKhoe", "Users", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = ' MA_BN IS NOT NULL ';
+
+                if (!isNullOrEmpty($('#quickSearchDT').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(DIENTHOAI LIKE N'%" + $('#quickSearchDT').val().trim() + "%')";
+                }
+
+
+                if (!isNullOrEmpty($('#quickSearchMaBN').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(MA_BN LIKE N'%" + $('#quickSearchMaBN').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchCMND').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(CMND LIKE N'%" + $('#quickSearchCMND').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchMA_LK').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(MA_LK LIKE N'%" + $('#quickSearchMA_LK').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchHoVaTen').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(HO_TEN LIKE N'%" + $('#quickSearchHoVaTen').val().trim() + "%')";
+                }
+
+                return stringFilter;
+
+            }
+        };
+
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.initComplete = function () {
+            this.api().columns().every(function (index) {
+                var headerName = $(this.header()).text();
+                var column = this;
+                if (index == 0) {
+                    $(column.header()).html('<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkbox-select-all">\
+                                <label for="checkbox-select-all"></label>\
+                            </div></div>');
+                }
+
+                table.columns.adjust();
+            });
+
+            $('#checkbox-select-all').off('change').on('change', function () {
+                $('#dtTable tbody input:checkbox[name="checkboxSelected"]').prop('checked', this.checked);
+            });
+        };
+
+        datatableOption.order = [[0, "DESC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all"
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false,
+                "orderable": false
+            },
+            {
+                "targets": [8],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            }
+        ];
+
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "KSK_ID", "name": "KSK_ID", "autoWidth": true,
+                "render": function (data, type, full, meta) {
+                    return '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                            <input type="checkbox" id="checkboxSelected_' + full.KSK_ID + '" name="checkboxSelected">\
+                            <label for="checkboxSelected_' + full.KSK_ID + '"></label>\
+                        </div></div>';
+                }
+            },
+            { "data": "MA_BN", "name": "MA_BN", "autoWidth": true, "title": "Mã bệnh nhân" },
+            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "Mã lượt khám" },
+            { "data": "HO_TEN", "name": "HO_TEN", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "DIENTHOAI", "name": "DIENTHOAI", "autoWidth": true, "title": "SDT" },
+            { "data": "NGAY_SINH", "name": "NGAY_SINH", "autoWidth": true, "title": "Ngày sinh" },
+            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "MA_LK" },
+            { "data": "CMND", "name": "CMND", "autoWidth": true, "title": "CMND" },
+            {
+                "data": "UserID", "mRender": function (data, type, row, meta) {
+                    if(suaHeThong == true || ( suaCaNhan==true && row.CreatedUserID == userId)){
+                        return '<a class="btn menu-icon vd_bg-yellow" href="@Url.Action("KhamSucKhoeUpdate", "Users", new { area = "Admin" })?Id=' + row.KSK_ID + '"> <i class="fa fa-pencil"></i> </a>';
+                    }else{
+                        return '';
+                    }
+                },width: "30px", "title": "Sửa"
+            },
+            //{
+            //    "data": "UserID", "mRender": function (data, type, row, meta) {
+            //        let html='';
+            //        if(xoaHeThong == true || (xoaCaNhan==true && row.CreatedUserID == userId)){
+            //            html ='<a class="btn menu-icon vd_bg-red" onclick=deleteDataRow(' + row.UserID + ')> <i class="fa fa-times"></i> </a>';
+            //        }
+            //        return html ;
+            //    }, width: "30px", "title": "Xóa"
+            //}
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $("#btnRefreshData").click(function () {
+            resetCheckboxAndTable();
+        });
+
+        $("#btnAdd").click(function () {
+            window.location.href = '@Url.Action("KhamSucKhoeUpdate", "Users", new { area = "Admin" })';
+        });
+
+        $('#btnDelete').click(function () {
+            dataListId = [];
+            dataListId = $(table.$('input:checkbox[name="checkboxSelected"]').map(function () {
+                return $(this).prop("checked") ? table.rows($(this).closest('tr')).data()[0].KSK_ID : null;
+            }));
+
+            if (dataListId.length > 0) {
+                $('#confirmDeleteDataRowModal').modal('show');
+            } else {
+                notification("topcenter", "", "fa fa-exclamation-triangle vd_yellow", "Error", "Bạn chưa chọn dòng nào để xóa.");
+            }
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            if (dataListId.length > 0) {
+                var data = { ids: dataListId.length == 1 ? dataListId[0] : dataListId.toArray() };
+                var url = "@Url.Action("DeleteKhamSucKhoeByIds", "Users", new { area = "Admin" })";
+
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("topleft", "notify", "fa fa-exclamation-triangle vd_yellow", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công.");
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        resetCheckboxAndTable();
+                    }
+                });
+            }
+        });
+
+        $('#quickSearchMaBN, #quickSearchCMND,#quickSearchDT, #quickSearchMA_LK, #quickSearchHoVaTen').keyup(function (e) {
+            e.preventDefault();
+            resetCheckboxAndTable();
+        });
+
+        $('#btnImportExcel').on('change', function () {
+            let filesUploads = $('#btnImportExcel').prop('files');
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                var data = new FormData();
+
+                data.append("file", filesUploads[0]);
+
+                var url = "@Url.Action("NhapDuLieuTuFileExcelXetNghiem", "Users", new { area = "Admin" })";
+
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    $('#btnImportExcel').val('');
+
+                    if (res) {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                    }
+                    else {
+                        resetCheckboxAndTable();
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Cập nhật thành công.");
+                    }
+                });
+            }
+        });
+    });
+
+    function updateCellDatatable(that) {
+        data ={
+            id : $(that).data("id"),
+            fields : [$(that).data("field")],
+            values : [$(that).data("value")],
+        }
+
+        var url = "@Url.Action("AddOrUpdate", "Users", new { area = "Admin" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                resetCheckboxAndTable();
+            }
+        });
+    }
+
+    function deleteDataRow(id) {
+        dataListId.push(id);
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+
+    function resetCheckboxAndTable() {
+        table.draw();
+        dataListId = [];
+        $('#checkbox-select-all').prop('checked', false);
+        selectedDataRow = null;
+    }
+</script>
+
+<div class="vd_content clearfix">
+
+    <div class="vd_head-section clearfix">
+        <div class="vd_panel-header">
+            <ul class="breadcrumb">
+                <li><a href="/">@Html.Raw("Trang chủ")</a> </li>
+                <li><a href="/">@Html.Raw("Chăm sóc khách hàng")</a> </li>
+                <li class="active">@Html.Raw("Khám chữa bệnh")</li>
+            </ul>
+            @Html.Partial("_PartialContentHeaderMenu")
+        </div>
+    </div>
+
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+                <div class="panel widget light-widget">
+
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-2 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchMaBN"  class="form-control" placeholder="Mã bệnh nhân" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-2 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchHoVaTen"  class="form-control" placeholder="họ tên" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-2 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchDT"  class="form-control" placeholder="SĐT" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-2 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchMA_LK"  class="form-control" placeholder="Mã lượt khám" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchCMND"  class="form-control" placeholder="Chứng minh nhân dân" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2 col-xs-12">
+                                <div class="vd_panel-menu">
+                                    <div id="btnRefreshData" class="menu entypo-icon largerFont" data-placement="bottom" data-original-title="Làm mới"> <i class="icon-cycle"></i> </div>
+                                    @if (Model.Menu_GroupPermission.AllowUpdate)
+                                    {
+                        <div id="btnAdd" class="menu entypo-icon vd_green largerFont" data-placement="bottom" data-original-title="Thêm"> <i class="icon-plus3"></i> </div>
+                                        <div class="menu entypo-icon vd_green largerFont fileinput-button" data-placement="bottom" data-original-title="Nhập dữ liệu từ excel">
+                                            <i class="fa fa-file-excel-o"></i>
+                                            <span></span>
+                                            <input id="btnImportExcel" type="file" name="files[]" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                        </div>}
+                                    @if (Model.Menu_GroupPermission.AllowDelete)
+                                    {
+                        <div id="btnDelete" class="menu entypo-icon vd_red largerFont" data-placement="bottom" data-original-title="Xóa"> <i class="icon-trash"></i> </div>}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <table id="dtTable" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")

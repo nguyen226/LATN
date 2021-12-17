@@ -1,0 +1,200 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="@ViewBag.seoDescription">
+    <meta name="keywords" itemprop="keywords" content="@ViewBag.seoKeyword">
+    <title>@ViewBag.seoTitle</title>
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    @RenderSection("styles", required: false)
+    <!-- Font Family & Font Icon -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="@Url.Content("~/Content/weather-icons/css/weather-icons.css")" rel="stylesheet" type="text/css">
+    <!-- CSS MAIN -->
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/slick.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/slick-theme.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/animition.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/ball.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/date.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/main.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu_drop.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/send_alert.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/tabs.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/swiper.min.css">
+    <!-- Responsive -->
+    <link rel="stylesheet" href="~/Content/Website/Assets/css/responsive/media.css">
+    <link rel="stylesheet" href="~/Content/spinner/css/spinner.css" />
+    <link href="@Url.Content("~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css")" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <!-- Script -->
+    <script type="text/javascript" src="~/Content/Website/Assets/js/jquery_3.2.1.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FZK3M25ES5"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-FZK3M25ES5');
+    </script>
+	@*<script type="text/javascript">        
+        if (window.location.protocol != "https:") {
+           window.location.protocol = "https";
+        }
+    </script>*@
+
+</head>
+
+<body>
+    @Html.Partial("_PartialNhanTuVanModal")
+    @Html.Partial("_PartialDatLichKhamModal")
+    @Html.Partial("_PartialDatLichKhamTheoPhongBanModal")
+    @Html.Partial("_PartialVideoModal")
+    @Html.Partial("_PartialModalRegister_Login")
+    @Html.Partial("_PartialCapNhatThongTinMemberModal")
+    @Html.Partial("_PartialChonThoiGianKhamBenh")
+
+    <div id="wrapper" style="max-width: 1920px;">
+        <div class="app_top">
+            <div class="img_app">
+                <img src="~/Content/Website/Assets/images/banner_header.png" alt="">
+            </div>
+            <div class="app_bv">
+                <a target="_blank" href="https://apps.apple.com" alt="">
+                    <img src="~/Content/Website/Assets/images/appstore.png" alt="">
+                </a>
+                </a>
+                <a target="_blank" href="https://play.google.com/store/apps">
+                    <img src="~/Content/Website/Assets/images/ggplay.png" alt="">
+                </a>
+
+            </div>
+        </div>
+        <div id="gop_top">
+            @{ Html.RenderAction("_Header", "Partial", new { area = "" }); }
+            @RenderSection("banner", required: false)
+        </div>
+        @RenderBody()
+        @{ Html.RenderAction("_Footer", "Partial", new { area = "", typeCode = JetMedicalWebApp.Common.CommonConstants.NewsType_Guide }); }
+    </div>
+    <!-- warper -->
+    <!-- Messenger Plugin chat Code -->
+    <div id="fb-root"></div>
+
+    <!-- Your Plugin chat code -->
+    <div id="fb-customer-chat" class="fb-customerchat">
+    </div>
+
+    <script>
+        var chatbox = document.getElementById('fb-customer-chat');
+        chatbox.setAttribute("page_id", "183751401770975");
+        chatbox.setAttribute("attribution", "biz_inbox");
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                xfbml: true,
+                version: 'v11.0'
+            });
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://connect.facebook.net/vi_VN/sdk/xfbml.customerchat.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+</body>
+
+<script src="~/Content/Website/Assets/js/swiper.min.js"></script>
+
+<!-- Initialize Swiper -->
+<script>
+    var swiper = new Swiper('.swiper-container', {
+        spaceBetween: 30,
+        effect: 'fade',
+        autoplay: true,
+        autoplaySpeed: 5000,
+        infinite: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+</script>
+<script async src="~/Content/Website/Assets/js/youtube_2.js"></script>
+<script async custom-element="amp-youtube" src="~/Content/Website/Assets/js/youtube_1.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/init.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/menu_header.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery_ui.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/edit_js.js"></script>
+<script type="text/javascript" src="~/Content/js/jquery.blockUI.js"></script>
+<script src="~/Content/Website/Assets/js/slick.min.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.flexslider-min.js"></script>
+<script src="~/Content/Website/Assets/js/main.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy2.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy1.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/edit_slick.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.repopup.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/tablist.js"></script>
+<script src="~/Content/spinner/js/spinner.js"></script>
+<script src="~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+<script src="~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+<script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+<script>
+    $(document).ready(function () {
+        $(".monica").monica({
+            settings: {
+                upTime: "fast",
+                downTime: "fast"
+            }
+        });
+    });
+</script>
+<script type="text/javascript">
+    $(function () {
+        //$('form#formSubmit').on('submit', function (e) {
+        //    e.preventDefault();
+           
+        //    $('#sendmail').hide();
+        //    var _data = $(this).serializeArray();
+        //    var _action = $(this).attr("action");
+        //    var _method = $(this).attr("method").toUpperCase();
+        //    $.ajax({
+        //        url: _action,
+        //        dataType: 'html',
+        //        type: _method,
+        //        data: _data,
+        //        success: function (_data) {
+        //            if (data.success) {
+        //                $('#myModal').hide();
+        //                $('.modal-backdrop').hide();
+        //                alert('Bạn đã đăng ký thành công, Bộ phận CSKH sẽ liên hệ bạn trong thời gian sớm nhất.');
+        //            }
+        //            else
+        //            {
+        //                alert(data.message);
+        //            }
+        //        },
+        //        error: function (_data) {
+        //        },
+        //    });
+        //});
+    });
+</script>
+</html>

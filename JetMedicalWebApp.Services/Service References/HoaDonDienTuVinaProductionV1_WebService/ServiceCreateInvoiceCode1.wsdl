@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://tempuri.org/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://tempuri.org/">
+      <s:element name="CreateInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Taxcode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="objinvoice" type="tns:InvoiceCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="listobjdetail" type="tns:ArrayOfInvoiceDetailCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="InvoiceCode2">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="MoneyCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ExchangeRate" nillable="true" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="CompanyName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CompanyTaxcode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CompanyAdd" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Email" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ContractName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="AccBank" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PaymentTerm" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Denominator" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SymbolCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalAmountNotax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Tax" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalAmount" nillable="true" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="AmountInwords" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="DateofInvoice" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="DateofSign" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="IvoiceCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax0" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax5" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax10" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountTax5" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountTax10" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNo" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Amount0" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Amount5" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Amount10" nillable="true" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="Notes" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="OtherTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="OtherCharges" nillable="true" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="InvoiceNumber" nillable="true" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Status" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SignXmlFile" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfInvoiceDetailCode2">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="InvoiceDetailCode2" nillable="true" type="tns:InvoiceDetailCode2" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="InvoiceDetailCode2">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="ProductName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Unit" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Number" nillable="true" type="s:double" />
+          <s:element minOccurs="1" maxOccurs="1" name="Price" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalAmount" nillable="true" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="Discount" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Tax" nillable="true" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Status" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="CreateInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CreateInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Taxcode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="objinvoice" type="tns:InvoiceCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="listobjdetail" type="tns:ArrayOfInvoiceDetailCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="UpdateInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UpdateInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateSignInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SerialNumber" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Taxcode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="objinvoice" type="tns:InvoiceCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="listobjdetail" type="tns:ArrayOfInvoiceDetailCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateSignInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CreateSignInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AddSignInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="signxmlstring" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AddSignInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AddSignInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateSignInvoiceCode1Checksum">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SerialNumber" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Taxcode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="objinvoice" type="tns:InvoiceCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="listobjdetail" type="tns:ArrayOfInvoiceDetailCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="checksum" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CreateSignInvoiceCode1ChecksumResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CreateSignInvoiceCode1ChecksumResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdjustedInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedDenominator" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedSymbolCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="AdjustedInvoiceNumber" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="Denominator" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SymbolCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="InvoiceNumber" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedContent" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Adjustedfile" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedfileName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdjustedInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReplaceInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ReplaceDenominator" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ReplaceSymbolCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="ReplaceInvoiceNumber" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="Denominator" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SymbolCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="InvoiceNumber" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="ReplaceDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="ReplaceContent" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Replacefile" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="ReplacefileName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ReplaceInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ReplaceInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdjustedCreateInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedDenominator" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedSymbolCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="AdjustedInvoiceNumber" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedDate" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedContent" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Adjustedfile" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedfileName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SerialNumber" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Taxcode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="objinvoice" type="tns:InvoiceCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="listobjdetail" type="tns:ArrayOfInvoiceDetailCode2" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="AdjustedCreateInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="AdjustedCreateInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteInvoiceCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Denominator" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SymbolCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="InvoiceNumber" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="DeleteContent" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Deletefile" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="DeletefileName" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DeleteInvoiceCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="DeleteInvoiceCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getInvoiceInfo">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="status" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getInvoiceInfoResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getInvoiceInfoResult" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="sentEmailCode1">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="CCEmail" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="sentEmailCode1Response">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="sentEmailCode1Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getInvoiceList">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="fromDate" nillable="true" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="toDate" nillable="true" type="s:dateTime" />
+            <s:element minOccurs="1" maxOccurs="1" name="status" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getInvoiceListResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getInvoiceListResult" type="tns:ArrayOfIvoice" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfIvoice">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Ivoice" nillable="true" type="tns:Ivoice" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Ivoice">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="Id" nillable="true" type="s:long" />
+          <s:element minOccurs="1" maxOccurs="1" name="NoticeissuedId" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="InvoiceNumber" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="DateofInvoice" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="MoneyCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Tempcode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Symbol" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ExchangeRate" nillable="true" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="CompanyName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CompanyTaxcode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="CompanyAdd" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Email" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ContractName" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Phone" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Fax" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="AccBank" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Bank" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="PaymentTerm" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalMoneyNoTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Tax" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="MoneyTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalMoney" nillable="true" type="s:decimal" />
+          <s:element minOccurs="0" maxOccurs="1" name="TextTotalMoney" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="DateofSign" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="IvoiceCode" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="IvoiceAdjustedId" nillable="true" type="s:long" />
+          <s:element minOccurs="0" maxOccurs="1" name="IsAdjusted" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="AdjustedDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="IsConvert" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ConvertDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="UrlInvoiceDelete" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="ContentInvoiceDelete" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="IvoiceUrl" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="CustomerID" nillable="true" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Status" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="CreateBy" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="CreateDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="ModifiedBy" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="ModifiedDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="SignXmlFile" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax0" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax5" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNoTax10" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountTax5" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountTax10" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AmountNo" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Amount0" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Amount5" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="Amount10" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="OtherTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="OtherCharges" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="BranchId" nillable="true" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Notes" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UrlAdjustedInvoice" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="SignXmlFileBuy" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="SignBuyDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="0" maxOccurs="1" name="SignBuyBy" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="IsChange" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="ChangeDate" nillable="true" type="s:dateTime" />
+          <s:element minOccurs="1" maxOccurs="1" name="IvoiceChangeId" nillable="true" type="s:long" />
+          <s:element minOccurs="1" maxOccurs="1" name="ServiceCharge" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="ServiceTax" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="ServiceAmountTax" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalServiceAmount" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="TotalAmount" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="AuthorisedCollection" nillable="true" type="s:decimal" />
+          <s:element minOccurs="1" maxOccurs="1" name="SearchUsingOR" nillable="true" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="RecPerPage" nillable="true" type="s:int" />
+          <s:element minOccurs="1" maxOccurs="1" name="PageIndex" nillable="true" type="s:int" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="TestConnection">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="TestConnectionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="TestConnectionResult" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetXMlFile">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetXMlFileResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetXMlFileResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetStatusInvoice">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideId" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GuideCode" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetStatusInvoiceResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="GetStatusInvoiceResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getInvoiceByInvocieNumber">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="UserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Password" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Key" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="Denominator" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="SymbolCode" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="InvoiceNumber" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="getInvoiceByInvocieNumberResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="getInvoiceByInvocieNumberResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="CreateInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:CreateInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="CreateInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:CreateInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="UpdateInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:UpdateInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="UpdateInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:UpdateInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="CreateSignInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:CreateSignInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="CreateSignInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:CreateSignInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="AddSignInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:AddSignInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="AddSignInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:AddSignInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="CreateSignInvoiceCode1ChecksumSoapIn">
+    <wsdl:part name="parameters" element="tns:CreateSignInvoiceCode1Checksum" />
+  </wsdl:message>
+  <wsdl:message name="CreateSignInvoiceCode1ChecksumSoapOut">
+    <wsdl:part name="parameters" element="tns:CreateSignInvoiceCode1ChecksumResponse" />
+  </wsdl:message>
+  <wsdl:message name="AdjustedInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:AdjustedInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="AdjustedInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:AdjustedInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="ReplaceInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:ReplaceInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="ReplaceInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:ReplaceInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="AdjustedCreateInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:AdjustedCreateInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="AdjustedCreateInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:AdjustedCreateInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="DeleteInvoiceCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:DeleteInvoiceCode1" />
+  </wsdl:message>
+  <wsdl:message name="DeleteInvoiceCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:DeleteInvoiceCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="getInvoiceInfoSoapIn">
+    <wsdl:part name="parameters" element="tns:getInvoiceInfo" />
+  </wsdl:message>
+  <wsdl:message name="getInvoiceInfoSoapOut">
+    <wsdl:part name="parameters" element="tns:getInvoiceInfoResponse" />
+  </wsdl:message>
+  <wsdl:message name="sentEmailCode1SoapIn">
+    <wsdl:part name="parameters" element="tns:sentEmailCode1" />
+  </wsdl:message>
+  <wsdl:message name="sentEmailCode1SoapOut">
+    <wsdl:part name="parameters" element="tns:sentEmailCode1Response" />
+  </wsdl:message>
+  <wsdl:message name="getInvoiceListSoapIn">
+    <wsdl:part name="parameters" element="tns:getInvoiceList" />
+  </wsdl:message>
+  <wsdl:message name="getInvoiceListSoapOut">
+    <wsdl:part name="parameters" element="tns:getInvoiceListResponse" />
+  </wsdl:message>
+  <wsdl:message name="TestConnectionSoapIn">
+    <wsdl:part name="parameters" element="tns:TestConnection" />
+  </wsdl:message>
+  <wsdl:message name="TestConnectionSoapOut">
+    <wsdl:part name="parameters" element="tns:TestConnectionResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetXMlFileSoapIn">
+    <wsdl:part name="parameters" element="tns:GetXMlFile" />
+  </wsdl:message>
+  <wsdl:message name="GetXMlFileSoapOut">
+    <wsdl:part name="parameters" element="tns:GetXMlFileResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetStatusInvoiceSoapIn">
+    <wsdl:part name="parameters" element="tns:GetStatusInvoice" />
+  </wsdl:message>
+  <wsdl:message name="GetStatusInvoiceSoapOut">
+    <wsdl:part name="parameters" element="tns:GetStatusInvoiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="getInvoiceByInvocieNumberSoapIn">
+    <wsdl:part name="parameters" element="tns:getInvoiceByInvocieNumber" />
+  </wsdl:message>
+  <wsdl:message name="getInvoiceByInvocieNumberSoapOut">
+    <wsdl:part name="parameters" element="tns:getInvoiceByInvocieNumberResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ServiceCreateInvoiceCode1Soap">
+    <wsdl:operation name="CreateInvoiceCode1">
+      <wsdl:input message="tns:CreateInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:CreateInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateInvoiceCode1">
+      <wsdl:input message="tns:UpdateInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:UpdateInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateSignInvoiceCode1">
+      <wsdl:input message="tns:CreateSignInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:CreateSignInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AddSignInvoiceCode1">
+      <wsdl:input message="tns:AddSignInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:AddSignInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateSignInvoiceCode1Checksum">
+      <wsdl:input message="tns:CreateSignInvoiceCode1ChecksumSoapIn" />
+      <wsdl:output message="tns:CreateSignInvoiceCode1ChecksumSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AdjustedInvoiceCode1">
+      <wsdl:input message="tns:AdjustedInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:AdjustedInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ReplaceInvoiceCode1">
+      <wsdl:input message="tns:ReplaceInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:ReplaceInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="AdjustedCreateInvoiceCode1">
+      <wsdl:input message="tns:AdjustedCreateInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:AdjustedCreateInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteInvoiceCode1">
+      <wsdl:input message="tns:DeleteInvoiceCode1SoapIn" />
+      <wsdl:output message="tns:DeleteInvoiceCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceInfo">
+      <wsdl:input message="tns:getInvoiceInfoSoapIn" />
+      <wsdl:output message="tns:getInvoiceInfoSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="sentEmailCode1">
+      <wsdl:input message="tns:sentEmailCode1SoapIn" />
+      <wsdl:output message="tns:sentEmailCode1SoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceList">
+      <wsdl:input message="tns:getInvoiceListSoapIn" />
+      <wsdl:output message="tns:getInvoiceListSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="TestConnection">
+      <wsdl:input message="tns:TestConnectionSoapIn" />
+      <wsdl:output message="tns:TestConnectionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetXMlFile">
+      <wsdl:input message="tns:GetXMlFileSoapIn" />
+      <wsdl:output message="tns:GetXMlFileSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStatusInvoice">
+      <wsdl:input message="tns:GetStatusInvoiceSoapIn" />
+      <wsdl:output message="tns:GetStatusInvoiceSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceByInvocieNumber">
+      <wsdl:input message="tns:getInvoiceByInvocieNumberSoapIn" />
+      <wsdl:output message="tns:getInvoiceByInvocieNumberSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ServiceCreateInvoiceCode1Soap" type="tns:ServiceCreateInvoiceCode1Soap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="CreateInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/CreateInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/UpdateInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSignInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/CreateSignInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddSignInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/AddSignInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSignInvoiceCode1Checksum">
+      <soap:operation soapAction="http://tempuri.org/CreateSignInvoiceCode1Checksum" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdjustedInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/AdjustedInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReplaceInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/ReplaceInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdjustedCreateInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/AdjustedCreateInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteInvoiceCode1">
+      <soap:operation soapAction="http://tempuri.org/DeleteInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceInfo">
+      <soap:operation soapAction="http://tempuri.org/getInvoiceInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sentEmailCode1">
+      <soap:operation soapAction="http://tempuri.org/sentEmailCode1" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceList">
+      <soap:operation soapAction="http://tempuri.org/getInvoiceList" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestConnection">
+      <soap:operation soapAction="http://tempuri.org/TestConnection" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetXMlFile">
+      <soap:operation soapAction="http://tempuri.org/GetXMlFile" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStatusInvoice">
+      <soap:operation soapAction="http://tempuri.org/GetStatusInvoice" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceByInvocieNumber">
+      <soap:operation soapAction="http://tempuri.org/getInvoiceByInvocieNumber" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ServiceCreateInvoiceCode1Soap12" type="tns:ServiceCreateInvoiceCode1Soap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="CreateInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/CreateInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/UpdateInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSignInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/CreateSignInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddSignInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/AddSignInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreateSignInvoiceCode1Checksum">
+      <soap12:operation soapAction="http://tempuri.org/CreateSignInvoiceCode1Checksum" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdjustedInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/AdjustedInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReplaceInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/ReplaceInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AdjustedCreateInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/AdjustedCreateInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteInvoiceCode1">
+      <soap12:operation soapAction="http://tempuri.org/DeleteInvoiceCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceInfo">
+      <soap12:operation soapAction="http://tempuri.org/getInvoiceInfo" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sentEmailCode1">
+      <soap12:operation soapAction="http://tempuri.org/sentEmailCode1" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceList">
+      <soap12:operation soapAction="http://tempuri.org/getInvoiceList" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="TestConnection">
+      <soap12:operation soapAction="http://tempuri.org/TestConnection" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetXMlFile">
+      <soap12:operation soapAction="http://tempuri.org/GetXMlFile" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStatusInvoice">
+      <soap12:operation soapAction="http://tempuri.org/GetStatusInvoice" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getInvoiceByInvocieNumber">
+      <soap12:operation soapAction="http://tempuri.org/getInvoiceByInvocieNumber" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ServiceCreateInvoiceCode1">
+    <wsdl:port name="ServiceCreateInvoiceCode1Soap" binding="tns:ServiceCreateInvoiceCode1Soap">
+      <soap:address location="https://ehd.smartvas.vn:10888/ServiceCreateInvoiceCode1.asmx" />
+    </wsdl:port>
+    <wsdl:port name="ServiceCreateInvoiceCode1Soap12" binding="tns:ServiceCreateInvoiceCode1Soap12">
+      <soap12:address location="https://ehd.smartvas.vn:10888/ServiceCreateInvoiceCode1.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,20 @@
+﻿
+<div class="modal fade" id="confirmDeleteDataRowModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeletedModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title" id="confirmDeleteModalLabel">@Html.Raw("Thông báo")</h4>
+            </div>
+            <div class="modal-body">
+                <p id="confirmDeleteModalContent">@Html.Raw("Bạn có chắc chắn là muốn xóa dữ liệu này?")</p>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn vd_btn vd_bg-green" id="btnExecuteDeleted"><i class="append-icon fa fa-fw fa-check"></i>@Html.Raw(" Đồng ý")</button>
+                <button type="button" class="btn vd_btn vd_bg-grey" data-dismiss="modal"><i class="append-icon fa fa-fw fa-ban"></i>@Html.Raw(" Hủy bỏ")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

@@ -1,0 +1,50 @@
+﻿@model JetMedicalWebApp.Models.BaseViewModel
+@using JetMedicalWebApp.Common
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section banner {
+    <div id="gop_top">
+        @Html.Partial("Partial/Banner")
+    </div>
+}
+@Html.Partial("Partial/News")
+@Html.Partial("Partial/Package")
+<div class="page_contact_time">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="khung_contact_time">
+                    <div class="contact_time">
+                        <div class="khung_ct">
+                            <p class="title_ct"><i class="fas fa-map-marker-alt"></i> @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "Địa chỉ Bệnh viện" : "Hospital address")</p>
+                            <h5>Xã Tam Hiệp</h5>
+                            <p>
+                                Huyện Núi Thành - Tỉnh Quảng Nam
+                            </p>
+                        </div>
+                        <div class="khung_ct">
+                            <p class="title_ct"><i class="far fa-clock"></i> @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "Thời gian làm việc" : "The Working Hours Of Hospital")</p>
+                            <h5>T2 - T7, 7h30 - 16h30</h5>
+                            <p>@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "CẤP CỨU 24/7" : "EMERGENCY 24/7")</p>
+                        </div>
+
+                        <div class="khung_ct">
+                            <p class="title_ct"><i class="fas fa-phone-volume"></i> hotline</p>
+                            <h5>0967 951 313</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*@Html.Partial("Partial/Staff")
+
+
+    @Html.Partial("Partial/Feedback")*@
+
+
+

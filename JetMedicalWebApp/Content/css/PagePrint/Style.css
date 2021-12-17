@@ -1,0 +1,94 @@
+﻿
+@media print {
+    body {
+        margin: 0;
+        border: initial;
+        border-radius: initial;
+        width: initial;
+        min-height: initial;
+        box-shadow: initial;
+        background: initial;
+    }
+
+}
+
+#page-print {
+    font-family: "Times New Roman",Times, serif;
+    font-size: 12px;
+    object-fit: fill;
+}
+
+#page-print .content {
+    width: 100%; 
+    margin: 0;
+    position:absolute; 
+    display: contents;
+}
+
+#page-print .table-header {
+    width: 100%;
+}
+
+#page-print .ten-phieu {
+    width: 100%;
+    text-align: center;
+}
+
+#page-print table.table-content td {
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
+#page-print table.table-chi-tiet {
+    width: 100%;
+}
+
+#page-print table.table-chi-tiet td, #page-print table.table-chi-tiet th {
+    border: 1px solid black;
+}
+#page-print table th {
+    text-align:center; 
+}
+
+#page-print p {
+    margin-bottom: 0.2rem;
+}
+.noi-dung-in-an-modal {
+    background-color: whitesmoke;
+    color: black;
+    width: 20cm !important;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid;
+    box-shadow: 5px 10px #888888;
+}
+
+.font-weight-bold {
+    font-weight:bold;
+}
+
+.font-size-doc-tien {
+    font-size: 11px;
+}
+
+.div-tai-Khoan {
+    margin-left:70%;
+    margin-top: -60px;
+    position:absolute;
+}
+.div-so-chung-tu {
+    right: 80px;
+    margin-top: -110px;
+    font-size: 18px;
+    position:absolute;
+}
+.div-tai-Khoan > .table-tai-khoan {
+    width:100%; 
+    min-height:50px; 
+    margin-top:3px;
+}
+
+.print-title {
+    font-size: 23px;
+    font-weight:bold;
+}

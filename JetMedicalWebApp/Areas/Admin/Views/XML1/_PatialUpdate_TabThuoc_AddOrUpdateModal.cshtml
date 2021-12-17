@@ -1,0 +1,189 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        $('#btnExecuteAddNewDataRowThuoc').click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdate_Thuoc()) {
+                var fields = [
+                    'TEN_THUOC',
+                    'DON_VI_TINH',
+                    'DUONG_DUNG',
+                    'LIEU_DUNG',
+                    'SO_LUONG',
+                    'NGAY_YL',
+                    'MA_LK'
+                ];
+
+                var values = [
+                    $('#formAddNewDataRowThuoc_TEN_THUOC').val(),
+                    $('#formAddNewDataRowThuoc_DON_VI_TINH').val(),
+                    $('#formAddNewDataRowThuoc_DUONG_DUNG').val(),
+                    $('#formAddNewDataRowThuoc_LIEU_DUNG').val(),
+                    $('#formAddNewDataRowThuoc_SO_LUONG').val(),
+                    $('#formAddNewDataRowThuoc_NGAY_YL').val(),
+                    $('#FormUpdate_MA_LK').val()
+                ];
+
+                var formData = new FormData();
+
+                let filesUpload = $('#formAddNewDataRowThuoc_XML2_01').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    formData.append("file", filesUpload[0]);
+                }
+
+                formData.append("id", (selectedDataRow != null ? selectedDataRow.Id : ""));
+                formData.append("fields", JSON.stringify(fields));
+                formData.append("values", JSON.stringify(values));
+
+                var url = "@Url.Action("AddOrUpdate", "XML2", new { area = "Admin" })";
+
+                sendDataFileToURL(url, formData, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Lưu thành công.");
+                        $('#formAddNewDataRowThuoc')[0].reset();
+                        //$('#modalAddNewDataRowThuoc').modal('hide');
+                        resetDataThuoc();
+                    }
+                });
+            }
+        });
+
+        $('#formAddNewDataRowThuoc_XML2_01').on('change', function () {
+            let filesUploads = $('#formAddNewDataRowThuoc_XML2_01').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            $('#formAddNewDataRowThuoc_XML2_01_Text').val(fileName);
+        });
+    });
+
+    function resetDataThuoc() {
+        selectedDataRow = null;
+        tableThuoc.draw();
+    }
+    function checkFormUpdate_Thuoc() {
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmpty($('#formAddNewDataRowThuoc_TEN_THUOC').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tên thuốc';
+        }
+
+        if (isNullOrEmpty($('#formAddNewDataRowThuoc_LIEU_DUNG').val())) {
+            check = false;
+            error = 'Bạn chưa nhập liều dùng';
+        }
+
+        if (isNullOrEmpty($('#formAddNewDataRowThuoc_DUONG_DUNG').val())) {
+            check = false;
+            error = 'Bạn chưa nhập đường dùng';
+        }
+
+        if (isNullOrEmpty($('#formAddNewDataRowThuoc_NGAY_YL').val())) {
+            check = false;
+            error = 'Bạn chưa nhập ngày thêm đơn';
+        }
+
+        if (isNullOrEmpty($('#formAddNewDataRowThuoc_SO_LUONG').val())) {
+            check = false;
+            error = 'Bạn chưa nhập số lượng';
+        }
+        else
+        {
+            if (parseInt($('#formAddNewDataRowThuoc_SO_LUONG').val()) < 0) {
+                check = false;
+                error = 'Số lượng phải lớn hơn 0';
+            }
+        }
+
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+</script>
+
+
+
+
+<div class="modal fade" id="modalAddNewDataRowThuoc" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <h5 class="modal-title">@Html.Raw("Cập nhật")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-body">
+                    <form id="formAddNewDataRowThuoc" class="row g-3" action="#" role="form">
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Tên thuốc")</label>
+                            <input class="form-control" id="formAddNewDataRowThuoc_TEN_THUOC" type="text">
+                        </div>
+
+
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Đơn vị tính")</label>
+                            <input class="form-control" id="formAddNewDataRowThuoc_DON_VI_TINH" type="text">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Đường dùng")</label>
+                            <input class="form-control" id="formAddNewDataRowThuoc_DUONG_DUNG" type="text">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Liều dùng")</label>
+                            <input class="form-control" id="formAddNewDataRowThuoc_LIEU_DUNG" type="text">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Số lượng")</label>
+                            <input class="form-control" id="formAddNewDataRowThuoc_SO_LUONG" type="number">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Ngày thêm đơn")</label>
+                            <input class="form-control datepicker" id="formAddNewDataRowThuoc_NGAY_YL" type="text" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("File PDF")</label>
+                            <div class="input-group">
+                                <input id="formAddNewDataRowThuoc_XML2_01" class="form-control" type="file" name="formAddNewDataRowThuoc_XML2_01[]" accept="application/pdf">
+
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <input id="formAddNewDataRowThuoc_XML2_01_Text" class="form-control" type="text" readonly>
+                        </div>
+
+
+
+                    </form>
+
+                </div>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn btn-primary" id="btnExecuteAddNewDataRowThuoc">@Html.Raw(" Lưu")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

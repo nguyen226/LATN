@@ -1,0 +1,112 @@
+﻿@model JetMedicalWebApp.Models.BaseViewModel
+@{
+    Layout = "~/Views/Shared/_ContactLayout.cshtml";
+}
+
+    <script>
+    $(document).ready(function () {
+        $('#btnGuiThongTinTuVan').click(function () {
+            var url = "@Url.Action("AddOrUpdate", "NhanTuVan", new { area = "Member" })";
+
+                var fields = [
+                    'HoVaTen',
+                    'SoDienThoai',
+                    'Email',
+                    'TieuDe',
+                    'NoiDung'
+                ];
+                var values = [
+                    $('#formDangKyNhanTuVan_HoTen').val(),
+                    $('#formDangKyNhanTuVan_DienThoai').val(),
+                    $('#formDangKyNhanTuVan_Email').val(),
+                    $('#formDangKyNhanTuVan_TieuDe').val(),
+                    $('#formDangKyNhanTuVan_NoiDung').val()
+            ];
+
+                var data = {
+                    id: null,
+                    fields: fields,
+                    values: values
+                };
+
+                sendDataToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        showAlertErrorDatLichKham(res);
+                    }
+                    else {
+                        window.location.href = "/lien-he_c_1045";
+                    }
+                });
+        })
+    });
+
+    </script>
+
+<section class="back_all" style="position: relative;">
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="title_center">
+                        LIÊN HỆ VỚI CHÚNG TÔI
+                    </h3>
+                    <div class="left_lh" id="fot_1_mobile">
+                        <div class="title_content title_lh_form">
+                            <h4>ĐĂNG KÝ NHẬN TƯ VẤN</h4>
+                        </div>
+                        <p class="der_lh">Vui lòng để lại thông tin, chúng tôi sẽ liên hệ đến bạn sớm nhất.</p>
+
+                        <form class="lienhehe" method="post">
+                            <div class="box_group_from">
+                                <div class="inputfrom">
+                                    <input type="text" id="formDangKyNhanTuVan_HoTen" placeholder="Họ và tên..." required>
+                                </div>
+                            </div>
+                            <div class="box_group_from">
+                                <div class="inputfrom">
+                                    <input type="number" id="formDangKyNhanTuVan_DienThoai" placeholder="Số điện thoại..." required>
+                                </div>
+                            </div>
+                            <div class="box_group_from">
+                                <div class="inputfrom">
+                                    <input type="email" id="formDangKyNhanTuVan_Email" placeholder="Email..." required>
+                                </div>
+                            </div>
+                            <div class="box_group_from">
+                                <div class="inputfrom">
+                                    <input type="text" id="formDangKyNhanTuVan_TieuDe" placeholder="Tiêu đề..." required>
+                                </div>
+                            </div>
+                            <div class="box_group_from">
+                                <div class="inputfrom">
+                                    <textarea  id="formDangKyNhanTuVan_NoiDung" placeholder="Nội dung yêu cầu..." cols="60" rows="3" required></textarea>
+                                </div>
+                            </div>
+                            <div id="box_send" style="text-align: left;">
+                                <button class="send_mail regs" id="btnGuiThongTinTuVan"><i class="fas fa-emailsend"></i> GỬI THÔNG TIN </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="right_lh" id="fot_2_mobile">
+                        <div class="contant_lh_1">
+                            <h5 class="title_lh">
+                                ĐỊA CHỈ LIÊN HỆ
+                            </h5>
+
+                            @if (Model.Contact != null)
+                            {
+                                @Html.Raw(HttpUtility.HtmlDecode(Model.Contact.note));
+                            }
+                        </div>
+                    </div>
+                    <div class="mapsgg">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3833.9798933861593!2d108.23414831395887!3d16.066533143779836!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142182a70a5d4f9%3A0x386b8e86591cb4a8!2zMjE2IE5ndXnhu4VuIEPDtG5nIFRy4bupLCBBbiBI4bqjaSBC4bqvYywgU8ahbiBUcsOgLCDEkMOgIE7hurVuZyA1NTAwMDAsIFZp4buHdCBOYW0!5e0!3m2!1svi!2s!4v1588850538760!5m2!1svi!2s"
+                                width="100%" height="337" frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

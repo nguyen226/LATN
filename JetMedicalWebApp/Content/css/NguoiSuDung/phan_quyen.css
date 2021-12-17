@@ -1,0 +1,31 @@
+﻿.phan-quyen-control-sidebar-bg, .phan-quyen-control-sidebar {
+    right: -520px;
+    width:520px;
+}
+
+
+#phanQuyenContent .ten-menu-cap1 {
+    cursor:pointer;
+}
+
+#phanQuyenContent .customize-phan-quyen-box-header {
+    padding: 10px 0px 10px 0px;
+}
+
+#phanQuyenContent .box-title-phan-quyen {
+    width:100%;
+}
+
+    #phanQuyenContent .box-title-phan-quyen .title-menu-cap-2-container {
+        margin-bottom:10px;
+    }
+
+#phanQuyenContent .checkbox-phan-quyen-container label {
+    margin-right:10px;
+}
+
+#phanQuyenContent .checkbox-phan-quyen-container.form-group {
+    margin-bottom: 0; 
+    font-size:14px;
+}
+

@@ -1,0 +1,69 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.UsersViewModels
+@{
+    Layout = "~/Areas/Member/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Người dùng - bệnh nhân";
+}
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/bootstrap-datepicker-1-6-4/css/bootstrap-datepicker3.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatetimepicker.css")" type="text/css">
+
+}
+
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/js/bootstrap-datepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/locales/bootstrap-datepicker.vi.min.js")"></script>
+}
+
+
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/customiseDatepicker.js")"></script>
+}
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel widget light-widget">
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab1" data-toggle="tab" class="text-uppercase">@Html.Raw("Lịch sử khám")</a></li>
+                        </ul>
+                        <br />
+                        <div class="tab-content mgbt-xs-20">
+                            <div class="tab-pane active" id="tab1">
+                                @Html.Partial("_PartialLichSuKham")
+                            </div>
+                        </div>
+                    </div>
+                    <!-- col-sm-12 -->
+                </div>
+                <!-- row -->
+            </div>
+        </div>
+        <!-- Panel Widget -->
+    </div>
+    <!-- col-sm-12-->
+</div>
+

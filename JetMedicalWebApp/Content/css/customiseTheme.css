@@ -1,0 +1,373 @@
+﻿@font-face {
+    font-family: Poppins;
+    src: url(../../fonts/Poppins-Regular.ttf);
+}
+
+body {
+    font-family: 'Poppins', 'Open Sans', 'arial';
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Poppins', 'Open Sans', 'arial';
+}
+
+.panel .no-title {
+    height: 40px;
+}
+
+.modal-backdrop {
+    background-color: #fff;
+}
+
+.d-flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flex-end {
+    align-items: flex-end;
+}
+
+.largerFont {
+    width: 35px !important;
+    height: 30px !important;
+    font-size: 26px !important;
+    line-height: 35px !important;
+}
+
+
+.content-chat .list-wrapper > .group-heading {
+    padding: 13px 10px !important;
+}
+
+
+.width-400 {
+    width: 500px !important;
+    z-index: 100;
+}
+
+.nav-right-hide .vd_navbar-right {
+    margin-right: -500px;
+}
+
+
+.vd_navbar-white {
+    background-color: #fff !important;
+    color: #fff;
+}
+
+.vd_navbar-white {
+    background-color: #fff !important;
+    color: #fff;
+}
+
+.rightWidth-400 a {
+    color: #fff;
+}
+
+
+
+
+.rightWidth-400 ul li .child-menu {
+    background: #fff;
+    font-weight: bold;
+}
+
+.menu-text {
+    font-weight: bold;
+}
+
+.blockUI.blockOverlay {
+    z-index: 100000 !important;
+}
+
+.blockUI.blockMsg.blockElement {
+    z-index: 100011 !important;
+}
+
+
+.vd_menu-search-text:focus, textarea:focus {
+    background-color: #fff;
+    border-color: #fff;
+    outline-width: 0;
+}
+
+
+.tagsinput {
+    padding: 0px;
+    min-height: 34px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+    .tagsinput .tag {
+        margin-bottom: 0px;
+    }
+
+    .tagsinput div input {
+        margin: 0px;
+    }
+
+.truncateText {
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.truncateText-350px, .truncateText-350px p {
+    width: 350px;
+}
+
+.truncateText-150px, .truncateText-150px p {
+    width: 150px;
+}
+
+.table-search .tag-input {
+    padding: 3px 0px 0px 0px;
+}
+
+.table-search .tagsinput {
+    border-width: 0px;
+}
+
+.vd_content-wrapper {
+    min-height: 950px !important;
+}
+
+header .vd_top-nav .vd_panel-header .logo a {
+    width: auto;
+}
+
+.vd_navbar {
+    background-color: #00AB9D !important;
+    color: #fff;
+}
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus {
+    background-color: #00AB9D !important;
+    border-color: #00AB9D !important;
+}
+
+a, a:hover {
+    color: #00AB9D;
+}
+
+    a:hover > span {
+        color: #FFF;
+    }
+
+
+.vd_menu-search > input:focus {
+    border: none;
+}
+
+.width-400 ul.nav-tabs li a {
+    background: #fff !important;
+}
+
+#noiDungTableCongTy tr td {
+    background: #00AB9D !important;
+    color: white;
+    border: none;
+}
+
+#flotTip {
+    padding: 3px 5px;
+    background-color: #000;
+    z-index: 100;
+    color: #fff;
+    opacity: .80;
+    filter: alpha(opacity=85);
+}
+
+.panel-body-list.table-responsive {
+    min-height: 300px;
+}
+
+
+.tooltip-inner {
+    min-width: 150px !important;
+}
+
+
+
+.rightWidth-400 a > .menu-text {
+    color: #000;
+}
+
+.p-0 {
+    padding: 0px !important;
+}
+
+@media (max-width: 991px) {
+    header .vd_top-nav .vd_panel-header .logo {
+        display: none;
+    }
+
+    .largerFont {
+        font-size: 18px !important;
+        line-height: 26px !important;
+        width: auto !important;
+    }
+
+    .vd_menu-search {
+        width: 80% !important;
+    }
+}
+
+.d-none {
+    display: none;
+}
+
+
+.pb-0 {
+    padding-bottom: 0px;
+}
+
+
+
+.pt-0 {
+    padding-top: 0px;
+}
+
+.p-0 {
+    padding: 0px;
+}
+
+.mh-100px {
+    min-height: 100px;
+}
+
+.modal-lgxx {
+    width: 95%;
+}
+
+.vd_bg-dark-green2 {
+    background-color: #00AB9D !important;
+}
+
+.vd-white {
+    color: white;
+}
+
+.chitiet.vd_content-wrapper {
+    min-height: 50px !important;
+}
+
+.modal-body iframe {
+    width: 100%;
+}
+
+@media (min-width: 991px) {
+    .NoiDungEmail {
+        position: relative;
+        width: 354px;
+        height: 700px;
+        background: url(../images/backgoundChienDich/Noti-Gmail.png);
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+
+    /* The screen (or content) of the device */
+    .NoiDungEmail .contentBaiViet {
+        padding: 20px;
+        max-height: 1024px !important;
+    }
+
+    .NoiDungEmail .contentBaiViet .contentTitle {
+        padding: 0 5px;
+        margin-top: 70px;
+        max-height: 70px;
+        overflow-y: scroll;
+        font-weight: bold;
+         font-size: large;
+    }
+
+    .NoiDungEmail .contentBaiViet .contentDetail {
+        padding: 0 5px;
+        margin-top: 40%;
+        max-height: 180px;
+        overflow-y: scroll;
+    }
+}
+
+@media (max-width: 991px) {
+    .NoiDungEmail {
+        display:none;
+    }
+}
+
+
+@media (min-width: 991px) {
+    .NoiDungTinTuc {
+        position: relative;
+        padding-top: 295px;
+    padding-left: 30px;
+        width: 354px;
+        height:700px;
+        background: url(../images/backgoundChienDich/Noti-App.png);
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+    /* The screen (or content) of the device */
+    .NoiDungTinTuc .contentTinTuc {        
+        max-height: 60px !important;
+        word-break: break-word;
+        overflow-y: scroll
+    }
+}
+
+@media (max-width: 991px) {
+    .NoiDungTinTuc {
+       display:none;
+    }
+}
+
+
+@media (min-width: 991px) {
+    .NoiDungSMS {
+        position: relative;
+        padding-top: 165px;
+        width: 354px;
+        height: 700px;
+        background: url(../images/backgoundChienDich/Noti-mess1.png);
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+
+   
+
+
+    /* The screen (or content) of the device */
+    .NoiDungSMS .contentSMS {
+        margin: 0 40px;
+        max-width: 250px;
+        max-height: 120px !important;
+        word-break: break-word;
+        overflow-y: scroll;
+    }
+}
+
+@media (max-width: 991px) {
+    .NoiDungSMS {
+       display:none;
+    }
+}
+
+.vd_menu-search{
+    border-radius:4px !important;
+}

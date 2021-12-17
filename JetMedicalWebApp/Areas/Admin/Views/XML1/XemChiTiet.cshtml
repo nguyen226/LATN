@@ -1,0 +1,346 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.XML1ViewModels
+@{
+    ViewBag.Title = "Lượt khám / điều trị";
+    Layout = "~/Views/Shared/_LayoutChiTiet.cshtml";
+
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/bootstrap-datepicker-1-6-4/css/bootstrap-datepicker3.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatetimepicker.css")" type="text/css">
+}
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-datetimepicker/moment/js/moment-with-locales.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/js/bootstrap-datepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/locales/bootstrap-datepicker.vi.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/customiseDatepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/customiseDatetimepicker.js")"></script>
+}
+<style>
+    div.tagsinput {
+        width: 100% !important;
+    }
+</style>
+<script type="text/javascript">
+    var xML1Data = null;
+    var selectedDataRow = null;
+
+    @if(Model.XML1 != null)
+    {
+        <text>
+    xML1Data = {
+        id: '@Model.XML1.MA_LK'
+    };
+    </text>
+    }
+
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker(initialDatepickerOption());
+        $('.datetimepicker').datetimepicker(initialDatetimepickerOption());
+        initialSelect2Option();
+
+        $('.nav-tabs a').on('click', function(){
+            var element = $(this);
+            setTimeout(function(){
+                switch (element.attr("href")) {
+                    case "#tab1":
+                        if (typeof tableThuoc !== 'undefined') {
+                            tableThuoc.columns.adjust();
+                        }
+                        break;
+                    case "#tab2":
+                        if (typeof tableCanLamSang !== 'undefined') {
+                            tableCanLamSang.columns.adjust();
+                        }
+                        break;
+                    case "#tab3":
+                        if (typeof tableDichVu !== 'undefined') {
+                            tableDichVu.columns.adjust();
+                        }
+                        break;
+                }
+            }, 50);
+        });
+    });
+
+    function initialSelect2Option() {
+        $('.select2-local').select2();
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn khoa";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Khoa", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'Id, Code, Name';
+                var condition = params.term ? ' (Code.Contains(\\' + params.term.trim() + '\\) OR Name.Contains(\\' + params.term.trim() + '\\))' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'Code asc, Name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.Code,
+                        text: item.Name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#FormUpdate_MA_KHOA').select2(dropdownlistSelect2Option);
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn mã bệnh";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "ICD10", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'Id, Ma';
+                var condition = params.term ? ' (Ma.Contains(\\' + params.term.trim() + '\\))' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'Ma asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.Ma,
+                        text: item.Ma
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#FormUpdate_MA_BENH').select2(dropdownlistSelect2Option);
+
+        $('#FormUpdate_MA_BENHKHAC').tagsInput({
+            placeholder: 'Chọn mã bệnh kèm',
+            unique: true,
+            clearText: true,
+            delimiter: ';',
+            errorMessage: 'Mã bệnh kèm này đã tồn tại.',
+            errorTitle: 'Lỗi',
+            autocomplete: {
+                source: function (request, response) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Filter", "ICD10", new { area = "Admin" })',
+                        dataType: 'json',
+                        contentType: "application/json",
+                        delay: 250,
+                        data: JSON.stringify({
+                            selectedFields: 'Id, Ma',
+                            stringFilter: request.term ? ' (Ma.Contains(\\' + request.term.trim() + '\\))' : '',
+                            sortCondition: 'Ma asc',
+                            top: 10,
+                        }),
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return item.Ma;
+                            }));
+                        }
+                    })
+                }
+            }
+        });
+    }
+</script>
+
+<div class="row">
+    <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+        <div class="panel widget light-widget">
+            <div class="panel-body" id="panelBody">
+                <form id="formUpdate">
+                    <div class="row d-flex">
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_MA_BN">@Html.Raw("Mã bệnh nhân")</label>
+                            <input id="FormUpdate_MA_BN" name="FormUpdate_MA_BN" class="form-control" readonly placeholder="Mã bệnh nhân" value="@(Model.XML1 != null ? Model.XML1.MA_BN : (Model.UserInfo != null ? Model.UserInfo.MA_BN : string.Empty))">
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_MA_LK">@Html.Raw("Mã lượt khám")</label>
+                            <input id="FormUpdate_MA_LK" name="FormUpdate_MA_LK" class="form-control" placeholder="Mã lượt khám" value="@(Model.XML1 != null ? Model.XML1.MA_LK : string.Empty)">
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_LASTNAME">@Html.Raw("Họ")</label>
+                            <input id="FormUpdate_LASTNAME" name="FormUpdate_LASTNAME" class="form-control" readonly placeholder="Họ" value="@(Model.XML1 != null ? Model.XML1.LASTNAME : (Model.UserInfo != null ? Model.UserInfo.LastName : string.Empty))">
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_FIRSTNAME">@Html.Raw("Tên BN")</label>
+                            <input id="FormUpdate_FIRSTNAME" name="FormUpdate_FIRSTNAME" class="form-control" readonly placeholder="Tên BN" value="@(Model.XML1 != null ? Model.XML1.FIRSTNAME : (Model.UserInfo != null ? Model.UserInfo.FirstName : string.Empty))">
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_NGAY_VAO">@Html.Raw("Ngày vào")</label>
+                            <input id="FormUpdate_NGAY_VAO" name="FormUpdate_NGAY_VAO" class="form-control datetimepicker" placeholder="Ngày vào" value="@(Model.XML1 != null ? Model.XML1.STRNGAY_VAO : DateTime.Now.ToString("dd/MM/yyyy HH:mm"))">
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_NGAY_RA">@Html.Raw("Ngày ra")</label>
+                            <input id="FormUpdate_NGAY_RA" name="FormUpdate_NGAY_RA" class="form-control datetimepicker" placeholder="Ngày ra" value="@(Model.XML1 != null ? Model.XML1.STRNGAY_RA: string.Empty)">
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_NGAY_TAI_KHAM">@Html.Raw("Ngày tái khám")</label>
+                            <input id="FormUpdate_NGAY_TAI_KHAM" name="FormUpdate_NGAY_TAI_KHAM" class="form-control datetimepicker" placeholder="Ngày tái khám" value="@(Model.XML1 != null ? Model.XML1.STRNGAY_TAI_KHAM: string.Empty)">
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_MA_BENH">@Html.Raw("Mã bệnh")</label>
+                            <select id="FormUpdate_MA_BENH" name="FormUpdate_MA_BENH" class="form-control select2">
+                                @if (Model.XML1 != null)
+                                {
+                                    <option value="@Model.XML1.MA_BENH" selected>@Html.Raw(Model.XML1.MA_BENH)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-8 col-lg-8 form-group">
+                            <label class="form-label" for="FormUpdate_MA_BENHKHAC">@Html.Raw("Mã bệnh kèm")</label>
+                            <input id="FormUpdate_MA_BENHKHAC" name="FormUpdate_MA_BENHKHAC" type="text" class="form-control tags" placeholder="Mã bệnh kèm" value="@(Model.XML1 != null ? Model.XML1.MA_BENHKHAC : string.Empty)" />
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_KET_QUA_DTRI">@Html.Raw("Kết quả điều trị")</label>
+                            <select id="FormUpdate_KET_QUA_DTRI" name="FormUpdate_KET_QUA_DTRI" class="form-control select2-local">
+                                <option value="-1" selected></option>
+                                @foreach (var item in CommonConstants.GetListKetQuaDieuTri())
+                                {
+                                    <option value="@item.Id" @(Model.XML1 != null ? Model.XML1.KET_QUA_DTRI == item.Id ? "selected" : "" : "")>@Html.Raw(item.Name)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_TINH_TRANG_RV">@Html.Raw("Kết quả điều trị")</label>
+                            <select id="FormUpdate_TINH_TRANG_RV" name="FormUpdate_TINH_TRANG_RV" class="form-control select2-local">
+                                <option value="-1" selected></option>
+                                @foreach (var item in CommonConstants.GetListTinhTrangRaVien())
+                                {
+                                    <option value="@item.Id" @(Model.XML1 != null ? Model.XML1.TINH_TRANG_RV == item.Id ? "selected" : "" : "")>@Html.Raw(item.Name)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <label class="form-label" for="FormUpdate_MA_KHOA">@Html.Raw("Khoa điều trị")</label>
+                            <select id="FormUpdate_MA_KHOA" name="FormUpdate_MA_KHOA" class="form-control select2">
+                                @if (Model.XML1 != null)
+                                {
+                                    <option value="@Model.XML1.MA_KHOA" selected>@Html.Raw(Model.XML1.TEN_KHOA)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 form-group">
+                            <label class="form-label" for="FormUpdate_TEN_BENH">@Html.Raw("Tên bệnh")</label>
+                            <input id="FormUpdate_TEN_BENH" name="FormUpdate_TEN_BENH" class="form-control" placeholder="Tên bệnh" value="@(Model.XML1 != null ? Model.XML1.TEN_BENH : string.Empty)">
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 form-group">
+                            <label class="form-label" for="FormUpdate_CHUAN_DOAN">@Html.Raw("Chuẩn đoán")</label>
+                            <input id="FormUpdate_CHUAN_DOAN" name="FormUpdate_CHUAN_DOAN" type="text" class="form-control" placeholder="Chuẩn đoán" value="@(Model.XML1 != null ? Model.XML1.CHUAN_DOAN : string.Empty)" />
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6 form-group">
+                            <label class="form-label" for="FormUpdate_PPDIEUTRI">@Html.Raw("Phương pháp điều trị")</label>
+                            <input id="FormUpdate_PPDIEUTRI" name="FormUpdate_PPDIEUTRI" type="text" class="form-control" placeholder="Phương pháp điều trị" value="@(Model.XML1 != null ? Model.XML1.PPDIEUTRI : string.Empty)" />
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6 form-group">
+                            <label class="form-label" for="FormUpdate_LOIDANTHAYTHUOC">@Html.Raw("Lời dặn thầy thuốc")</label>
+                            <input id="FormUpdate_LOIDANTHAYTHUOC" name="FormUpdate_LOIDANTHAYTHUOC" type="text" class="form-control" placeholder="Lời dặn thầy thuốc" value="@(Model.XML1 != null ? Model.XML1.LOIDANTHAYTHUOC : string.Empty)" />
+                        </div>
+
+                        <div class="col-sm-12 col-md-6 col-lg-6 form-group">
+                            <label class="form-label" for="FormUpdate_GHICHU">@Html.Raw("Ghi chú")</label>
+                            <input id="FormUpdate_GHICHU" name="FormUpdate_GHICHU" type="text" class="form-control" placeholder="Ghi chú" value="@(Model.XML1 != null ? Model.XML1.GHICHU : string.Empty)" />
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6 form-group">
+                            <label class="form-label" for="FormUpdate_XML1_File">@Html.Raw("PDF file")</label>
+                            <div class="input-group">
+                                <input id="FormUpdate_XML1_File_Text" type="text" readonly value="@(Model.XML1 != null ? Model.XML1.XML1_File : string.Empty)" />
+                                @if (Model.XML1 != null && !string.IsNullOrEmpty(Model.XML1.XML1_File))
+                                {
+                                    <a class="input-group-addon btn vd_btn vd_bg-blue fileinput-button" target="_blank" href="@CommonConstants.DuongDanThuMucTapTin/@Model.XML1.XML1_File">
+                                        <i class="glyphicon glyphicon-download"></i> <span>@Html.Raw("Tải file")</span>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" @(Model.XML1 == null ? "hidden" : "")>
+    <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+        <div class="panel vd_transaction-widget light-widget widget">
+            <div class="panel-body">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab1" data-toggle="tab" class="text-uppercase">@Html.Raw("Thuốc")</a></li>
+                    <li><a href="#tab3" data-toggle="tab" class="text-uppercase">@Html.Raw("Kết quả CLS")</a></li>
+                    @*<li><a href="#tab3" data-toggle="tab" class="text-uppercase">@Html.Raw("Dịch vụ kỹ thuật")</a></li>*@
+                </ul>
+                <br />
+                <div class="tab-content mgbt-xs-20">
+                    <div class="tab-pane active" id="tab1">
+                        @Html.Partial("_PatialUpdate_TabThuoc")
+                    </div>
+                    @*<div class="tab-pane" id="tab2">
+                @Html.Partial("_PatialUpdate_TabKetQuaCanLamSang")
+            </div>*@
+                    <div class="tab-pane" id="tab3">
+                        @Html.Partial("_PatialUpdate_TabDichVu")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_PatialUpdate_TabThuoc_AddOrUpdateModal")
+@Html.Partial("_PatialUpdate_TabKetQuaCanLamSang_AddOrUpdateModal")
+@Html.Partial("_PatialUpdate_TabDichVu_AddOrUpdateModal")
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

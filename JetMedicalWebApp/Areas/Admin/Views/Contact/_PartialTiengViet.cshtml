@@ -1,0 +1,86 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.ContactViewModels
+
+<script>
+    $(document).ready(function () {
+        CKEDITOR.replace('noteVN', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+
+        CKEDITOR.replace('footerVN', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+
+    });
+</script>
+
+
+<input type="text" id="idVN" class="form-control" hidden value="@(Model.ContactVN != null ? Model.ContactVN.id : 0)">
+<div class="mb-2">
+    <select class="form-select select2-local" id="languageId">
+        @foreach (var item in CommonConstants.GetDanhSachNgonNgu())
+        {
+            if (Model.ContactVN != null)
+            {
+                if (Model.ContactVN.languageId == item.Id)
+                {
+                    <option value="@item.Id" selected>@Html.Raw(item.Name)</option>
+                }
+                else
+                {
+                    <option value="@item.Id">@Html.Raw(item.Name)</option>
+                }
+            }
+            else
+            {
+                <option value="@item.Id" @if (item.Id == Model.LanguageId) { <text> selected </text> }>@Html.Raw(item.Name)</option>
+            }
+        }
+    </select>
+</div>
+<div class="mb-2">
+    <label class="form-label">@Html.Raw("Hotline")</label>
+    <input type="text" id="addressVN" class="form-control" placeholder="Địa chỉ" value="@(Model.ContactVN != null ? Model.ContactVN.address : "")">
+</div>
+
+<div class="mb-2">
+    <div class="form-label">Email</div>
+    <input type="text" id="emailVN" class="form-control" placeholder="Email" value="@(Model.ContactVN != null ? Model.ContactVN.email : "")">
+</div>
+
+<div class="mb-2">
+    <div class="row">
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+            <div class="form-label">Điện thoại</div>
+            <input type="text" id="phoneVN" class="form-control" placeholder="Điện thoại" value="@(Model.ContactVN != null ? Model.ContactVN.phone : "")">
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+            <div class="form-label">Hotline</div>
+            <input type="text" id="hotlineVN" class="form-control" placeholder="Hotline" value="@(Model.ContactVN != null ? Model.ContactVN.hotline : "")">
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+            <div class="form-label">Fax</div>
+            <input type="text" id="faxVN" class="form-control" placeholder="Fax" value="@(Model.ContactVN != null ? Model.ContactVN.fax : "")">
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 form-group">
+            <div class="form-label">Note</div>
+            <textarea rows="50" class="form-control m-input" id="noteVN" placeholder="Nội dung">@Html.Raw(Model.ContactVN != null ? Model.ContactVN.note.Replace("&nbsp;", " ") : "")</textarea>
+        </div>
+
+
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 form-group">
+            <div class="form-label">Footer</div>
+            <textarea rows="50" class="form-control m-input" id="footerVN" placeholder="Nội dung">@Html.Raw(Model.ContactVN != null ? Model.ContactVN.footer.Replace("&nbsp;", " ") : "")</textarea>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,163 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.ChienDichViewModels
+@{
+    ViewBag.Title = "Thông tin chi tiết";
+    Layout = "~/Views/Shared/_LayoutChiTiet.cshtml";
+}
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var chienDich = null;
+    @if (Model.ChienDich != null)
+    {
+        <text>
+    chienDich = {
+        id: '@Model.ChienDich.Id'
+    }
+    </text>
+    };
+
+    var tableChiTiet
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (tableChiTiet) !== 'undefined') {
+                tableChiTiet.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "ChienDichId, TrangThai,HO_TEN,EmailId, GhiChu";
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "LichSuGuiChienDich", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = ' ChienDichId = ' + (chienDich != null ? chienDich.id : -1);
+
+                if (!isNullOrEmpty($('#quickSearchHoTen').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(HO_TEN LIKE N'%" + $('#quickSearchHoTen').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchEmail').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(EmailId LIKE N'%" + $('#quickSearchEmail').val().trim() + "%')";
+                }
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableChiTiet.columns.adjust();
+        };
+
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "HO_TEN", "name": "HO_TEN", "autoWidth": true, "title": "Họ tên" },
+            { "data": "EmailId", "name": "EmailId", "autoWidth": true, "title": "Email" },
+            { "data": "GhiChu", "name": "GhiChu", "autoWidth": true, "title": "Ghi chú" },
+            {
+                "data": "TrangThai", "name": "TrangThai", "title": "Trạng thái", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    switch (data) {
+                        case 1:
+                            content = '<span class="text-uppercase vd_bd-green vd_green">Thành công</span>';
+                            break;
+
+                        case 2:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Thất bại</span>';
+                            break;
+                    }
+                    return content;
+                }, width: "30px"
+            }
+        ]
+
+        tableChiTiet = $('#dtTableChiTiet').DataTable(datatableOption);
+
+        $('#dtTableChiTiet tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableChiTiet.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            selectedDataRow = tableChiTiet.row($(this)).data();
+        });
+
+
+        $("#btnRefreshData").click(function () {
+            resetCheckboxAndTable();
+        });
+
+        $('#quickSearchHoTen, #quickSearchEmail').keyup(function (e) {
+            e.preventDefault();
+            resetCheckboxAndTable();
+        });
+    });
+
+    function resetCheckboxAndTable() {
+        tableChiTiet.draw();
+    }
+</script>
+
+<div class="row">
+    <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+        <div class="panel widget light-widget">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-2 col-xs-12">
+                        <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                            <input type="text" id="quickSearchHoTen"  class="form-control" placeholder="họ tên" onchange="resetCheckboxAndTable()">
+                            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 col-xs-12">
+                        <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                            <input type="text" id="quickSearchEmail"  class="form-control" placeholder="Email" onchange="resetCheckboxAndTable()">
+                            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <table id="dtTableChiTiet" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

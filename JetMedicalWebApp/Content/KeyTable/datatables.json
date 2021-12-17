@@ -1,0 +1,13 @@
+{
+    "css": [
+        "css/keyTable.dataTables.css",
+        "css/keyTable.dataTables.min.css"
+    ],
+    "js": [
+        "js/keyTable.dataTables.js",
+        "js/keyTable.dataTables.min.js"
+    ],
+    "src-repo": "http://github.com/DataTables/KeyTable",
+    "last-sync": "a55908872aadf36b6df974a907c7c9aaf0b65441",
+    "last-tag": "2.5.0"
+}

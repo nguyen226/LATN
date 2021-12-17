@@ -1,0 +1,89 @@
+﻿.common-img-bg {
+    /*background: url("/Content/metronic/default/dist/default/assets/app/media/img/bg/bg-3.jpg")no-repeat center center !important;*/
+}
+
+select{
+    border:none;
+    color: #7668a4;
+    margin-top:10px;
+    background-color: #24143f;
+    width: 100%;
+    height: 59px;
+    padding: 1rem 1.5rem;
+    border-radius: 40px;
+    font-weight: bold;
+    outline:none;
+}
+
+.m-login.m-login--2.m-login-2--skin-2 .m-login__container .m-login__head{
+    text-align: center;
+     color: #f9f5ff; 
+}
+
+#checkboxGhiNho, .m_login_forget_password{
+    color:#5e5288 !important;
+}
+
+#iconLock{
+    font-size:30px; color:#5e5288;
+}
+
+#noiDungLoi{
+    color:black;
+}
+
+#m_login{
+    background-image:url(/Content/images/Smarttax-webdesign.jpg);
+    background-size: cover;
+    background-position: bottom left;
+    background-repeat: no-repeat;
+    
+}
+
+.m-login__container {
+   background: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 0 !important;
+}
+
+.m-login__container img{
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+    margin-left: -15px;
+}
+
+.m-login.m-login--2 .m-login__wrapper .m-login__container .m-login__logo {
+    margin: 0 !important;
+}
+
+.m-login.m-login--2 .m-login__wrapper .m-login__container .m-login__form {
+    margin: 0.5rem auto !important;
+}
+
+.m-login.m-login--2 .m-login__wrapper .m-login__container .m-login__form .m-form__group .form-control {
+     border-radius:0px !important 
+}
+
+#m_login_signin_submit{
+    background-color: #3c8dbc !important;
+    border-color: #39abd1 !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+    outline:none;
+}
+
+.m-login.m-login--2.m-login-2--skin-3 .m-login__container .m-login__form .form-control {
+    background: rgb(232, 240, 254) !important;
+}
+
+.customNoPadding{
+    padding : 0 !important;
+}
+
+
+.m-login.m-login--2 .m-login__wrapper .m-login__container .m-login__form .m-form__group .form-control {
+    padding: 1rem 1rem !important;
+    margin-top: 0.5rem !important;
+}

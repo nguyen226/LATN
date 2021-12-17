@@ -1,0 +1,155 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        $('#btnExecuteAddNewDataRowDichVu').click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdate_DichVu()) {
+                var fields = [
+                    'MA_DICH_VU',
+                    'TEN_DICH_VU',
+                    'DON_VI_TINH',
+                    'NGAY_KQ',
+                    'MA_LK'
+                ];
+
+                var values = [
+                    $('#formAddNewDataRowDichVu_MA_DICH_VU').val(),
+                    $('#formAddNewDataRowDichVu_TEN_DICH_VU').val(),
+                    $('#formAddNewDataRowDichVu_DON_VI_TINH').val(),
+                    $('#formAddNewDataRowDichVu_NGAY_KQ').val(),
+                    $('#FormUpdate_MA_LK').val()
+                ];
+
+                var formData = new FormData();
+
+                let filesUpload = $('#formAddNewDataRowDichVu_XML3_01').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    formData.append("file", filesUpload[0]);
+                }
+
+                formData.append("id", (selectedDataRow != null ? selectedDataRow.Id : ""));
+                formData.append("fields", JSON.stringify(fields));
+                formData.append("values", JSON.stringify(values));
+
+                var url = "@Url.Action("AddOrUpdate", "XML3", new { area = "Admin" })";
+
+                sendDataFileToURL(url, formData, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Lưu thành công.");
+                        $('#formAddNewDataRowDichVu')[0].reset();
+                        resetDataDichVu();
+                    }
+                });
+            }
+        });
+
+        $('#formAddNewDataRowDichVu_XML3_01').on('change', function () {
+            let filesUploads = $('#formAddNewDataRowDichVu_XML3_01').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            $('#formAddNewDataRowDichVu_XML3_01_Text').val(fileName);
+        });
+    });
+
+    function resetDataDichVu() {
+        selectedDataRow = null;
+        tableDichVu.draw();
+    }
+    function checkFormUpdate_DichVu() {
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmpty($('#formAddNewDataRowDichVu_TEN_DICH_VU').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tên dịch vụ';
+        }
+
+        if (isNullOrEmpty($('#formAddNewDataRowDichVu_DON_VI_TINH').val())) {
+            check = false;
+            error = 'Bạn chưa nhập đơn vị tính';
+        }
+
+        if (isNullOrEmpty($('#formAddNewDataRowDichVu_NGAY_KQ').val())) {
+            check = false;
+            error = 'Bạn chưa nhập ngày kết quả';
+        }
+
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+</script>
+
+
+<div class="modal fade" id="modalAddNewDataRowDichVu" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <h5 class="modal-title">@Html.Raw("Cập nhật")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-body">
+                    <form id="formAddNewDataRowDichVu" class="row g-3" action="#" role="form">
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Mã dịch vụ")</label>
+                            <input class="form-control" id="formAddNewDataRowDichVu_MA_DICH_VU" type="text">
+                        </div>
+
+
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Tên dịch vụ")</label>
+                            <input class="form-control" id="formAddNewDataRowDichVu_TEN_DICH_VU" type="text">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Đơn vị tính")</label>
+                            <input class="form-control" id="formAddNewDataRowDichVu_DON_VI_TINH" type="text">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Ngày kết quả")</label>
+                            <input class="form-control datepicker" id="formAddNewDataRowDichVu_NGAY_KQ" type="text" value="@DateTime.Now.ToString("dd/MM/yyyy")">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("File PDF")</label>
+                            <div class="input-group">
+                                <input id="formAddNewDataRowDichVu_XML3_01" class="form-control" type="file" name="formAddNewDataRowDichVu_XML3_01[]" accept="application/pdf">
+
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <input id="formAddNewDataRowDichVu_XML3_01_Text" class="form-control" type="text" readonly>
+                        </div>
+
+
+
+                    </form>
+
+                </div>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn btn-primary" id="btnExecuteAddNewDataRowDichVu">@Html.Raw(" Lưu")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,121 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.ContactViewModels
+@{
+    ViewBag.Title = "Liên hệ";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatetimepicker.css")" type="text/css">
+}
+
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/ckeditor/ckeditor.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/ckfinder/ckfinder.js")"></script>
+}
+
+<script>
+    $(document).ready(function () {
+        $("#languageId").change(function (e) {
+            window.location.href = "/Admin/Contact/Index?languageId=" + $(this).val();
+        });
+
+        $("#btnCapNhat").click(function (e) {
+            e.preventDefault();
+
+            var url = "@Url.Action("AddOrUpdate", "Contact", new { area = "Admin" })";
+            var values = {
+                id: $('#idVN').val(),
+                address: $('#addressVN').val(),
+                phone: $('#phoneVN').val(),
+                hotline: $('#hotlineVN').val(),
+                email: $('#emailVN').val(),
+                fax: $('#faxVN').val(),
+                note: CKEDITOR.instances.noteVN.getData(),
+                footer: CKEDITOR.instances.footerVN.getData(),
+                languageId: $('#languageId').val()
+            };
+
+
+            var data = {
+                listItem: [values]
+            };
+
+            var url = "@Url.Action("AddOrUpdate", "Contact", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    Lobibox.notify('warning', {
+                        pauseDelayOnHover: true,
+                        continueDelayOnInactiveTab: false,
+                        position: 'top right',
+                        icon: 'bx bx-error',
+                        msg: res
+                    });
+                }
+                else {
+                    notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Lưu thành công.");
+
+                    Lobibox.notify('success', {
+                        pauseDelayOnHover: true,
+                        continueDelayOnInactiveTab: true,
+                        position: 'top right',
+                        icon: 'bx bx-check-circle',
+                        msg: 'Thêm mới/cập nhật thành công.'
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+
+<form id="formUpdate">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs nav-primary" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#contact" role="tab" aria-selected="false">
+                        <div class="d-flex align-items-center">
+                            <div class="tab-icon">
+                                <i class='bx bx-user-pin font-18 me-1'></i>
+                            </div>
+                            <div class="tab-title">Liên hệ</div>
+                        </div>
+                    </a>
+                </li>
+                
+            </ul>
+            <div class="tab-content py-3">
+                <div class="tab-pane fade  show active" id="contact" role="tabpanel">
+                    @Html.Partial("_PartialTiengViet")
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>

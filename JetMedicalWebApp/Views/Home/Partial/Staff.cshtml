@@ -1,0 +1,61 @@
+@using JetMedicalWebApp.Entities.EntityDto
+@model JetMedicalWebApp.Models.BaseViewModel
+@using JetMedicalWebApp.Common
+<div id="page_3">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="khung_nd_gt">
+                    <div class="box_nd_gt">
+                        <h3 class="title_right">
+                            @Html.Raw(ViewBag.DoiNguChuyenGia)@*ĐỘI NGŨ BÁC SĨ - CHUYÊN GIA*@
+                        </h3>
+                        <p class="descript_title">
+                            @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "Đội ngũ y bác sĩ có trình độ chuyên môn cao và đầy nhiệt huyết cùng trang thiết bị hiện đại và kỹ thuật tiên tiến. Phục vụ tận tình, ân cần, chính xác và chu đáo là những tiêu chí hàng đầu chúng tôi mang đến cho Quý bệnh nhân và Quý khách hàng." : "A team of doctors with high professional qualifications and enthusiasm, modern equipment and advanced technology. Dedicated, considerate, accurate and attentive service are the top criteria we bring to our patients and customers.")
+                            
+                            
+                        </p>
+                        <div class="more_tatca">
+                            <a href="/gioi-thieu/gioi-thieu-tong-quan_a_2" class="more"><i class="fa fa-eye"></i>@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "XEM THÊM VỀ CHÚNG TÔI" : "MORE ABOUT US")</a>
+                        </div>
+                    </div>
+                    <div class="box_img_gt">
+                        <img src="~/Content/Website/Assets/images/img_gt.png" alt="">
+                    </div>
+                </div>
+                <div class="slider_doingu">
+                    @{
+                        if (Model.Staffs != null)
+                        {
+                            if (Model.Staffs.Count() > 0)
+                            {
+                                int count = 0;
+                                foreach (StaffDto item in Model.Staffs)
+                                {
+                                    count++;
+                                    if (count > 12)
+                                    {
+                                        break;
+                                    }
+                                    @Html.Raw("<div class='khung_tin'>")
+                                    @Html.Raw("<div class='khung_t_tinkham'><div class='img_effect'><a href='/" + Model.IDicResource["STAFF"] + "/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_sf_" + item.id + "'>")
+                                    @Html.Raw("<img class='staffimg' src='" + item.img + "' alt = '" + item.brandname + " " + item.fullname + "'> </a></div>")
+                                    @Html.Raw("<div class='ct_tin center_dn'>")
+                                    @Html.Raw("<h4 class='title_xanh'>")
+                                    @Html.Raw("<a alt='" + item.brandname + " " + item.fullname + "' href='/" + Model.IDicResource["STAFF"] + "/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_sf_" + item.id + "'>")
+                                    @Html.Raw(item.brandname + " " + item.fullname + "</a> </h4>")
+                                    @Html.Raw("<div class='der_dn'>")
+                                    @Html.Raw(item.position + " </div></div></div></div>")
+                                }
+                            }
+                        }
+
+                    }
+                </div>
+                <div class="mb-2 more_tatca">
+                    <a href="/@Model.IDicResource["STAFF"]/@Utilities.urlConvert(Utilities.VnConcert("Danh sách chuyên gia").ToLower())_st_0" class="more"><i class="fa fa-eye"></i> @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "XEM THÊM VỀ CHÚNG TÔI" : "MORE ABOUT US")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

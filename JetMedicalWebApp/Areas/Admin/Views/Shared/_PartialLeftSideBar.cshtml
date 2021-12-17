@@ -1,0 +1,225 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.LeftNavigationViewModel
+
+<script>
+    $(document).ready(function () {
+        $('#btnImportExcelUsers').on('change', function () {
+            let filesUploads = $('#btnImportExcelUsers').prop('files');
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                var data = new FormData();
+
+                data.append("file", filesUploads[0]);
+
+                var url = "@Url.Action("NhapDuLieuTuFileExcel", "Users", new { area = "Admin" })";
+                
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    $('#btnImportExcelUsers').val('');
+
+                    if (res) {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Cập nhật thành công.");
+                    }
+                });
+            }
+        });
+
+        $('#btnImportExcelLuotKham').on('change', function () {
+            let filesUploads = $('#btnImportExcelLuotKham').prop('files');
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                var data = new FormData();
+
+                data.append("file", filesUploads[0]);
+
+                var url = "@Url.Action("NhapDuLieuTuFileExcel", "XML1", new { area = "Admin" })";
+
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    $('#btnImportExcelLuotKham').val('');
+
+                    if (res) {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Cập nhật thành công.");
+                    }
+                });
+            }
+        });
+    })
+</script>
+
+<div class="vd_navbar vd_nav-width vd_navbar-tabs-menu vd_navbar-left" id="vdMenu">
+    <div class="navbar-tabs-menu clearfix">
+        <span class="expand-menu" data-action="expand-navbar-tabs-menu">
+            <span class="menu-icon menu-icon-left">
+                <i class="fa fa-ellipsis-h"></i>
+            </span>
+            <span class="menu-icon menu-icon-right">
+                <i class="fa fa-ellipsis-h"></i>
+            </span>
+        </span>
+        <div class="menu-container">
+            <div class="vd_mega-menu-wrapper">
+                <div class="vd_mega-menu" data-intro="<strong>Tabs Menu</strong><br/>Can be placed for dropdown menu, tabs, or user profile. Responsive for medium and small size navigation." data-step=3>
+                    <ul class="mega-ul">
+                        @if (Model.Menu_GroupPermission != null)
+                        {
+                            if (Model.Menu_GroupPermission.IsSystemUpdate_User)
+                            {
+                                <li id="shortLink_ImportUsers" class="one-icon mega-li">
+                                    <a class="mega-link vd_bg-dark-green fileinput-button" href="jsvascript:void(0)" data-toggle="tooltip" data-placement="bottom" data-original-title="Import người dùng">
+                                        <span class="mega-icon">
+                                            <i class="fa fa-cloud-upload"></i>
+                                        </span>
+                                        <span></span>
+                                        <input id="btnImportExcelUsers" type="file" name="files[]" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    </a>
+                                </li>
+                            }
+                        }
+                        
+                        @if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.IsSystemUpdate_XML1)
+                        {
+                            <li class="one-icon mega-li">
+                                <a class="mega-link vd_bg-green fileinput-button" href="jsvascript:void(0)" data-toggle="tooltip" data-placement="bottom" data-original-title="Import lươt khám">
+                                    <span class="mega-icon">
+                                        <i class="icon icon-upload2"></i>
+                                    </span>
+                                    <span></span>
+                                    <input id="btnImportExcelLuotKham" type="file" name="files[]" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                </a>
+                            </li>
+                        }
+                        @if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.IsSystemUpdate_XML1)
+                        {
+                            <li class="one-icon mega-li">
+                                <a class="mega-link vd_bg-yellow " href="@Url.Action("Index", "XML1", new { area = "Admin" })" data-toggle="tooltip" data-placement="bottom" data-original-title="Danh sách lượt khám">
+                                    <span class="mega-icon">
+                                        <i class="fa fa-pencil"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                        @if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.IsSystemUpdate_User)
+                        {
+                            <li class="one-icon mega-li">
+                                <a class="mega-link vd_bg-red" href="@Url.Action("Update", "Users", new { area = "Admin" })" data-toggle="tooltip" data-placement="bottom" data-original-title="Thêm mới người dùng">
+                                    <span class="mega-icon">
+                                        <i class="fa fa-plus"></i>
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navbar-menu clearfix">
+        <div class="vd_panel-menu hidden-xs">
+            <span data-original-title="Mở rộng tát cả" data-toggle="tooltip" data-placement="bottom" data-action="expand-all" class="menu" data-intro="<strong>Expand Button</strong><br/>To expand all menu on left navigation menu." data-step=4>
+                <i class="fa fa-sort-amount-asc"></i>
+            </span>
+        </div>
+        <h3 class="menu-title hide-nav-medium hide-nav-small">Menu</h3>
+        <div class="vd_menu">
+            <ul>
+                @foreach (var menuCap1 in Model.Menus.Where(m => string.IsNullOrEmpty(m.MaMenuCapTren)).OrderBy(m => m.No))
+                {
+                    if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).FirstOrDefault() != null)
+                    {
+                        <li>
+                            <a href="javascript:void(0);" data-action="click-trigger">
+                                <span class="menu-icon"><i class="@menuCap1.Icon"></i></span>
+                                <span class="menu-text">@menuCap1.Name</span>
+                                <span class="menu-badge"><span class="badge vd_bg-black-30"><i class="fa fa-angle-down"></i></span></span>
+                            </a>
+                            <div class="child-menu" data-action="click-target">
+                                <ul>
+                                    @foreach (var menuCap2 in Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).OrderBy(m => m.No))
+                                    {
+                                        if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap2.Code.Trim().ToLower())).FirstOrDefault() != null)
+                                        {
+                                            <li>
+                                                <a href="javascript:void(0);" data-action="click-trigger">
+                                                    @if (!string.IsNullOrEmpty(menuCap2.Icon))
+                                                    {
+                                                        <span class="menu-icon"><i class="bx @menuCap2.Icon"></i></span>
+                                                    }
+                                                    <span class="menu-text">@menuCap2.Name</span>
+                                                    <span class="menu-badge"><span class="badge vd_bg-black-30"><i class="fa fa-angle-down"></i></span></span>
+                                                </a>
+                                                <div class="child-menu" data-action="click-target">
+                                                    <ul>
+                                                        @foreach (var menuCap3 in Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).OrderBy(m => m.No))
+                                                        {
+                                                            <li>
+                                                                <a href="@(!string.IsNullOrEmpty(menuCap3.ControllerName) ? Url.Content("/"+menuCap3.ControllerName+"/" +menuCap3.ActionName) + (!string.IsNullOrEmpty(menuCap3.Parameters) ? "?" + menuCap3.Parameters : "") : "javascript:void(0);")">
+                                                                    @if (!string.IsNullOrEmpty(menuCap3.Icon))
+                                                                    {
+                                                                        <span class="menu-icon"><i class="@menuCap3.Icon"></i></span>
+                                                                    }
+                                                                    <span class="menu-text">@menuCap3.Name</span>
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <a href="@(!string.IsNullOrEmpty(menuCap2.ControllerName) ? Url.Content("/"+menuCap2.ControllerName+"/" +menuCap2.ActionName) + (!string.IsNullOrEmpty(menuCap2.Parameters) ? "?" + menuCap2.Parameters : "") : "javascript:void(0);")">
+                                                    @if (!string.IsNullOrEmpty(menuCap2.Icon))
+                                                    {
+                                                        <span class="menu-icon"><i class="@menuCap2.Icon"></i></span>
+                                                    }
+                                                    <span class="menu-text">@menuCap2.Name</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="@(!string.IsNullOrEmpty(menuCap1.ControllerName) ? Url.Content("/"+menuCap1.ControllerName+"/" +menuCap1.ActionName) + (!string.IsNullOrEmpty(menuCap1.Parameters) ? "?" + menuCap1.Parameters : "") : "javascript:void(0);")">
+                                <span class="menu-icon"><i class="@menuCap1.Icon"></i></span>
+                                <span class="menu-text">@menuCap1.Name</span>
+                            </a>
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="navbar-spacing clearfix">
+    </div>
+    <div class="vd_menu vd_navbar-bottom-widget">
+        <ul>
+            <li>
+                @using (Html.BeginForm("LogOff", "Home", FormMethod.Post, new { id = "logoutForm" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <a href="javascript:document.getElementById('logoutForm').submit()" style="padding:15px;">
+                        <span class="menu-icon"><i class="fa fa-sign-out"></i></span>
+                        <span class="menu-text">Đăng xuất</span>
+                    </a>
+
+                    @*<a href="javascript:document.getElementById('logoutForm').submit()" style="padding:15px;">@Html.Raw("Đăng xuất")</a>*@
+                }
+
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+﻿#titleUsername {
+    margin-top:10px;
+    color: whitesmoke;
+    font-weight: bold;
+}
+
+.control-sidebar.control-sidebar-open, .control-sidebar.control-sidebar-open+.control-sidebar-bg {
+    right: 0;
+}
+
+
+.menu-cap-1-box {
+    margin-top:5px;
+}
+
+#rowDonVi_TaiKhoanNguoiDung{
+    height:30vh; 
+    overflow:auto;
+}
+
+#rowNhomGroupPermission{
+    height:25vh; 
+    overflow:auto;
+}
+
+#ThemUserVaoNhomGroupPermissionModal_NhomGroupPermissionId, #ThemDonViModal_DonViId{
+    width: 100%;
+}
+
+#noiDungTableNhomGroupPermission{
+    min-height:200px;
+}
+
+#m_quick_sidebar{
+    overflow:hidden;
+}
+
+#textDonViToChuc{
+    color:#716aca;
+}
+
+.tableHoverCustomise tbody tr:hover {
+    background-color: #ddd !important;
+    cursor: pointer;
+    transition: 0.5s;
+    -moz-transition: 0.5s;
+    -webkit-transition: 0.5s;
+}
+
+.selected {
+    background-color: #FFD884 !important;
+}

@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title - App</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="App">
+    <meta name="keywords" content="App">
+    <meta name="author" content="Bao Huy Software">
+    <!--begin::Web font -->
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.16/webfont.js"></script>
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Font Poppins-->
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="@Url.Content("~/Content/theme/img/ico/apple-touch-icon-144-precomposed.png")">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="@Url.Content("~/Content/theme/img/ico/apple-touch-icon-114-precomposed.png")">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="@Url.Content("~/Content/theme/img/ico/apple-touch-icon-72-precomposed.png")">
+    <link rel="apple-touch-icon-precomposed" href="@Url.Content("~/Content/theme/img/ico/apple-touch-icon-57-precomposed.png")">
+    <link rel="shortcut icon" href="@Url.Content("~/Content/theme/img/ico/favicon.png")">
+    <!-- CSS -->
+    <!-- Bootstrap & FontAwesome & Entypo CSS -->
+    <link href="@Url.Content("~/Content/theme/css/bootstrap.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/css/font-awesome.min.css")" rel="stylesheet" type="text/css">
+    <!--[if IE 7]><link type="text/css" rel="stylesheet" href="@Url.Content("~/Content/theme/css/font-awesome-ie7.min.css")"><![endif]-->
+    <link href="@Url.Content("~/Content/theme/css/font-entypo.css")" rel="stylesheet" type="text/css">
+
+    <!-- Fonts CSS -->
+    <link href="@Url.Content("~/Content/theme/css/fonts.css")" rel="stylesheet" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link href="@Url.Content("~/Content/snailsoft/plugins/jquery-ui/jquery-ui.custom.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/prettyPhoto-plugin/css/prettyPhoto.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/isotope/css/isotope.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/pnotify/css/jquery.pnotify.css")" media="screen" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/google-code-prettify/prettify.css")" rel="stylesheet" type="text/css">
+
+    <link href="@Url.Content("~/Content/theme/plugins/mCustomScrollbar/jquery.mCustomScrollbar.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/tagsInput/jquery.tagsinput.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/bootstrap-switch/bootstrap-switch.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/daterangepicker/daterangepicker-bs3.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/colorpicker/css/colorpicker.css")" rel="stylesheet" type="text/css">
+
+    <link href="@Url.Content("~/Content/theme/plugins/jquery-file-upload/css/jquery.fileupload.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/jquery-file-upload/css/jquery.fileupload-ui.css")" rel="stylesheet" type="text/css">
+
+    <!-- Specific CSS -->
+    @*<link href="@Url.Content("~/Content/theme/plugins/fullcalendar/fullcalendar.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/fullcalendar/fullcalendar.print.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/plugins/introjs/css/introjs.min.css")" rel="stylesheet" type="text/css">*@
+    @RenderSection("Vendors_CSS", false)
+
+    <!-- Theme CSS -->
+    <link href="@Url.Content("~/Content/theme/css/theme.min.css")" rel="stylesheet" type="text/css">
+    <!--[if IE]> <link href="@Url.Content("~/Content/theme/css/ie.css")" rel="stylesheet" > <![endif]-->
+    <link href="@Url.Content("~/Content/theme/css/chrome.css")" rel="stylesheet" type="text/chrome"> <!-- chrome only css -->
+    <!-- Responsive CSS -->
+    <link href="@Url.Content("~/Content/theme/css/theme-responsive.min.css")" rel="stylesheet" type="text/css">
+
+
+    <!-- for specific page in style css -->
+    <!-- for specific page responsive in style css -->
+    <!-- Custom CSS -->
+    <link href="@Url.Content("~/Content/theme/custom/custom.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/css/customiseTheme.css")" rel="stylesheet" type="text/css">
+
+    @RenderSection("HeaderScript", false)
+
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/modernizr.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/mobile-detect.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/mobile-detect-modernizr.js")"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script type="text/javascript" src="@Url.Content("~/Content/theme/js/html5shiv.js")"></script>
+      <script type="text/javascript" src="@Url.Content("~/Content/theme/js/respond.min.js")"></script>
+    <![endif]-->
+
+    <!-- Head SCRIPTS -->    <!-- Javascript =============================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/jquery.js")"></script>
+    <!--[if lt IE 9]>
+      <script type="text/javascript" src="@Url.Content("~/Content/theme/js/excanvas.js")"></script>
+    <![endif]-->
+
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/bootstrap.min.js")"></script>
+    <script type="text/javascript" src='@Url.Content("~/Content/snailsoft/plugins/jquery-ui/jquery-ui.custom.min.js")'></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/snailsoft/plugins/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js")"></script>
+</head>
+
+<body class="full-layout nav-right-hide nav-right-start-hide nav-top-fixed responsive clearfix" data-active="dashboard "  data-smooth-scrolling="1">
+    <div class="vd_body">
+        <div class="content">
+            <div class="container">
+                <div class="chitiet vd_content-wrapper">
+                    <div class="">
+                        <div class="vd_content clearfix" id="vdContentContainer">
+                            @RenderBody()
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_PartialViewUrlModal")
+
+   
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/caroufredsel.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/plugins.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/breakpoints/breakpoints.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/dataTables/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/prettyPhoto-plugin/js/jquery.prettyPhoto.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/mCustomScrollbar/jquery.mCustomScrollbar.concat.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/tagsInput/jquery.tagsinput.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/bootstrap-switch/bootstrap-switch.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/blockUI/jquery.blockUI.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/plugins/pnotify/js/jquery.pnotify.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/js/theme.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/theme/custom/custom.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/app.js")"></script>
+
+    <!-- Specific Page Scripts Put Here -->
+    @RenderSection("Vendors_Scripts", false)
+
+    @RenderSection("FooterScript", false)
+
+</body>
+</html>

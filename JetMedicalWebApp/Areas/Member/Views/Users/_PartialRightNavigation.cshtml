@@ -1,0 +1,245 @@
+﻿
+<script type="text/javascript" charset="utf-8">
+    var selectedUser_GroupPermissionId = null;
+    $(document).ready(function () {
+
+        var dropdownlistSelect2TinhOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2TinhOption.placeholder = "Chọn nhóm phân quyền";
+        dropdownlistSelect2TinhOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "GroupPermission", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'Id, Name, IsActive';
+                var condition = params.term ? ' Name.Contains(\\' + params.term + '\\) AND IsActive = True' : ' IsActive = True ';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'Name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.Id,
+                        text: item.Name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+        $('#nhomPhanQuyenIds').select2(dropdownlistSelect2TinhOption);
+
+
+        $("#themNhomPhanQuyenVaoUser").click(function () {
+            $('#nhomPhanQuyenModal').modal();
+        });
+
+        $("#btnThucHienThemNhomPhanQuyenVaoUser").click(function () {
+            updateUsers_GroupPermission($('#nhomPhanQuyenIds').val(), selectedDataRow.UserID);
+        });
+
+        $("#btnExecuteDeletedNhomPhanQuyen").click(function () {
+            if (selectedUser_GroupPermissionId != null) {
+                var data = { id: selectedUser_GroupPermissionId };
+                var url = "@Url.Action("DeleteById", "Users_GroupPermission", new { area = "Admin" })";
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", res);
+                    }
+                    else {
+                        notification("topright", "success", "fa fa-check-circle vd_green", "", "Xóa thành công.");
+                        $('#confirmDeleteNhomPhanQuyenModal').modal('hide');
+                        selectedUser_GroupPermissionId = null;
+                        loadUser_GroupPermission(selectedDataRow.UserID);
+                    }
+                });
+            }
+        });
+
+
+    });
+
+
+
+    function updateUsers_GroupPermission(groupPermissionId, userId) {
+        if (groupPermissionId && userId) {
+
+            var data = {
+                groupPermissionId: groupPermissionId,
+                userId: userId
+            };
+
+            $.ajax({
+                url: '@Url.Action("AddOrUpdate", "Users_GroupPermission", new { area = "Admin" })',
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                error: function () {
+                    notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", "Không tìm thấy máy chủ.");
+                    return false;
+                },
+                success: function (res) {
+                    console.log(res);
+                    if (res) {
+                        notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", res);
+                    }
+                    else {
+                        loadUser_GroupPermission(userId);
+                    }
+                }
+            });
+        }
+    }
+
+    function loadUser_GroupPermission(userId) {
+        $('#noiDungTableNhomPhanQuyen').empty();
+
+        if (userId) {
+            run_waitMe($(".rightWidth-400"));
+            var data = {
+                userId: userId
+            };
+
+            $.ajax({
+                url: '@Url.Action("GetListByGroupPermissionId", "Users_GroupPermission", new { area = "Admin" })',
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                error: function () {
+                    stop_waitMe($(".rightWidth-400"));
+                    notification("topcenter", "", "fa fa-exclamation-triangle vd_yellow", "Error", 'Không tìm thấy máy chủ');
+                    return false;
+                },
+                success: function (res) {
+                    stop_waitMe($(".rightWidth-400"));
+                    if (res) {
+                        res.forEach(function (item) {
+                            var html = '';
+
+                                html += '<tr>' +
+                                            '<td>' + item.GroupPermissionName + '</td>' +
+                                            '<td class="text-center">' +
+                                            '<a href="#!" name="xoaNhomPhanQuyen" data-id="' + item.Id + '" data-rel="tooltip" data-original-title="xóa" class="menu entypo-icon vd_bd-red vd_red">' +
+                                            '<i class="icon-trash"></i></a></td>'+
+                                        '</tr>';
+
+                            $('#noiDungTableNhomPhanQuyen').append(html);
+
+                            initialButtonInTableNoiDungTableNhomPhanQuyen();
+                            //string selectedFields = "Id, Users.UserID AS UserID, GroupPermission.Id AS GroupPermissionId, GroupPermission.Name AS GroupPermissionName";
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+
+
+    function initialButtonInTableNoiDungTableNhomPhanQuyen() {
+        $('a[name="xoaNhomPhanQuyen"]').click(function (e) {
+            e.preventDefault();
+            selectedUser_GroupPermissionId = $(this).data('id');
+            if (selectedUser_GroupPermissionId) {
+                $('#confirmDeleteNhomPhanQuyenModal').modal();
+            }
+        });
+    };
+
+</script>
+
+
+<div class="vd_navbar vd_nav-width vd_navbar-chat vd_navbar-white vd_navbar-right width-400">
+    <div class="navbar-menu clearfix">
+        <div class="content-list content-image content-chat">
+            <ul class="list-wrapper no-bd-btm pd-lr-10">
+                <li class="group-heading vd_bg-black">
+                    <div class="title">
+                        <span id="userName"></span>
+                        <div class="vd_panel-menu">
+                            <a href="#!" data-action="toggle-navbar-right" data-rel="tooltip" data-original-title="đóng" class="menu entypo-icon">
+                                <i class="fa fa-reply"></i>
+                            </a>
+                            <a href="#!" id="themNhomPhanQuyenVaoUser" data-rel="tooltip" data-original-title="thêm" class="menu entypo-icon">
+                                <i class="icon-plus"></i>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="vd_menu rightWidth-400">
+            <ul>
+                <li>
+                    <table class="table no-head-border table-striped">
+                        <tbody id="noiDungTableNhomPhanQuyen" style="color:#000"></tbody>
+                    </table>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="navbar-spacing clearfix">
+    </div>
+</div>
+
+
+<div class="modal fade" id="confirmDeleteNhomPhanQuyenModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteNhomPhanQuyenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title" id="confirmDeleteNhomPhanQuyenModalLabel">@Html.Raw("Thông báo")</h4>
+            </div>
+            <div class="modal-body">
+                <p id="confirmDeleteModalContent">@Html.Raw("Bạn có chắc chắn là muốn xóa dữ liệu này?")</p>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn vd_btn vd_bg-green" id="btnExecuteDeletedNhomPhanQuyen">@Html.Raw("Đồng ý")</button>
+                <button type="button" class="btn vd_btn vd_bg-grey" data-dismiss="modal">@Html.Raw("Hủy bỏ")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+
+<div class="modal fade" id="nhomPhanQuyenModal" tabindex="-1" role="dialog" aria-labelledby="nhomPhanQuyenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title" id="nhomPhanQuyenModalLabel">@Html.Raw("Nhóm phân quyền")</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="#" role="form">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="form-label">Nhóm phân quyền</div>
+                            <select id="nhomPhanQuyenIds" name="nhomPhanQuyenIds" class="form-control select2">
+                            </select>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn vd_btn vd_bg-green" id="btnThucHienThemNhomPhanQuyenVaoUser">@Html.Raw("Thêm")</button>
+                <button type="button" class="btn vd_btn vd_bg-grey" data-dismiss="modal"><i class="append-icon fa fa-fw fa-ban"></i>@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

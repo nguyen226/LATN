@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    @{
+        string seoTitle = string.Empty;
+        string seoKeyword = string.Empty;
+        string seoDescription = string.Empty;
+
+        if (!string.IsNullOrEmpty(ViewBag.seoTitle))
+        {
+            seoTitle = ViewBag.seoTitle + " | Bệnh viện 199 Bộ Công An";
+        }
+        else
+        {
+            seoTitle = "Dịch vụ | Bệnh viện 199 Bộ Công An";
+        }
+
+        if (!string.IsNullOrEmpty(ViewBag.seoKeyword))
+        {
+            seoKeyword = ViewBag.seoKeyword;
+        }
+        else
+        {
+            seoKeyword = "199hospital, 199hospital da nang, Bệnh viện 199 Bộ Công An, bệnh viện 199, bv199, Bệnh viện công an đà nẵng, bệnh viện 199 đà nẵng, bv199 đà nẵng";
+        }
+
+        if (!string.IsNullOrEmpty(ViewBag.seoDescription))
+        {
+            seoDescription = ViewBag.seoDescription;
+        }
+        else
+        {
+            seoDescription = "Bệnh viện 199 là Bệnh viện đa khoa hạng I với 450 giường bệnh, 25 khoa, phòng cùng 412 cán bộ, công nhân viên. Bệnh viện có nhiệm vụ chăm sóc sức khỏe cho Cán bộ, chiến sĩ Công an các tỉnh, thành phố Miền Trung – Tây Nguyên và tham gia y tế cộng đồng theo quy định của Nhà nước và của Bộ Công an.";
+        }
+    }
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="@Html.Raw(seoDescription)">
+    <meta name="keywords" itemprop="keywords" content="@Html.Raw(seoKeyword)">
+    <title>@Html.Raw(seoTitle)</title>
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <!-- Open Graph data -->
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Bệnh viện 199 Bộ Công AN" />
+    <meta property="og:title" content="@Html.Raw(seoTitle)" />
+    <meta property="og:url" content="https://benhvien199.vn/@ViewBag.url" />
+    <meta property="og:image" content="@ViewBag.avartar" />
+    <meta property="og:description" content="@Html.Raw(seoDescription)" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="thumbnail" content="@ViewBag.avartar" />
+
+    @RenderSection("styles", required: false)
+    <!-- Font Family & Font Icon -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="@Url.Content("~/Content/weather-icons/css/weather-icons.css")" rel="stylesheet" type="text/css">
+    <!-- CSS MAIN -->
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/slick.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/slick-theme.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/animition.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/ball.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/date.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/main.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu_drop.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/send_alert.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/tabs.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/swiper.min.css">
+    <!-- Responsive -->
+    <link rel="stylesheet" href="~/Content/Website/Assets/css/responsive/media.css">
+    <link rel="stylesheet" href="~/Content/spinner/css/spinner.css" />
+    <link href="~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/View/style/tag.css">
+
+    <!-- Script -->
+    <script type="text/javascript" src="~/Content/Website/Assets/js/jquery_3.2.1.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FZK3M25ES5"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-FZK3M25ES5');
+    </script>
+	@*<script type="text/javascript">        
+        if (window.location.protocol != "https:") {
+           window.location.protocol = "https";
+        }
+    </script>*@
+</head>
+
+<body>
+    @Html.Partial("_PartialNhanTuVanModal")
+    @Html.Partial("_PartialDatLichKhamModal")
+    @Html.Partial("_PartialVideoModal")
+    @Html.Partial("_PartialModalRegister_Login")
+    @Html.Partial("_PartialCapNhatThongTinMemberModal")
+    @Html.Partial("_PartialChonThoiGianKhamBenh")
+
+    <div id="wrapper" style="max-width: 1920px;">
+        <section>
+            <div class="app_top">
+                <div class="img_app">
+                    <img src="~/Content/Website/Assets/images/banner_header.png" alt="">
+                </div>
+                <div class="app_bv">
+                    <a target="_blank" href="https://apps.apple.com" alt="">
+                        <img src="~/Content/Website/Assets/images/appstore.png" alt="">
+                    </a>
+                    </a>
+                    <a target="_blank" href="https://play.google.com/store/apps">
+                        <img src="~/Content/Website/Assets/images/ggplay.png" alt="">
+                    </a>
+
+                </div>
+            </div>
+        </section>
+        <div id="gop_top">
+            @{ Html.RenderAction("_Header", "Partial", new { area = "" }); }
+
+            @RenderSection("banner", required: false)
+        </div>
+
+        @RenderBody()
+
+        @{ Html.RenderAction("_Footer", "Partial", new { area = "", typeCode = JetMedicalWebApp.Common.CommonConstants.NewsType_Guide }); }
+    </div>
+    <!-- warper -->
+    <!-- Messenger Plugin chat Code -->
+    <div id="fb-root"></div>
+
+    <!-- Your Plugin chat code -->
+    <div id="fb-customer-chat" class="fb-customerchat">
+    </div>
+
+    <script>
+        var chatbox = document.getElementById('fb-customer-chat');
+        chatbox.setAttribute("page_id", "183751401770975");
+        chatbox.setAttribute("attribution", "biz_inbox");
+
+        window.fbAsyncInit = function () {
+            FB.init({
+                xfbml: true,
+                version: 'v11.0'
+            });
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://connect.facebook.net/vi_VN/sdk/xfbml.customerchat.js';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+</body>
+
+<script src="~/Content/Website/Assets/js/swiper.min.js"></script>
+
+<!-- Initialize Swiper -->
+<script>
+    var swiper = new Swiper('.swiper-container', {
+        spaceBetween: 30,
+        effect: 'fade',
+        autoplay: true,
+        autoplaySpeed: 5000,
+        infinite: true,
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+    });
+</script>
+<script async src="~/Content/Website/Assets/js/youtube_2.js"></script>
+<script async custom-element="amp-youtube" src="~/Content/Website/Assets/js/youtube_1.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/init.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/menu_header.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery_ui.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/edit_js.js"></script>
+<script type="text/javascript" src="~/Content/js/jquery.blockUI.js"></script>
+<script src="~/Content/Website/Assets/js/slick.min.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.flexslider-min.js"></script>
+<script src="~/Content/Website/Assets/js/main.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy2.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy1.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/edit_slick.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.repopup.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/tablist.js"></script>
+<script src="~/Content/spinner/js/spinner.js"></script>
+<script src="~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
+<script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+<script>
+    $(document).ready(function () {
+        $(".monica").monica({
+            settings: {
+                upTime: "fast",
+                downTime: "fast"
+            }
+        });
+    });
+</script>
+
+</html>

@@ -1,0 +1,28 @@
+﻿<script>
+    function showNotificationModal(title, message) {
+        $("#notificationModalLabel").text(title);
+        $("#notificationModalContent").html(message);
+        $('#notificationModal').modal({
+            "show": true
+        });
+    }
+</script>
+
+<div class="modal fade" id="notificationModal" tabindex="-1" role="dialog" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title" id="notificationModalLabel">@Html.Raw("Thông báo")</h4>
+            </div>
+            <div class="modal-body">
+                <p id="notificationModalContent"></p>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn vd_btn vd_bg-grey" data-dismiss="modal"><i class="append-icon fa fa-fw fa-ban"></i>@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

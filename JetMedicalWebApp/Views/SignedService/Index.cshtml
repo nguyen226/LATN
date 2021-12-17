@@ -1,0 +1,105 @@
+﻿@using JetMedicalWebApp.Entities.EntityDto
+@using JetMedicalWebApp.Common
+@{
+    Layout = "~/Views/Shared/_ServiceLayout.cshtml";
+}
+
+
+<div id="gop_top">
+    @Html.Partial("~/Views/Shared/Include/View/BannerService.cshtml")
+</div>
+
+@{
+    List<NewsContentDto> PackageList = new List<NewsContentDto>();
+    if (ViewData.ContainsKey("PackageList"))
+    {
+        PackageList = (List<NewsContentDto>)ViewData["PackageList"];
+    }
+
+    int memberId = -1;
+    if (ViewData.ContainsKey("MemberId"))
+    {
+        memberId = (int)ViewData["MemberId"];
+    }
+}
+<section class="back_all" style="position: relative;">
+    <!-- Content -->
+    <div id="khoangcach">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3 class="title_center">
+                        GÓI DỊCH VỤ Y KHOA
+                    </h3>
+                    @*<p class="descript_title">
+                            Chúng tôi đưa ra những gói khám tiện lợi, giúp người bệnh dễ dàng chọn lựa để điều trị hiệu quả.
+                        </p>*@
+                    <div class="content_gt_bv199">
+                        <div class="xoamargin">
+                            @{
+                                if (PackageList != null && PackageList.Count() > 0)
+                                {
+                                    foreach (var item in PackageList)
+                                    {
+                                        <div class="khung_tinkham">
+                                            <div class="khung_t_tinkham">
+                                                <div class="img_effect">
+                                                    <a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_pdt_@item.id">
+                                                        <img src='@item.avatar' class="img_project">
+                                                    </a>
+                                                </div>
+                                                <div class="text_tinkham">
+                                                    <h4 class="title_xanh"><a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_pdt_@item.id">@item.name</a></h4>
+                                                    
+                                                        
+                                                            <div class="price">
+                                                                <p class="price_old">@string.Format("{0:#,0.#}", item.priceOld) đ</p>
+                                                                <p class="price_sale">@string.Format("{0:#,0.#}", item.priceSale) đ</p>
+                                                            </div>
+                                                            <a href="javascript:void(0)" data-packageid="@item.id" data-name="@Html.Raw(item.title)" onclick="dangKyKham(this)" class="more_blue click_view"><i class="fa fa-dk"></i>  Đăng ký</a>
+                                                       
+                                                        
+                                                   
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="~/Content/Website/Assets/js/validationForm.js"></script>
+<script>
+    function dangKyKham(that) {
+        var packageId = $(that).data("packageid");
+        var packageName = $(that).data("name");
+
+        @if (memberId > 0)
+        {
+            <text>
+                resetFormDatLichKham();
+                $('#datLichKhamModal').modal();
+            $('.timepicker').timepicker({
+                showMeridian: false,
+                scrollbar: true,
+            });
+
+            $('#formDatLichKham_GoiKham').append('<option value="' + packageId + '" selected>' + packageName + '</option>');
+            </text>
+        }
+        else
+        {
+            <text>
+                loginForm();
+            </text>
+        }
+    }
+</script>

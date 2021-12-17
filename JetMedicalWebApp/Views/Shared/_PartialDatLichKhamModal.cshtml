@@ -1,0 +1,211 @@
+﻿@using JetMedicalWebApp.Common
+
+<script>
+    $(document).ready(function () {
+        hideAlertErrorDatLichKham();
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn gói khám";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsContent", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = "id, name";
+                var condition = 'TypeId IN (@CommonConstants.CategoryGoiKhamVN) AND languageId IN (@CommonConstants.TiengViet) AND isactive = 1';
+                if(params.term){
+                    condition += "AND (name LIKE N'%" + params.term.trim() + "%')";
+                }
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#formDatLichKham_GoiKham').select2(dropdownlistSelect2Option);
+
+        var dropdownlistSelect2StaffOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2StaffOption.placeholder = "Chọn bác sĩ";
+        dropdownlistSelect2StaffOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Staff", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, fullname, isactive, Isexamination';
+                var condition = params.term ? ' ProvinceName.Contains(\\' + params.term + '\\) AND IsActive = True AND Isexamination = TRUE' : ' IsActive = True AND Isexamination = TRUE';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'fullname asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.fullname
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#formDatLichKham_BacSi').select2(dropdownlistSelect2StaffOption);
+
+        $('#btnDatLichKham').click(function () {
+            if (checkFormDangKyLichKham()) {
+                var url = "@Url.Action("AddOrUpdate", "DangKyKhamBenh", new { area = "Member" })";
+
+                var fields = [
+                    'PackageId',
+                    'StaffId',
+                    'RegisterDate'
+                ];
+                var values = [
+                    $('#formDatLichKham_GoiKham').val(),
+                    $('#formDatLichKham_BacSi').val(),
+                    $('#formDatLichKham_NgayKham').val() + " " + $('#formDatLichKham_ThoiGianKham').val()
+                ];
+
+                var data = {
+                    id: null,
+                    fields: fields,
+                    values: values
+                };
+
+                sendDataToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        showAlertErrorDatLichKham(res);
+                    }
+                    else {
+                        $('.formDatLichKhamThanhCong').fadeIn().show();
+                        $('.formDatLichKham').fadeOut().hide();
+                    }
+                });
+            }
+        })
+    });
+
+    function resetFormDatLichKham() {
+        hideAlertErrorDatLichKham();
+        $('.formDatLichKham').fadeIn().show();
+        $('.formDatLichKhamThanhCong').fadeOut().hide();
+
+        $('#formDatLichKham')[0].reset();
+        $('#formDatLichKham_GoiKham').val('').trigger('change');
+        $('#formDatLichKham_BacSi').val('').trigger('change');
+    }
+
+    function hideAlertErrorDatLichKham() {
+        $('#formErrorDangKyKhamBenh').fadeOut().hide();
+        $('#formDangKyKhamBenhLabel').text('');
+    }
+
+    function showAlertErrorDatLichKham(msg) {
+        $('#formErrorDangKyKhamBenh').fadeIn().show();
+        $('#formDangKyKhamBenhLabel').text(msg);
+    }
+
+    function checkFormDangKyLichKham() {
+        hideAlertErrorDatLichKham();
+
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmptySelect2($('#formDatLichKham_GoiKham').val())) {
+            check = false;
+            error = 'Bạn chưa chọn gói khám';
+        }
+
+        if (isNullOrEmpty($('#formDatLichKham_NgayKham').val())) {
+            check = false;
+            error = 'Bạn chưa nhập ngày khám';
+        }
+
+        if (isNullOrEmpty($('#formDatLichKham_ThoiGianKham').val())) {
+            check = false;
+            error = 'Bạn chưa nhập thời giam khám';
+        }
+
+        if (!check) {
+            showAlertErrorDatLichKham(error);
+        }
+
+        return check;
+    }
+</script>
+
+<div class="modal fade" id="datLichKhamModal" role="dialog">
+    <div class="modal-dialog modal-fix-width-470 modalsp">
+        <div class="modal-content">
+            <button type="button" class="btn-close-modal" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+            <div class="khung_register">
+                <div class="formDatLichKham">
+                    <form id="formDatLichKham" class="frm shopping form-group">
+                        <div class="text-center">
+                            <img src="/Content/Website/Assets/images/logo.svg">
+                        </div>
+                        <h2>ĐĂNG KÝ KHÁM</h2>
+                        <p>Bộ phận CSKH sẽ phản hồi bạn trong thời gian sớm nhất</p>
+                        <div class="alert d-none" id="formErrorDangKyKhamBenh">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            <strong>Lỗi!</strong> <span id="formDangKyKhamBenhLabel"></span>.
+                        </div>
+                        <div class="box_group_from">
+                            <select id="formDatLichKham_GoiKham" name="formDatLichKham_GoiKham" class="form-control select2"></select>
+                        </div>
+                        <div class="box_group_from">
+                            <select id="formDatLichKham_BacSi" name="formDatLichKham_BacSi" class="form-control select2"></select>
+                        </div>
+                        <div class="box_group_from">
+                            <input type="text" class="datepicker" name="formDatLichKham_NgayKham" id="formDatLichKham_NgayKham" placeholder="Ngày khám" required autocomplete="off">
+                        </div>
+                        <div class="box_group_from">
+                            <input type="text" readonly onclick="openTimepicker(this)" name="formDatLichKham_ThoiGianKham" id="formDatLichKham_ThoiGianKham" placeholder="Giờ khám" required autocomplete="off">
+                        </div>
+                    </form>
+                    <div class="form-group">
+                        <button id="btnDatLichKham" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐẶT LỊCH KHÁM</button>
+                    </div>
+                </div>
+                <div class="formDatLichKhamThanhCong d-none frm shopping form-group">
+                    <div class="text-center">
+                        <img src="/Content/Website/Assets/images/logo.svg">
+                    </div>
+                    <h2>ĐẶT LỊCH THÀNH CÔNG</h2>
+                    <p>Bạn đã đăng ký thành công, Bộ phận CSKH sẽ liên hệ bạn trong thời gian sớm nhất</p>
+
+                    <div class="form-group">
+                        <button type="button" data-dismiss="modal" aria-hidden="true" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐÓNG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,227 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    var tableCanLamSang;
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (tableCanLamSang) !== 'undefined') {
+                tableCanLamSang.columns.adjust();
+            }
+        });
+        khoiTaoDatatableCanLamSang();
+
+        $('#btnThemMoiRowDataCanLamSang').click(function (e) {
+            e.preventDefault();
+            $("#modalAddNewDataRowCanLamSangLabel").text("Thêm mới");
+
+            selectedDataRow = null;
+
+            $('#formAddNewDataRowCanLamSang')[0].reset();
+
+            $('#modalAddNewDataRowCanLamSang').modal('show');
+        });
+
+        $('#btnDeleteDataRowCanLamSang').click(function (e) {
+            e.preventDefault();
+
+            var selectedDataRowId = $(tableCanLamSang.$('input:checkbox[name="selectedDataDtTableCanLamSangId"]').map(function () {
+                return $(this).prop("checked") ? tableCanLamSang.row($(this).closest('tr')).index() : null;
+            })).toArray();
+
+            if (selectedDataRowId.length > 0) {
+                $('#confirmDeleteDtTableCanLamSangDataRowModal').modal('show');
+            }
+            else {
+                hienThiThongBaoModal('Thông báo', 'Bạn chưa chọn dòng dữ liệu cần xóa.');
+            }
+        });
+
+        $('#btnExecuteDeleteCanLamSangDataRow').click(function (e) {
+            e.preventDefault();
+
+            selectedDataRowId = $(tableCanLamSang.$('input:checkbox[name="selectedDataDtTableCanLamSangId"]').map(function () {
+                return $(this).prop("checked") ? tableCanLamSang.row($(this).closest('tr')).index() : null;
+            })).toArray();
+
+            var times = 0;
+            $.each(selectedDataRowId, function (index, item) {
+                tableCanLamSang.row(item - times).remove().draw();
+
+                times++;
+            });
+
+            $('#confirmDeleteDtTableCanLamSangDataRowModal').modal('hide');
+        });
+
+        $("#btnRefreshDataCanLamSang").click(function () {
+            tableCanLamSang.draw();
+        });
+
+        $("#quickSearchDonCanLamSang").change(function () {
+            tableCanLamSang.draw();
+        });
+    });
+
+    function khoiTaoDatatableCanLamSang() {
+        let selectedFields = "Id, MA_DICH_VU,TEN_CHI_SO, MA_LK, GIA_TRI, KET_LUAN, MO_TA, NGAY_KQ, STRNGAY_KQ, XML4_01";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "XML4", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearchDonCanLamSang').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(TEN_CHI_SO LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%' OR GIA_TRI LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%' OR KET_LUAN LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%' OR MO_TA LIKE N'%" + $('#quickSearchDonCanLamSang').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+                stringFilter += "MA_LK=N'" + (xML1Data != null ? xML1Data.id : -1) + "'";
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableCanLamSang.columns.adjust();
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [3,6],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [7],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            },
+            {
+                "targets": [8],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            },
+            {
+                "targets": [9],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowDelete)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "MA_DICH_VU", "name": "MA_DICH_VU", "autoWidth": true, "title": "Mã dịch vụ" },
+            { "data": "TEN_CHI_SO", "name": "TEN_CHI_SO", "autoWidth": true, "title": "Chỉ số" },
+            { "data": "GIA_TRI", "name": "GIA_TRI", "autoWidth": true, "title": "Giá trị" },
+            { "data": "STRNGAY_KQ", "name": "NGAY_KQ", "autoWidth": true, "title": "Ngày" },
+            { "data": "MO_TA", "name": "MO_TA", "autoWidth": true, "title": "Mô tả" },
+            { "data": "KET_LUAN", "name": "KET_LUAN", "autoWidth": true, "title": "Kết luận" },
+            {
+                "data": "XML4_01", "name": "XML4_01", "autoWidth": true, "title": "FPD đơn", "render": function (data, type, full, meta) {
+                    return !isNullOrEmpty(data) ? '<a target="_blank" href="' + data + '">Tải file</a>' : '';
+                }
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<button class="btn menu-icon vd_bg-green btnViewXML4"> <i class="fa fa-eye"></i> </button>';
+                    return html;
+                }, width: "30px"
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<button data-original-title="edit" data-toggle="tooltip" data-placement="top" class="btn menu-icon vd_bg-yellow btnEdit"> <i class="fa fa-pencil"></i> </button>';
+                    return html;
+                }, width: "30px"
+            },
+            {"mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<a data-original-title="delete" data-toggle="tooltip" data-placement="top" class="btn menu-icon vd_bg-red" onclick=deleteDataRowDonCanLamSang(' + row.Id + ')> <i class="fa fa-trash-o"></i> </a>';
+                    return html;
+                }, width: "30px"
+            }
+        ]
+
+        tableCanLamSang = $('#dtTableCanLamSang').DataTable(datatableOption);
+
+        $('#dtTableCanLamSang tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableCanLamSang.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#dtTableCanLamSang tbody').on('click', 'tr td.menu-action > .btnEdit', function () {
+            selectedDataRow = tableCanLamSang.row($(this).parents('tr')).data();
+
+            $('#formAddNewDataRowCanLamSang_TEN_CHI_SO').val(selectedDataRow.TEN_CHI_SO);
+            $('#formAddNewDataRowCanLamSang_GIA_TRI').val(selectedDataRow.GIA_TRI);
+            $('#formAddNewDataRowCanLamSang_MO_TA').val(selectedDataRow.MO_TA);
+            $('#formAddNewDataRowCanLamSang_KET_LUAN').val(selectedDataRow.KET_LUAN);
+            $('#formAddNewDataRowCanLamSang_NGAY_KQ').val(selectedDataRow.STRNGAY_KQ);
+            $('#formAddNewDataRowCanLamSang_XML4_01_Text').val(selectedDataRow.XML4_01);
+
+            $("#modalAddNewDataRowCanLamSangLabel").text("Cập nhật");
+
+            $('#modalAddNewDataRowCanLamSang').modal('show');
+        });
+    }
+
+    function deleteDataRowDonCanLamSang(id) {
+        selectedDataRow = {
+            Id: id,
+            url: '@Url.Action("DeleteByIds", "XML4", new { area = "Admin" })',
+            table: tableCanLamSang
+        };
+
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+</script>
+
+
+<div class="col-sm-12 col-md-6">
+    <div class="vd_menu-search table-search input-group input-border">
+        <input type="text" id="quickSearchDonCanLamSang" class="form-control" placeholder="Tìm kiếm">
+        <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+    </div>
+</div>
+
+<div class="col-sm-12 col-md-6 themChiTietXML1 float-right">
+    <div id="btnRefreshDataCanLamSang" class="btn buttons-excel buttons-html5 btn-secondary" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới"> <i class="bx bx-refresh"></i> </div>
+    <div id="btnThemMoiRowDataCanLamSang" class="btn buttons-excel buttons-html5 btn-primary" data-placement="bottom" data-toggle="tooltip" data-original-title="Thêm"> <i class="bx bx-plus"></i> </div>
+</div>
+
+<div class="col-sm-12">
+    <table id="dtTableCanLamSang" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+</div>

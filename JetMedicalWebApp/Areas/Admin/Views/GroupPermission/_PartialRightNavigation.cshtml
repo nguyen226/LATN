@@ -1,0 +1,819 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.GroupPermissionViewModels
+
+<script type="text/javascript" charset="utf-8">
+
+    var selectedCompany_GroupPermissionId = null;
+    $(document).ready(function () {
+        $("#phanQuyenMenu").metisMenu();
+
+        var dropdownlistSelect2CompanyOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CompanyOption.placeholder = "Chọn công ty";
+        dropdownlistSelect2CompanyOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Company", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'CompanyId, ComName, IsActive';
+                var condition = params.term ? ' ComName.Contains(\\' + params.term + '\\) AND IsActive = True' : ' IsActive = True ';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'ComName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.CompanyId,
+                        text: item.ComName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+        $('#congTyIds').select2(dropdownlistSelect2CompanyOption);
+
+
+        $(".checkbox-phan-quyen-menu").change(function () {
+            updateMenu_GroupPermission(selectedDataRow.Id, $(this).data('menuid'), $(this).data('loai'), $(this).is(':checked'))
+        });
+
+
+        $("#themCongTyVaoNhomPhanQuyen").click(function () {
+            $('#congTyModal').modal('show');
+        });
+
+        $("#btnThucHienThemCongTyVaoNhomPhanQuyen").click(function () {
+            updateCompany_GroupPermission($('#congTyIds').val(), selectedDataRow.Id);
+        });
+
+        $("#btnExecuteDeletedCongTy").click(function () {
+            if (selectedCompany_GroupPermissionId != null) {
+                var data = { id: selectedCompany_GroupPermissionId };
+                var url = "@Url.Action("DeleteById", "Company_GroupPermission", new { area = "Admin" })";
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công.");
+                        $('#confirmDeleteCongTyModal').modal('hide');
+                        selectedCompany_GroupPermissionId = null;
+                        loadCompany_GroupPermission(selectedDataRow.Id);
+                    }
+                });
+            }
+        });
+
+
+    });
+
+    function updateMenu_GroupPermission(groupPermissionId, menuId, loai, value) {
+        if (groupPermissionId && menuId) {
+
+            var data = {
+                groupPermissionId: groupPermissionId,
+                menuId: menuId,
+                loai: loai,
+                value: value
+            };
+
+            $.ajax({
+                url: '@Url.Action("AddOrUpdate", "Menu_GroupPermission", new { area = "Admin" })',
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                error: function () {
+                    notification("top right", "info", "fadeIn animated bx bx-info-circle", "", "Không tìm thấy máy chủ.");
+                    return false;
+                },
+                success: function (res) {
+                    console.log(res);
+                    if (res) {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                    }
+                    else {
+                        loadMenu_GroupPermission(groupPermissionId);
+                    }
+                }
+            });
+        }
+    }
+
+    function loadMenu_GroupPermission(groupPermissionId) {
+
+        var checkboxNhomPhanQuyen_Menu = $('.checkbox-phan-quyen-menu');
+
+        for (var i = 0; i < checkboxNhomPhanQuyen_Menu.length; i++) {
+            $(checkboxNhomPhanQuyen_Menu[i]).prop('checked', false);
+        }
+
+        if (groupPermissionId) {
+            run_waitMe($(".rightWidth-400"));
+            var data = {
+                groupPermissionId: groupPermissionId
+            };
+
+            $.ajax({
+                url: '@Url.Action("GetListByGroupPermissionId", "Menu_GroupPermission", new { area = "Admin" })',
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                error: function () {
+                    stop_waitMe($(".rightWidth-400"));
+                    notification("topcenter", "", "fa fa-exclamation-triangle vd_yellow", "Error", 'Không tìm thấy máy chủ');
+                    return false;
+                },
+                success: function (res) {
+                    stop_waitMe($(".rightWidth-400"));
+                    if (res) {
+                        res.forEach(function (item) {
+                            for (key in item) {
+                                if (key == 'SystemView' || key == 'PersonalView'
+                                        || key == 'SystemEdit' || key == 'PersonalEdit'
+                                        || key == 'PersonalDelete' || key == 'SystemDelete'
+                                    )
+                                    $('input[data-menuid="' + item.MenuId + '"][data-loai="' + key + '"]').prop('checked', item[key]);
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+
+    function updateCompany_GroupPermission(companyId, groupPermissionId) {
+        if (groupPermissionId && userId) {
+
+            var data = {
+                groupPermissionId: groupPermissionId,
+                companyId: companyId
+            };
+
+            $.ajax({
+                url: '@Url.Action("AddOrUpdate", "Company_GroupPermission", new { area = "Admin" })',
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                error: function () {
+                    notification("top right", "info", "fadeIn animated bx bx-info-circle", "", "Không tìm thấy máy chủ.");
+                    return false;
+                },
+                success: function (res) {
+                    console.log(res);
+                    if (res) {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                    }
+                    else {
+                        loadCompany_GroupPermission(groupPermissionId);
+                    }
+                }
+            });
+        }
+    }
+
+    function loadCompany_GroupPermission(groupPermissionId) {
+
+        if (userId) {
+            run_waitMe($(".rightWidth-400"));
+            var data = {
+                groupPermissionId: groupPermissionId
+            };
+
+            $.ajax({
+                url: '@Url.Action("GetListByGroupPermissionId", "Company_GroupPermission", new { area = "Admin" })',
+                type: "POST",
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                error: function () {
+                    stop_waitMe($(".rightWidth-400"));
+                    notification("topcenter", "", "fa fa-exclamation-triangle vd_yellow", "Error", 'Không tìm thấy máy chủ');
+                    return false;
+                },
+                success: function (res) {
+                    stop_waitMe($(".rightWidth-400"));
+                    if (res) {
+                        $('#noiDungTableCongTy').empty();
+                        res.forEach(function (item) {
+                            var html = '';
+
+                            html += '<tr>' +
+                                        '<td>' + item.ComName + '</td>' +
+                                        '<td class="text-center">' +
+                                        '<a href="#!" name="xoaCongTy" data-id="' + item.Id + '" data-rel="tooltip" data-original-title="xóa" class="menu entypo-icon vd_bd-red vd_red">' +
+                                        '<i class="icon-trash"></i></a></td>' +
+                                    '</tr>';
+
+                            $('#noiDungTableCongTy').append(html);
+                            initialButtonInTableNoiDungTableCongTy();
+                        });
+                    }
+                }
+            });
+        }
+    }
+
+
+
+    function initialButtonInTableNoiDungTableCongTy() {
+        $('a[name="xoaCongTy"]').click(function (e) {
+            e.preventDefault();
+            selectedCompany_GroupPermissionId = $(this).data('id');
+            if (selectedCompany_GroupPermissionId) {
+                $('#confirmDeleteCongTyModal').modal('show');
+            }
+        });
+    };
+
+</script>
+
+
+<div class="switcher-wrapper phan-quyen-chuc-nang">
+    <div class="switcher-body">
+        <div class="d-flex align-items-center">
+            <h5 class="mb-0 text-uppercase permissonName" id="permissonName">Theme Customizer</h5>
+            <button type="button" class="btn-close ms-auto close-switcher" aria-label="Close"></button>
+        </div>
+        <hr>
+        <ul class="nav nav-tabs nav-primary" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-bs-toggle="tab" href="#phanQuyen" role="tab" aria-selected="true">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon">
+                            <i class="bx bx-cog font-18 me-1"></i>
+                        </div>
+                        <div class="tab-title">Phân quyền</div>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-bs-toggle="tab" href="#congTy" role="tab" aria-selected="false">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon">
+                            <i class="bx bx-building font-18 me-1"></i>
+                        </div>
+                        <div class="tab-title">Công ty</div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content py-3">
+            <div class="tab-pane fade show active" id="phanQuyen" role="tabpanel">
+                <ul class="metismenu mm-show" id="phanQuyenMenu">
+                    @foreach (var menuCap1 in Model.Menus.Where(m => string.IsNullOrEmpty(m.MaMenuCapTren)).OrderBy(m => m.No))
+                    {
+                        if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).FirstOrDefault() != null)
+                        {
+                            <li>
+                                <a class="has-arrow" href="javascript:;" aria-expanded="true">
+                                    <div class="menu-title">@Html.Raw(menuCap1.Name)</div>
+                                </a>
+                                <div class="d-flex flex-wrap p-2">
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemView" id="SystemView_@menuCap1.Id">
+                                            <label for="SystemView_@menuCap1.Id">Xem HT</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalView" id="PersonalView_@menuCap1.Id">
+                                            <label for="PersonalView_@menuCap1.Id">Xem cá nhân</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap1.Id">
+                                            <label for="SystemEdit_@menuCap1.Id">Sửa HT</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap1.Id">
+                                            <label for="PersonalEdit_@menuCap1.Id">Sửa cá nhân</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap1.Id">
+                                            <label for="SystemDelete_@menuCap1.Id">Xóa HT </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap1.Id">
+                                            <label for="PersonalDelete_@menuCap1.Id">Xóa cá nhân </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="mm-collapse" style="">
+                                    @foreach (var menuCap2 in Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).OrderBy(m => m.No))
+                                    {
+                                        if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap2.Code.Trim().ToLower())).FirstOrDefault() != null)
+                                        {
+                                            <li>
+                                                <a class="has-arrow" href="javascript:;" aria-expanded="true">
+                                                    <div class="menu-title">@Html.Raw(menuCap2.Name)</div>
+                                                </a>
+                                                <div class="d-flex flex-wrap p-2">
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemView" id="SystemView_@menuCap2.Id">
+                                                            <label for="SystemView_@menuCap2.Id">Xem HT</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalView" id="PersonalView_@menuCap2.Id">
+                                                            <label for="PersonalView_@menuCap2.Id">Xem cá nhân</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap2.Id">
+                                                            <label for="SystemEdit_@menuCap2.Id">Sửa HT</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap2.Id">
+                                                            <label for="PersonalEdit_@menuCap2.Id">Sửa cá nhân</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap2.Id">
+                                                            <label for="SystemDelete_@menuCap2.Id">Xóa HT </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap2.Id">
+                                                            <label for="PersonalDelete_@menuCap2.Id">Xóa cá nhân </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li>
+                                                <a href="javascript:;">@Html.Raw(menuCap2.Name)</a>
+                                                <div class="d-flex flex-wrap p-2">
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemView" id="SystemView_@menuCap2.Id">
+                                                            <label for="SystemView_@menuCap2.Id">Xem HT</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalView" id="PersonalView_@menuCap2.Id">
+                                                            <label for="PersonalView_@menuCap2.Id">Xem cá nhân</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap2.Id">
+                                                            <label for="SystemEdit_@menuCap2.Id">Sửa HT</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap2.Id">
+                                                            <label for="PersonalEdit_@menuCap2.Id">Sửa cá nhân</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap2.Id">
+                                                            <label for="SystemDelete_@menuCap2.Id">Xóa HT </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                        <div class="vd_checkbox checkbox-success">
+                                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap2.Id">
+                                                            <label for="PersonalDelete_@menuCap2.Id">Xóa cá nhân </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+                                <a href="javascript:;">@Html.Raw(menuCap1.Name)</a>
+                                <div class="d-flex flex-wrap p-2">
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemView" id="SystemView_@menuCap1.Id">
+                                            <label for="SystemView_@menuCap1.Id">Xem HT</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalView" id="PersonalView_@menuCap1.Id">
+                                            <label for="PersonalView_@menuCap1.Id">Xem cá nhân</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap1.Id">
+                                            <label for="SystemEdit_@menuCap1.Id">Sửa HT</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap1.Id">
+                                            <label for="PersonalEdit_@menuCap1.Id">Sửa cá nhân</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap1.Id">
+                                            <label for="SystemDelete_@menuCap1.Id">Xóa HT </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap1.Id">
+                                            <label for="PersonalDelete_@menuCap1.Id">Xóa cá nhân </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="congTy" role="tabpanel">
+                <div class="d-flex justify-content-end mb-2">
+                    <button type="button" class="btn btn-outline-primary" id="themCongTyVaoNhomPhanQuyen">
+                        <i class="lni lni-plus me-0"></i>
+                    </button>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <table class="table mb-0 table-striped table-hover">
+                        <tbody id="noiDungTableCongTy" style="color:#000"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@*<div class="vd_navbar vd_nav-width vd_navbar-chat vd_navbar-white vd_navbar-right width-400  ">
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#tab1" data-toggle="tab">Phân quyền</a></li>
+        <li class=""><a href="#tab2" data-toggle="tab">Công ty</a></li>
+    </ul>
+
+    <div class="tab-content mgbt-xs-20">
+        <div class="tab-pane active" id="tab1">
+            <div class="navbar-menu clearfix">
+                <div class="content-list content-image content-chat">
+                    <ul class="list-wrapper no-bd-btm pd-lr-10">
+                        <li class="group-heading vd_bg-black">
+                            <div class="title">
+                                <span class="permissonName"></span>
+                                <div class="vd_panel-menu">
+                                    <a href="#!" data-action="toggle-navbar-right" data-rel="tooltip" data-original-title="đóng" class="menu entypo-icon">
+                                        <i class="fa fa-reply"></i>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="vd_menu rightWidth-400">
+                    <ul>
+                        @foreach (var menuCap1 in Model.Menus.Where(m => string.IsNullOrEmpty(m.MaMenuCapTren)).OrderBy(m => m.No))
+                        {
+                            if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).FirstOrDefault() != null)
+                            {
+                                <li>
+                                    <a href="javascript:void(0);" data-action="click-trigger">
+                                        <span class="menu-text">@menuCap1.Name</span>
+                                        <span class="menu-badge"><span class="badge vd_bg-black-30"><i class="fa fa-angle-down"></i></span></span>
+                                    </a>
+                                    <div class="child-menu" data-action="click-target" style="">
+                                        <div class="row">
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemView" id="SystemView_@menuCap1.Id">
+                                                    <label for="SystemView_@menuCap1.Id">Xem HT</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalView" id="PersonalView_@menuCap1.Id">
+                                                    <label for="PersonalView_@menuCap1.Id">Xem cá nhân</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap1.Id">
+                                                    <label for="SystemEdit_@menuCap1.Id">Sửa HT</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap1.Id">
+                                                    <label for="PersonalEdit_@menuCap1.Id">Sửa cá nhân</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap1.Id">
+                                                    <label for="SystemDelete_@menuCap1.Id">Xóa HT </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap1.Id">
+                                                    <label for="PersonalDelete_@menuCap1.Id">Xóa cá nhân </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <ul>
+                                            @foreach (var menuCap2 in Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).OrderBy(m => m.No))
+                                            {
+                                                if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap2.Code.Trim().ToLower())).FirstOrDefault() != null)
+                                                {
+                                                    <li>
+                                                        <a href="javascript:void(0);" data-action="click-trigger">
+                                                            <span class="menu-text">@menuCap2.Name</span>
+                                                            <span class="menu-badge"><span class="badge vd_bg-black-30"><i class="fa fa-angle-down"></i></span></span>
+                                                        </a>
+                                                        <div class="child-menu" data-action="click-target" style="">
+                                                            <div class="row">
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemView" id="SystemView_@menuCap2.Id">
+                                                                        <label for="SystemView_@menuCap2.Id">Xem HT</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalView" id="PersonalView_@menuCap2.Id">
+                                                                        <label for="PersonalView_@menuCap2.Id">Xem cá nhân</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap2.Id">
+                                                                        <label for="SystemEdit_@menuCap2.Id">Sửa HT</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap2.Id">
+                                                                        <label for="PersonalEdit_@menuCap2.Id">Sửa cá nhân</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap2.Id">
+                                                                        <label for="SystemDelete_@menuCap2.Id">Xóa HT </label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap2.Id">
+                                                                        <label for="PersonalDelete_@menuCap2.Id">Xóa cá nhân </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    <li>
+                                                        <a href="javascript:void(0);" data-action="click-trigger">
+                                                            <span class="menu-text">@menuCap2.Name</span>
+                                                            <span class="menu-badge"><span class="badge vd_bg-black-30"><i class="fa fa-angle-down"></i></span></span>
+                                                        </a>
+                                                        <div class="child-menu" data-action="click-target" style="">
+                                                            <div class="row">
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemView" id="SystemView_@menuCap2.Id">
+                                                                        <label for="SystemView_@menuCap2.Id">Xem HT</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalView" id="PersonalView_@menuCap2.Id">
+                                                                        <label for="PersonalView_@menuCap2.Id">Xem cá nhân</label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap2.Id">
+                                                                        <label for="SystemEdit_@menuCap2.Id">Sửa HT</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap2.Id">
+                                                                        <label for="PersonalEdit_@menuCap2.Id">Sửa cá nhân</label>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap2.Id">
+                                                                        <label for="SystemDelete_@menuCap2.Id">Xóa HT </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                                    <div class="vd_checkbox checkbox-success">
+                                                                        <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap2.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap2.Id">
+                                                                        <label for="PersonalDelete_@menuCap2.Id">Xóa cá nhân </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <a href="javascript:void(0);" data-action="click-trigger">
+                                        <span class="menu-text">@menuCap1.Name</span>
+                                        <span class="menu-badge"><span class="badge vd_bg-black-30"><i class="fa fa-angle-down"></i></span></span>
+                                    </a>
+                                    <div class="child-menu" data-action="click-target" style="">
+                                        <div class="row">
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemView" id="SystemView_@menuCap1.Id">
+                                                    <label for="SystemView_@menuCap1.Id">Xem HT</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalView" id="PersonalView_@menuCap1.Id">
+                                                    <label for="PersonalView_@menuCap1.Id">Xem cá nhân</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemEdit" id="SystemEdit_@menuCap1.Id">
+                                                    <label for="SystemEdit_@menuCap1.Id">Sửa HT</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalEdit" id="PersonalEdit_@menuCap1.Id">
+                                                    <label for="PersonalEdit_@menuCap1.Id">Sửa cá nhân</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="SystemDelete" id="SystemDelete_@menuCap1.Id">
+                                                    <label for="SystemDelete_@menuCap1.Id">Xóa HT </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                                                <div class="vd_checkbox checkbox-success">
+                                                    <input type="checkbox" class="checkbox-phan-quyen-menu" data-menuid="@menuCap1.Id" data-loai="PersonalDelete" id="PersonalDelete_@menuCap1.Id">
+                                                    <label for="PersonalDelete_@menuCap1.Id">Xóa cá nhân </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane" id="tab2">
+            <div class="navbar-menu clearfix">
+                <div class="content-list content-image content-chat">
+                    <ul class="list-wrapper no-bd-btm pd-lr-10">
+                        <li class="group-heading vd_bg-black">
+                            <div class="title">
+                                <span class="permissonName"></span>
+                                <div class="vd_panel-menu">
+                                    <a href="#!" data-action="toggle-navbar-right" data-rel="tooltip" data-original-title="đóng" class="menu entypo-icon">
+                                        <i class="fa fa-reply"></i>
+                                    </a>
+                                    <a href="#!" id="themCongTyVaoNhomPhanQuyen" data-rel="tooltip" data-original-title="thêm" class="menu entypo-icon">
+                                        <i class="icon-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="vd_menu rightWidth-400">
+                    <ul>
+                        <li>
+                            <table class="table no-head-border table-striped">
+                                <tbody id="noiDungTableCongTy" style="color:#000"></tbody>
+                            </table>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="navbar-spacing clearfix">
+    </div>
+</div>*@
+
+
+
+<div class="modal fade" id="congTyModal" aria-labelledby="congTyModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="congTyModalLabel">@Html.Raw("Công ty")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="#" role="form">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="form-label">@Html.Raw("Công ty")</div>
+                            <select id="congTyIds" name="congTyIds" class="form-control select2"></select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnThucHienThemCongTyVaoNhomPhanQuyen"><i class="lni lni-plus"></i>@Html.Raw("Thêm")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="lni lni-ban"></i>@Html.Raw("Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="confirmDeleteCongTyModal" tabindex="-1" aria-labelledby="confirmDeleteCongTyModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteCongTyModalLabel">@Html.Raw("Thông báo")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmDeleteModalContent">@Html.Raw("Bạn có chắc chắn là muốn xóa dữ liệu này?")</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnExecuteDeletedCongTy"><i class="lni lni-checkmark"></i>@Html.Raw("Đồng ý")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="lni lni-ban"></i>@Html.Raw("Hủy bỏ")</button>
+            </div>
+        </div>
+    </div>
+</div>

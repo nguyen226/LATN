@@ -1,0 +1,140 @@
+﻿@using JetMedicalWebApp.Entities.EntityDto
+@using JetMedicalWebApp.Common
+
+@model JetMedicalWebApp.Models.BaseViewModel
+
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+
+<div class="content_gt_bv199">
+    <div class="xoamargin">
+        @{
+            List<NewsContentDto> news = (List<NewsContentDto>)ViewData["newsList"];
+            if (news.Count() > 0)
+            {
+                foreach (NewsContentDto item in news)
+                {
+                    @Html.Raw("<div class='khung_dv_con'>")
+                    @Html.Raw("<div class='khung_t_tinkham'>")
+                    @Html.Raw("<div class='img_effect'>")
+
+                    if (!string.IsNullOrEmpty(item.slug))
+                    {
+                        @Html.Raw("<a href='/" + (item.slug).ToLower() + "_dt_" + item.id + "'>")
+                    }
+                    else
+                    {
+                        @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_dt_" + item.id + "'>")
+                    }
+
+
+                    if (item.avatar != "")
+                    {
+                        @Html.Raw("<img src='" + item.avatar + "' alt='" + item.name + "'>")
+
+                    }
+                    else
+                    {
+                        @Html.Raw("<img src='/Images/files/Logo_BenhVien199.png'  alt='" + item.name + "'>")
+                    }
+                    @Html.Raw("</a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("<div class='time_up'>")
+                    @Html.Raw("<h6>" + item.created_at.Substring(0, 2) + "</h6>")
+                    @Html.Raw("<p>" + item.created_at.Substring(3) + "</p>")
+
+                    @Html.Raw("</div>")
+                    @Html.Raw("<div class='ct_tin'>")
+                    @Html.Raw("<h4 class='title_dv'>")
+                    if (!string.IsNullOrEmpty(item.slug))
+                    {
+                        @Html.Raw("<a href='/" + (item.slug).ToLower() + "_dt_" + item.id + "' class='title'>" + item.name + "</a>")
+                    }
+                    else
+                    {
+                        @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_dt_" + item.id + "' class='title'>" + item.name + "</a>")
+                    }
+
+
+                    @Html.Raw("</h4>")
+                    @Html.Raw("<div class='descript_dv'>")
+                    @Html.Raw("<p>" + item.shorttitle + "</p>")
+                    @Html.Raw(" </div>")
+                    if (!string.IsNullOrEmpty(item.slug))
+                    {
+                        @Html.Raw("<a href='/" + (item.slug).ToLower() + "_dt_" + item.id + "' class='more_dv'>Xem thêm")
+                    }
+                    else
+                    {
+                        @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_dt_" + item.id + "' class='more_dv'>Xem thêm")
+                    }
+
+                    @Html.Raw("<i class='fa fa-more-next'></i></a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                }
+            }
+            else
+            {
+                @Html.Raw(Model.Resource != null ? Model.Resource.name : "Nội dung đang cập nhật");
+            }
+        }
+
+    </div>
+</div>
+
+@if (Model.TongSoTrang > 1)
+{
+    NewsCategoryDto newsCategory = (NewsCategoryDto)ViewData["categori"];
+    int pageStart = Model.PageIndex - 3 > 1 ? Model.PageIndex - 3 : 1;
+    int pageEnd = Model.PageIndex + 3 < Model.TongSoTrang ? Model.PageIndex + 3 : Model.TongSoTrang;
+
+    <div class="pagination">
+        <ul class="page-number">
+            <li class="paginate_button @(Model.PageIndex == 1 || Model.PageIndex < 1 ? "d-none" : "")">
+                <a href="@(Model.PageIndex == 1 || Model.PageIndex < 1 ? "javascript:void(0);" : Model.Url + "?pageIndex=" + (Model.PageIndex - 1))">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            </li>
+            @if (pageStart > 1)
+            {
+                <li><a href='@(Model.Url + "?pageIndex=" +1)'>1</a></li>
+            }
+            @if (pageStart > 2)
+            {
+                <li class="active"><a href="#">...</a></li>
+            }
+            @for (int n = pageStart; n <= pageEnd; n++)
+            {
+                if (n == Model.PageIndex)
+                {
+                    <li class="active"><a id="@n" href="#">@n.ToString()</a></li>
+                }
+                else
+                {
+                    <li><a href='@(Model.Url + "?pageIndex=" +n)'>@n.ToString()</a></li>
+                }
+            }
+            @if (pageEnd < Model.TongSoTrang - 1)
+            {
+                <li><a href="#">...</a></li>
+            }
+            @if (pageEnd < Model.TongSoTrang)
+            {
+                <li><a href='@(Model.Url + "?pageIndex=" +Model.TongSoTrang)'>@Model.TongSoTrang</a></li>
+            }
+            <li class="paginate_button @(Model.PageIndex == Model.TongSoTrang || Model.PageIndex > Model.TongSoTrang ? "d-none" : "")">
+                <a href="@(Model.PageIndex == Model.TongSoTrang || Model.PageIndex > Model.TongSoTrang ? "javascript:void(0);" : Model.Url + "?pageIndex=" + (Model.PageIndex + 1))">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+}
+
+
+
+
+

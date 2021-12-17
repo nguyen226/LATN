@@ -1,0 +1,52 @@
+﻿@using JetMedicalWebApp.Entities.EntityDto
+@using JetMedicalWebApp.Common
+@{
+    Layout = "~/Views/Shared/_AboutLayout.cshtml";
+}
+
+<div class="content_gt_bv199">
+    <div class="xoamargin">
+        @{
+            List<NewsContentDto> result = (List<NewsContentDto>)ViewData["searchResult"];
+            if (result.Count() > 0)
+            {
+                foreach (NewsContentDto item in result)
+                {
+                    @Html.Raw("<div class='khung_dv_con'>")
+                    @Html.Raw("<div class='khung_t_tinkham'>")
+                    @Html.Raw("<div class='img_effect'>")
+                    @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_dt_" + item.id + "'>")
+
+                    if (item.avatar != null)
+                    {
+                        @Html.Raw("<img src='" + item.avatar + "' alt=''>")
+
+                    }
+                    else
+                    {
+                        @Html.Raw("<img src='/Images/files/Logo_BenhVien199.png'  alt=''>")
+                    }
+                   
+                    @Html.Raw("</a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("<div class='ct_tin'>")
+                    @Html.Raw("<h4 class='title_dv'>")
+                    @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_dt_" + item.id + "' class='title'>" + item.name + "</a>")
+                    @Html.Raw("</h4>")
+                    @Html.Raw("<div class='descript_dv'>")
+                    @Html.Raw("<p>" + item.shorttitle + "</p>")
+                    @Html.Raw(" </div>")
+                    @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_dt_" + item.id + "' class='more_dv'>Xem thêm")
+                    @Html.Raw("<i class='fa fa-more-next'></i></a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                }
+            }
+            else
+            {
+                @Html.Raw("Không tìm thấy thông tin")
+            }
+        }
+    </div>
+</div>

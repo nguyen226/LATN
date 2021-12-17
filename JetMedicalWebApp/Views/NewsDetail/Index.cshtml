@@ -1,0 +1,186 @@
+﻿@using JetMedicalWebApp.Entities.Entity
+@using JetMedicalWebApp.Entities.EntityDto
+@using JetMedicalWebApp.Common
+@{
+    Layout = "~/Views/Shared/_NewLayout.cshtml";
+}
+
+@{
+    List<NewsContentDto> packagesOther = new List<NewsContentDto>();
+    NewsContentDto package = null;
+    int memberId = -1;
+    if (ViewData.ContainsKey("MemberId"))
+    {
+        memberId = (int)ViewData["MemberId"];
+    }
+    if (ViewData.ContainsKey("Package"))
+    {
+        package = (NewsContentDto)ViewData["Package"];
+    }
+    if (ViewData.ContainsKey("PackagesOther"))
+    {
+        packagesOther = (List<NewsContentDto>)ViewData["PackagesOther"];
+    }
+}
+
+<script type="text/javascript">
+    function dangKyKham(that) {
+        var packageId = $(that).data("packageid");
+        var packageName = $(that).data("name");
+
+        @if (memberId > 0)
+        {
+            <text>
+                resetFormDatLichKham();
+                $('#datLichKhamModal').modal();
+            $('.timepicker').timepicker({
+                showMeridian: false,
+                scrollbar: true,
+            });
+
+            $('#formDatLichKham_GoiKham').append('<option value="' + packageId + '" selected>' + packageName + '</option>');
+            </text>
+        }
+        else
+        {
+            <text>
+                loginForm();
+            </text>
+        }
+    }
+</script>
+
+<div class="title_content">
+    <h4 class='title-sm'>@Html.Raw(ViewBag.Title)</h4>
+</div>
+@*<div class="time_up_content">
+        <p>Cập nhật ngày: 20/04/2020</p>
+    </div>*@
+<div class="content_gt_bv199">
+    @Html.Raw(HttpUtility.HtmlDecode(ViewBag.Description.Replace("&nbsp;", " ")))
+</div>
+
+@if (package != null)
+{
+    <div class="more_tatca col-md-12">
+        <a href="javscript:void(0)" data-packageid="@package.id" data-name="@Html.Raw(package.name)" onclick="dangKyKham(this)" class="more more_blue click_view"><i class="fa fa-dk"></i> ĐĂNG KÝ GÓI KHÁM</a>
+        <br />
+        <br />
+    </div>
+}
+@{
+    if (packagesOther.Count() > 0)
+    {
+        <div class="cg_bs_lq11">
+            <h3 class="title_center">
+                GÓI DỊCH VỤ BẠN QUAN TÂM
+            </h3>
+            <div class="xoamargin">
+                <div class="slider_doingu_lq">
+                    @foreach (var item in packagesOther)
+                    {
+                        <div class="khung_tinkham">
+                            <div class="khung_t_tinkham">
+                                <div class="img_effect">
+                                    <a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_pdt_@item.id">
+                                        <img src='@item.avatar' class="img_project">
+                                    </a>
+                                </div>
+                                <div class="text_tinkham">
+                                    <h4 class="title_xanh"><a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_pdt_@item.id">@item.title</a></h4>
+                                    <div class="price">
+                                        <p class="price_old">@string.Format("{0:#,0.#}", item.priceOld) đ</p>
+                                        <p class="price_sale">@string.Format("{0:#,0.#}", item.priceSale) đ</p>
+                                    </div>
+                                    <a href="javascript:void(0)" data-packageid="@item.id" data-name="@Html.Raw(item.title)" onclick="dangKyKham(this)" class="more_blue click_view"><i class="fa fa-dk"></i>  Đăng ký</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+
+    }
+}
+<div class="menu-tags  mgbt-xs-15">
+    <i class="fa fa-tags"></i>
+    <strong class="tag-item">Tags</strong>
+    @{
+        var tags = (List<Tag>)ViewBag.Tags;
+
+        if (tags != null)
+        {
+            if (tags.Count > 0)
+            {
+                foreach (var item in tags.Where(m => !string.IsNullOrEmpty(m.TagId)))
+                {
+                    <a href='/tag/@Utilities.urlConvert(Utilities.VnConcert(item.TagId).ToLower())'><span class="labeltag vd_bg-blue">@item.Name</span></a>
+                }
+            }
+        }
+    }
+</div>
+
+
+
+
+
+@*<div class="follow_us">
+        <h5>Chia sẻ:</h5>
+        <div class="mxh_fl">
+            <a href=""><img src="~/Content/Website/Assets/images/fb.svg"></a>
+            <a href=""><img src="~/Content/Website/Assets/images/yt.svg"></a>
+            <a href=""><img src="~/Content/Website/Assets/images/tw.svg"></a>
+            <a href=""><img src="~/Content/Website/Assets/images/gg.svg"></a>
+            <a href=""><img src="~/Content/Website/Assets/images/insta.svg"></a>
+        </div>
+    </div>*@
+
+
+
+
+@{
+    List<NewsContentDto> newsOther = (List<NewsContentDto>)ViewData["newsOther"];
+    if (newsOther.Count() > 0)
+    {
+        <div class="cg_bs_lq">
+            <h3 class="title_center">
+                CÁC TIN TỨC KHÁC
+            </h3>
+            <div class="xoamargin">
+                <div class="slider_doingu_lq">
+                   @foreach (NewsContentDto item in newsOther.OrderByDescending(x => x.created_at))
+                    {
+                    @Html.Raw("<div class='khung_dv_con'>")
+                    @Html.Raw("<div class='khung_t_tinkham'>")
+                    @Html.Raw("<div class='img_effect'>")
+                    @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_dt_" + item.id + "'>")
+                    @Html.Raw("<img src='" + item.avatar + "'>")
+                    @Html.Raw("</a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("<div class='time_up'>")
+                    @Html.Raw("<h6>" + item.created_at.Substring(0, 2) + "</h6>")
+                    @Html.Raw("<p>" + item.created_at.Substring(3) + "</p>")
+
+                    @Html.Raw("</div>")
+                    @Html.Raw("<div class='ct_tin'>")
+                    @Html.Raw("<h4 class='title_dv'>")
+                    @Html.Raw("<a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_dt_" + item.id + "'>" + item.fullname + "</a>")
+                    @Html.Raw("</h4>")
+                    @*@Html.Raw("<div class='descript_dv'>")
+                        @Html.Raw("<p>" + item.shorttitle + "</p>")
+                        @Html.Raw("</div>")*@
+                    @Html.Raw("<a  class='more_dv' href='/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_dt_" + item.id + "'>")
+                    @Html.Raw("Xem thêm <i class='fa fa-more-next'></i></a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+

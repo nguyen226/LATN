@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Tra cứu kết quả KSK";
+    Layout = "~/Views/Shared/_TraCuuLayout.cshtml";
+}
+
+
+<div class="heading clearfix">
+    <div class="logo" style="width: 200px; display: block; margin-left: auto; margin-right: auto">
+        <h2 class="mgbt-xs-5"><img src="~/Content/theme/img/ico/logo-bv199.png" alt="logo"></h2>
+    </div>
+    <br />
+    <h3 class="text-center vd_grey" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight:700">TRA CỨU KẾT QUẢ KSK</h3>
+</div>
+<div class="panel widget">
+    <div class="panel-body">
+
+        <form class="form-horizontal" action="" role="form" id="register-form">
+            <div class="alert alert-danger vd_hidden" id="hienThiLoi">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="icon-cross"></i></button>
+                <span class="vd_alert-icon"><i class="fa fa-exclamation-circle vd_red"></i></span>
+                <strong>
+                    Không tìm thấy kết quả khám chữa bệnh!
+                </strong>
+            </div>
+
+            <h4 class="text-center vd_grey" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight:700; ">
+                MÃ LƯỢT KCB VÀ ID (TRÊN PHIẾU KCB)
+            </h4>
+            <div class="form-group">
+                <div class="col-md-12" style="margin-bottom: 10px">
+                    <div class="vd_input-wrapper" id="company-input-wrapper">
+                        <span class="menu-icon"> <i class="fa fa-hospital-o"></i> </span>
+                        <input type="text" placeholder="Nhập mã bệnh nhân của bạn tại đây!" required name="" id="quickSearchMaBN">
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="vd_input-wrapper" id="company-input-wrapper">
+                        <span class="menu-icon"> <i class="fa fa-hospital-o"></i> </span>
+                        <input type="text" placeholder="Nhập mã KCB bạn tại đây!" class="required" required  id="quickSearchMA_LK" >
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-3 text-center mgbt-xs-5" style="float:right">
+                    <button class="btn btn-info vd_white width-100" type="button" id="tra-cuu" name="tra-cuu">TRA CỨU</button>
+                </div>
+            </div>
+            <br />
+
+
+
+            <div class="form-group" id="thongtin" style="display:none">
+                <div class="col-md-12">
+                    <label class="col-xs-6 control-label">Họ và tên:</label> <div class="col-xs-6 controls" id="hoTen"> Nguyễn Văn A </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-xs-6 control-label">Năm sinh:</label> <div class="col-xs-6 controls" id="namSinh"> 1994 </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-xs-6 control-label">Số điện thoại:</label> <div class="col-xs-6 controls" id="soDienThoai"> 012*****789 </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="col-xs-6 control-label">Ngày khám:</label> <div class="col-xs-6 controls" id="ngayKham"> 20/6/2021</div>
+                </div>
+                <div class="col-md-3 text-center mgbt-xs-5" style="float:right">
+                    <a class="btn btn-success vd_white width-100" id="ketQua" data-link="" name="ketQua">Kết quả</a>
+                </div>
+            </div>
+        </form>
+
+        <div style="bottom:0px"> <i> (Ghi chú: Nếu bạn đã nhập đúng Mã KCB và ID nhưng chưa nhận được kết quả KCB, Vui lòng tra cứu lại sau - hệ thống đang đồng bộ dữ liệu KCB.)</i></div>
+    </div>
+</div>
+<!-- Panel Widget -->
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#tra-cuu').click(function () {
+            var url = "@Url.Action("TimKiemKetQuaKSK", "ResultOnline")";
+                var data = {
+                    maBN: $('#quickSearchMaBN').val(),
+                    maLK: $('#quickSearchMA_LK').val()
+                };
+
+                sendDataToURL(url, data, true)
+                    .then(function (res) {
+                        console.log(res);
+
+                    if (res.ketQua == true) {
+                        $('#hienThiLoi').hide();
+                        $('#hoTen').text(res.hoTen);
+                        $('#namSinh').text(res.namSinh);
+                        $('#soDienThoai').text(res.soDienThoai);
+                        $('#ngayKham').text(res.ngayKham);
+                        $('#ketQua').attr('href', '/ResultOnline/KetQuaKSK?id=' + res.id);
+                        $('#thongtin').show();
+                    }
+                    else {
+                        $('#hienThiLoi').show();
+                        $('#thongtin').hide();
+                    }
+                    });
+            
+        })
+    });
+
+</script>
+
+
+

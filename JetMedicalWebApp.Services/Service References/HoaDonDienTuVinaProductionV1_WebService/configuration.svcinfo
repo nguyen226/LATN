@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configurationSnapshot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-microsoft-com:xml-wcfconfigurationsnapshot">
+  <behaviors />
+  <bindings>
+    <binding digest="System.ServiceModel.Configuration.BasicHttpBindingElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089:&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data name=&quot;ServiceCreateInvoiceCode1Soap3&quot;&gt;&lt;security mode=&quot;Transport&quot; /&gt;&lt;/Data&gt;" bindingType="basicHttpBinding" name="ServiceCreateInvoiceCode1Soap3" />
+    <binding digest="System.ServiceModel.Configuration.BasicHttpBindingElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089:&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data name=&quot;ServiceCreateInvoiceCode1Soap4&quot; /&gt;" bindingType="basicHttpBinding" name="ServiceCreateInvoiceCode1Soap4" />
+  </bindings>
+  <endpoints>
+    <endpoint normalizedDigest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;https://ehd.smartvas.vn:10888/ServiceCreateInvoiceCode1.asmx&quot; binding=&quot;basicHttpBinding&quot; bindingConfiguration=&quot;ServiceCreateInvoiceCode1Soap3&quot; contract=&quot;HoaDonDienTuVinaProductionV1_WebService.ServiceCreateInvoiceCode1Soap&quot; name=&quot;ServiceCreateInvoiceCode1Soap2&quot; /&gt;" digest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;https://ehd.smartvas.vn:10888/ServiceCreateInvoiceCode1.asmx&quot; binding=&quot;basicHttpBinding&quot; bindingConfiguration=&quot;ServiceCreateInvoiceCode1Soap3&quot; contract=&quot;HoaDonDienTuVinaProductionV1_WebService.ServiceCreateInvoiceCode1Soap&quot; name=&quot;ServiceCreateInvoiceCode1Soap2&quot; /&gt;" contractName="HoaDonDienTuVinaProductionV1_WebService.ServiceCreateInvoiceCode1Soap" name="ServiceCreateInvoiceCode1Soap2" />
+  </endpoints>
+</configurationSnapshot>

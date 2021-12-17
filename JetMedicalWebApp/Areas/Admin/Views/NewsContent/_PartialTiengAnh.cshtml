@@ -1,0 +1,154 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.NewsContentViewModels
+@using JetMedicalWebApp.Common
+
+<div class="vd_content-section clearfix">
+    <div class="row clearfix">
+        <form class="form-horizontal" action="#" id="formEN" role="form">
+            <div class="col-md-8 mgbt-md-20 mgbt-lg-0">
+                <div class="panel widget">
+                    <div class="panel-heading vd_bg-green">
+                        <h3 class="panel-title"> <span class="menu-icon"> <i class="fa fa-magic"></i> </span> CONTENT </h3>
+                    </div>
+                    <input type="text" id="idEN" class="form-control hidden" value="@(Model.NewsContent != null ? Model.NewsContent.id : 0)">
+                    <input type="text" id="codeEN" class="form-control hidden" value="@(Model.NewsContent != null ? Model.NewsContent.code : "")">
+
+                    <div class="panel-body-list">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Name</div>
+                            <input type="text" id="name" class="form-control" placeholder="tên" value="@(Model.NewsContent != null ? Model.NewsContent.name : "")">
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Date created</div>
+                            <input type="text" id="ngayTao" class="form-control datepicker" placeholder="Ngày tạo" value="@(Model.NewsContent != null ? Model.NewsContent.created_at : DateTime.Now.ToString("yyyy-MM-dd"))">
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Tags</div>
+                            <input type="text" id="tag" data-rel="tags-input" class="form-control" placeholder="Tags" value="@(Model.NewsContent != null ? Model.NewsContent.Tags : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Package</div>
+                            <input id="packageId" name="packageId" type="text" class="form-control tags" value="@(Model.NewsContentVN != null ? Model.NewsContent.GoiKham : string.Empty)" />
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Danh mục tin</div>
+                            <select id="categoriId" name="categoriId" class="form-control select2">
+                                @if (Model.NewsCategory != null)
+                                {
+                                    <option value="@Model.NewsCategory.id" selected> @Html.Raw(Model.NewsCategory.name) </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Mô tả ngắn</div>
+                            <textarea class="form-control" cols="20" id="shorttitle" name="shorttitle" placeholder="Mô tả ngắn" rows="6">@if (Model.NewsContent != null){<text>@Html.Raw(Model.NewsContent.shorttitle != null ? Model.NewsContent.shorttitle.Replace("&nbsp;", " ") : "")</text>}</textarea>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                            <div class="form-label">Position</div>
+                            <input type="number" id="position" class="form-control" placeholder="position" value="@(Model.NewsContent != null ? Model.NewsContent.position : 0)">
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                            <br />
+                            <div class="vd_checkbox  checkbox-success">
+                                <input type="checkbox" id="active" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.isactive ? "checked" : "" : "")>
+                                <label for="active"> Kích hoạt</label>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                            <br />
+                            <div class="vd_checkbox  checkbox-success">
+                                <input type="checkbox" id="ishot" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.ishot ? "checked" : "" : "")>
+                                <label for="ishot"> Tin hot</label>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                            <br />
+                            <div class="vd_checkbox  checkbox-success">
+                                <input type="checkbox" id="approved" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.approved ? "checked" : "" : "")>
+                                <label for="approved"> Phê duyệt</label>
+                            </div>
+                        </div>
+                        <br />
+                        @*<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <br />
+            <div class="vd_checkbox  checkbox-success">
+                <input type="checkbox" id="ActivePhone" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.ActivePhone ? "checked" : "" : "")>
+                <label for="ActivePhone"> Active Phone</label>
+            </div>
+        </div>*@
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4 sidebar-affix">
+                <div class="panel widget">
+                    <div class="panel-heading vd_bg-blue">
+                        <h3 class="panel-title white"><span class="menu-icon"> <i class="fa fa-info"></i> </span> SEO </h3>
+                    </div>
+                    <div class="panel-body-list">
+                        <div class="content-list menu-action-right">
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                <div class="form-label">Meta title</div>
+                                <div class="input-group">
+                                    <span class="input-group-addon float-left" id="meta_title_counter">70</span>
+                                    <input type="text" class="form-control" data-maxchar="70" onblur="updateLinkRewrite();" onkeyup="if (isArrowKey(event)) return ;updateFriendlyURL();" value="@(Model.NewsContent != null ? Model.NewsContent.title : "")" name="title" id="title">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                <div class="form-label">Meta Keyword</div>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="keywords_counter">160</span>
+                                    <input type="text" class="form-control" data-maxchar="160" data-rel="tags-input" onblur="updateLinkRewrite();" onkeyup="if (isArrowKey(event)) return ;" value="@(Model.NewsContent != null ? Model.NewsContent.keywords : "")" name="keywords" id="keywords">
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                <div class="form-label">Meta description</div>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="meta_description_counter">160</span>
+                                    <input type="text" data-maxchar="160" onblur="updateLinkRewrite();" onkeyup="if (isArrowKey(event)) return ;" value="@(Model.NewsContent != null ? Model.NewsContent.descriptions : "")" name="descriptions" id="descriptions">
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                <div class="form-label">Friendly URL</div>
+                                <input type="text" id="slug" class="form-control" placeholder="Alias" value="@(Model.NewsContent != null ? Model.NewsContent.slug : "")">
+
+                                <br />
+                            </div>
+                           
+                           
+                        </div>
+                    </div>
+                    <br />
+                    <div class="panel-heading vd_bg-yellow">
+                        <h3 class="panel-title"> <span class="menu-icon"> <i class="fa fa-image"></i> </span>HÌNH ĐẠI DIỆN</h3>
+                    </div>
+                    <div class="panel-body-list text-center">
+                        <img id="imagePreview"
+                             @if (Model.NewsContent != null) { if (!string.IsNullOrEmpty(Model.NewsContent.avatar)) { <text>
+                             src="@Url.Content(Model.NewsContent.avatar)"
+                             </text>  } else { <text>
+                             src="@CommonConstants.FileNoImage"
+                             </text>  } } else { <text>
+                             src="@CommonConstants.FileNoImage"
+                             </text> } alt="Image" width="300" height="200" />
+                    </div>
+                </div>
+                <!-- Panel Widget -->
+            </div>
+        </form>
+    </div>
+
+    <div class="panel-body" id="panelBody">
+        
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <textarea rows="50" class="form-control m-input" id="description" placeholder="Chi tiết">
+                    @if (Model.NewsContent != null)
+                    { <text> @Html.Raw(Model.NewsContent.description != null ? Model.NewsContent.description.Replace("&nbsp;", " ") : "")</text>}
+                </textarea>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,341 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.StaffViewModels
+@{ ViewBag.Title = "Chuyên gia";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+    }
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+
+}
+
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/ckfinder/ckfinder.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/ckeditor/ckeditor.js")"></script>
+}
+
+<script type="text/javascript">
+    var staff = null;
+
+     @if(Model.Staff != null)
+    {
+        <text>
+    staff = {
+        id: '@Model.Staff.id'
+    };
+    </text>
+    }
+
+
+    $(document).ready(function () {
+        initialSelect2Option();
+
+        $("#imagePreview").click(function (e) {
+            e.preventDefault();
+            var finder = new CKFinder();
+            finder.selectActionFunction = function (url) {
+                if ($('#imagePreview').hasClass("d-none")) {
+                    $('#imagePreview').removeClass("d-none");
+                }
+                $('#imagePreview').attr('src', url);
+            };
+            finder.popup();
+        });
+
+        CKEDITOR.replace('description', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+
+
+        $("#imagePreview").click(function (e) {
+            e.preventDefault();
+
+            var finder = new CKFinder();
+            finder.selectActionFunction = function (url) {
+                if ($('#imagePreview').hasClass("d-none")) {
+                    $('#imagePreview').removeClass("d-none");
+                }
+                $('#imagePreview').attr('src', url);
+            };
+            finder.popup();
+        });
+
+
+        $('[name="btnTroVeDanhSach"], #btnTroLai').click(function () {
+            window.location.href = "@Url.Action("Index", "Staff", new { area = "Admin" })";
+        });
+
+        $('[name="btnAddNew"]').click(function () {
+            window.location.href = "@Url.Action("Update", "Staff", new { area = "Admin" })";
+        });
+
+        $('#btnXoa').click(function () {
+            $('#confirmDeleteDataRowModal').modal('show');
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            var data = { ids: staff != null ? staff.id : "" };
+            var url = "@Url.Action("DeleteByIds", "Staff", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    if (res == null) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                    }
+                    else if (res == "") {
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        window.location.href = "@Url.Action("Index", "Staff", new { area = "Admin" })";
+                    }
+                }
+            });
+        });
+
+        $('#btnLuu').click(function () {
+            var values = {
+                id: $('#id').val(),
+                code: $('#code').val(),
+                fullname: $('#fullName').val(),
+                brandname: $('#brandname').val(),
+                position: $('#position').val(),
+                summary: $('#summary').val(),
+                newscategoryid: $('#newscategoryid').val(),
+                isactive: $('#active').is(':checked'),
+                Isexamination: $('#Isexamination').is(':checked'),
+                img: $('#imagePreview').attr('src'),
+                order: $('#order').val(),
+                description: CKEDITOR.instances.description.getData(),
+                languageId: $('#languageId').val(),
+            };
+
+
+            var url = "@Url.Action("AddOrUpdate", "Staff", new { area = "Admin" })";
+
+            var data = {
+                listItem: [values]
+            };
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else
+                {
+                    $('#form')[0].reset();
+                    $('#imagePreview').attr('src', '');
+                    showNotificationAndAskModal('Thông báo', 'Cập nhật thành công.');
+                }
+            });
+        });
+    });
+
+    function initialSelect2Option() {
+         var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+            dropdownlistSelect2Option.placeholder = "Loại tin";
+            dropdownlistSelect2Option.ajax = {
+                type: "POST",
+                url: '@Url.Action("FilterParent", "NewsCategory")',
+                dataType: 'json',
+                contentType: "application/json",
+                delay: 250,
+                data: function (params) {
+                    var selectedFields = 'id, name, parent_ids';
+                    var condition = (params.term ? " AND (name LIKE N'%" + params.term + "%')" : "");
+
+                    return JSON.stringify({
+                        selectedFields: selectedFields,
+                        stringFilter: condition,
+                        top: 20
+                    });
+                },
+                processResults: function (res, params) {
+                    var data = $.map(res, function (item, i) {
+                        var space = '';
+
+                        if (!isNullOrEmpty(item.parent_ids)) {
+                            space = hienThiPhanBacV2(item.parent_ids.split(',').length);
+                        }
+                        return {
+                            id: item.id,
+                            text: space + item.name
+                        }
+                    });
+
+                    data.unshift({
+                        id: -1,
+                        text: ""
+                    })
+
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+        };
+        dropdownlistSelect2Option.escapeMarkup = function (markup) {
+            return markup;
+        }
+
+        $('#newscategoryid').select2(dropdownlistSelect2Option);
+
+    }
+</script>
+
+
+<div class="d-flex justify-content-between">
+    @Html.Partial("_PartialContentHeader")
+    <div class="mb-3">
+        <button class="btn buttons-excel buttons-html5 btn-secondary" id="btnTroLai" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-arrow-back"></i><span> Trở lại danh sách</span></button>
+
+
+        @if (Model.Menu_GroupPermission.SystemDelete == true && Model.Staff != null)
+        {
+            <button class="btn buttons-excel buttons-html5 btn-danger" id="btnXoa" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-trash-alt"></i><span> Xoá</span></button>
+
+        }
+
+        @if (Model.Menu_GroupPermission.SystemEdit == true)
+        {
+            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnLuu" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-save"></i><span> Lưu</span></button>
+        }
+    </div>
+</div>
+
+
+<form id="form">
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs nav-primary" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#formData_ThongTin" role="tab" aria-selected="false">
+                        <div class="d-flex align-items-center">
+                            <div class="tab-icon">
+                                <i class='bx bx-home-alt font-18 me-1'></i>
+                            </div>
+                            <div class="tab-title">Thông tin</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content py-3">
+                <div class="tab-pane fade show active" id="formData_ThongTin" role="tabpanel">
+                    <div class="row g3">
+                        <div class="col-md-9 mb-2">
+                            <div class="row d-flex">
+
+                                <input type="text" id="id" class="form-control " hidden value="@(Model.Staff != null ? Model.Staff.id : 0)">
+                                <input type="text" id="code" class="form-control " hidden value="@(Model.Staff != null ? Model.Staff.code : "")">
+
+
+                                <div class="col-md-12 mb-2">
+                                    <label for="languageId" class="form-label">@Html.Raw("Ngôn ngữ")</label>
+                                    <select class="form-select select2-local" id="languageId">
+                                        @foreach (var item in CommonConstants.GetDanhSachNgonNgu())
+                                        {
+                                            <option value="@item.Id" @(Model.Staff != null ? (Model.Staff.languageId == item.Id ? "selected" : "") : (item.Id == Model.LanguageId ? "selected" : ""))>@Html.Raw(item.Name)</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-12 mb-2">
+                                    <label for="name" class="form-label">@Html.Raw("Tên")</label>
+                                    <input type="text" id="fullName" class="form-control" placeholder="full name" value="@(Model.Staff != null ? Model.Staff.fullname : "")">
+                                </div>
+
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <div class="form-label">Brand Name</div>
+                                    <input type="text" id="brandname" class="form-control" placeholder="brand name" value="@(Model.Staff != null ? Model.Staff.brandname : "")">
+                                </div>
+
+
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <div class="form-label">Chức vụ</div>
+                                    <input type="text" id="position" class="form-control" placeholder="Chức vụ" value="@(Model.Staff != null ? Model.Staff.position : "")">
+                                </div>
+
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <div class="form-label">Thứ tự</div>
+                                    <input type="number" id="order" class="form-control" placeholder="Thứ tự" value="@(Model.Staff != null ? Model.Staff.order : 0)">
+                                </div>
+
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <div class="form-label">Summary</div>
+                                    <input type="text" id="summary" class="form-control" placeholder="summary" value="@(Model.Staff != null ? Model.Staff.summary : "")">
+                                </div>
+
+                                <div class="col-md-12 mb-2">
+                                    <label for="newscategoryid" class="form-label">@Html.Raw("Chuyên khoa")</label>
+                                    <select id="newscategoryid" class="form-control select2">
+                                        @if (Model.Staff != null)
+                                        {
+                                            <option value="@Model.Staff.newscategoryid" selected> @Html.Raw(Model.Staff.newcategoryname) </option>
+                                        }
+                                    </select>
+                                </div>
+
+
+                                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                    <br />
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="active"  @(Model.Staff != null ? Model.Staff.isactive ? "checked" : "" : "")>
+                                        <label class="form-check-label" for="active">@Html.Raw("Kích hoạt")</label>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                    <br />
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="Isexamination"  @(Model.Staff != null ? Model.Staff.Isexamination ? "checked" : "" : "")>
+                                        <label class="form-check-label" for="Isexamination">@Html.Raw("Đăng ký lịch khám trực tuyến")</label>
+                                    </div>
+
+                                 
+                                </div>
+
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                    <textarea rows="50" class="form-control m-input" id="description" placeholder="Chi tiết">
+                                        @if (Model.Staff != null && !string.IsNullOrEmpty(Model.Staff.description))
+                                        {
+                                            @(Html.Raw(Model.Staff.description != null ? Model.Staff.description.Replace("&nbsp;", " ") : ""))
+                                        }
+                                    </textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <div class="form-img text-center mgbt-xs-15">
+                                <img id="imagePreview" src="@(Model.Staff != null && !string.IsNullOrEmpty(Model.Staff.img) ?Url.Content(Model.Staff.img) : CommonConstants.FileNoImage)" alt="Image" width="300" height="300" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

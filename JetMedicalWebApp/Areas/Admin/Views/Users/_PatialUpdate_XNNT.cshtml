@@ -1,0 +1,195 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    var tableXNNT;
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (tableXNNT) !== 'undefined') {
+                tableXNNT.columns.adjust();
+            }
+        });
+      let selectedFields = "KSK_XNNT_ID, MA_LK, TEN_XNNT, KQ_XNTT";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "KSK_XNNT", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearchXNNT').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(TEN_XNNT LIKE N'%" + $('#quickSearchXNNT').val().trim() + "%' OR KQ_XNTT LIKE N'%" + $('#quickSearchXNNT').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+                stringFilter += "MA_LK=N'" + (ttbnData != null ? ttbnData.maLK : "-1") + "'";
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableXNNT.columns.adjust();
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                "searchable": false
+            },
+            {
+                "targets": [3],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            },
+            {
+                "targets": [4],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowDelete)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "Mã Lượt khám" },
+            { "data": "TEN_XNNT", "name": "TEN_XNNT", "autoWidth": true, "title": "Tên XNNT" },
+            { "data": "KQ_XNTT", "name": "KQ_XNTT", "autoWidth": true, "title": "Kết quả" },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<button data-original-title="edit" data-toggle="tooltip" data-placement="top" class="btn menu-icon vd_bg-yellow btnEdit"> <i class="fa fa-pencil"></i> </button>';
+                    return html;
+                }, width: "30px"
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<a data-original-title="delete" data-toggle="tooltip" data-placement="top" class="btn menu-icon vd_bg-red" onclick=deleteDataRowDonXNNT(' + row.KSK_XNNT_ID + ')> <i class="fa fa-trash-o"></i> </a>';
+                    return html;
+                }, width: "30px"
+            }
+        ]
+
+        tableXNNT = $('#dtTableXNNT').DataTable(datatableOption);
+
+        $('#dtTableXNNT tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableXNNT.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#dtTableXNNT tbody').on('click', 'tr td.menu-action > .btnEdit', function () {
+            selectedDataRow = tableXNNT.row($(this).parents('tr')).data();
+            $('#formAddNewDataRowXNNT_TEN_XNNT').val(selectedDataRow.TEN_XNNT);
+            $('#formAddNewDataRowXNNT_KQ_XNTT').val(selectedDataRow.KQ_XNTT);
+            $("#modalAddNewDataRowXNNTLabel").text("Cập nhật");
+            $('#modalAddNewDataRowXNNT').modal('show');
+        });
+
+        $('#btnThemMoiRowDataXNNT').click(function (e) {
+            e.preventDefault();
+            $("#modalAddNewDataRowXNNTLabel").text("Thêm mới");
+
+            selectedDataRow = null;
+
+            $('#formAddNewDataRowXNNT')[0].reset();
+            $('#modalAddNewDataRowXNNT').modal('show');
+        });
+
+        $('#btnDeleteDataRowXNNT').click(function (e) {
+            e.preventDefault();
+
+            var selectedDataRowId = $(tableXNNT.$('input:checkbox[name="selectedDataDtTableXNNTId"]').map(function () {
+                return $(this).prop("checked") ? tableXNNT.row($(this).closest('tr')).index() : null;
+            })).toArray();
+
+            if (selectedDataRowId.length > 0) {
+                $('#confirmDeleteDtTableXNNTDataRowModal').modal('show');
+            }
+            else {
+                hienThiThongBaoModal('Thông báo', 'Bạn chưa chọn dòng dữ liệu cần xóa.');
+            }
+        });
+
+        $('#btnExecuteDeleteXNNTDataRow').click(function (e) {
+            e.preventDefault();
+
+            selectedDataRowId = $(tableXNNT.$('input:checkbox[name="selectedDataDtTableXNNTId"]').map(function () {
+                return $(this).prop("checked") ? tableXNNT.row($(this).closest('tr')).index() : null;
+            })).toArray();
+
+            var times = 0;
+            $.each(selectedDataRowId, function (index, item) {
+                tableXNNT.row(item - times).remove().draw();
+
+                times++;
+            });
+
+            $('#confirmDeleteDtTableXNNTDataRowModal').modal('hide');
+        });
+
+        $("#btnRefreshDataXNNT").click(function () {
+            tableXNNT.draw();
+        });
+
+        $("#quickSearchXNNT").change(function () {
+            tableXNNT.draw();
+        });
+    });
+
+ 
+    function deleteDataRowDonXNNT(id) {
+        selectedDataRow = {
+            Id: id,
+            url: '@Url.Action("DeleteByIds", "KSK_XNNT", new { area = "Admin" })',
+            table: tableXNNT
+        };
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+
+</script>
+<div class="panel widget light-widget">
+    <div class="panel-heading no-title">
+        <div class="vd_menu-search table-search input-group input-border">
+            <input type="text" id="quickSearchXNNT"  class="form-control" placeholder="Tìm kiếm">
+            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+        </div>
+        <div class="vd_panel-menu themChiTietXML1">
+            <div id="btnRefreshDataXNNT" class="menu entypo-icon largerFont" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới"> <i class="icon-cycle"></i> </div>
+            <div id="btnThemMoiRowDataXNNT" class="menu entypo-icon largerFont vd_green" data-placement="bottom" data-toggle="tooltip" data-original-title="Thêm"> <i class="icon-plus3"></i> </div>
+        </div>
+    </div>
+    <div class="panel-body" id="panelBody">
+        <div class="row">
+            <table id="dtTableXNNT" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+        </div>
+    </div>
+</div>

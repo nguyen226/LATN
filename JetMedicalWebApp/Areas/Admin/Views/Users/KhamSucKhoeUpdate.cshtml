@@ -1,0 +1,339 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.KSKTTBenhNhanViewModels
+
+@{
+    ViewBag.Title = "Khám sức khỏe";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript">
+    var ttbnData = null;
+    var selectedDataRow = null;
+
+    @if(Model.TTBN != null)
+    {
+        <text>
+    ttbnData = {
+        id: '@Model.TTBN.KSK_ID',
+        maLK: '@Model.TTBN.MA_LK'
+    };
+    </text>
+    }
+
+
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+
+
+        $('#btnTroLai').click(function () {
+            window.location.href = "@Url.Action("KhamSucKhoe", "Users", new { area = "Admin" })";
+        });
+
+        $('#btnXoa').click(function () {
+            selectedDataRow = {
+                Id: ttbnData != null ? ttbnData.id : "",
+                url: '@Url.Action("DeleteKhamSucKhoeByIds", "Users", new { area = "Admin" })',
+                table: null,
+                urlCallback: "@Url.Action("KhamSucKhoe", "Users", new { area = "Admin" })"
+            };
+
+            $('#confirmDeleteDataRowModal').modal('show');
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            if (selectedDataRow != null) {
+                var data = { ids: [selectedDataRow.Id] };
+
+                sendDataToURL(selectedDataRow.url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                         window.location.href = "@Url.Action("KhamSucKhoe", "Users", new { area = "Admin" })";
+                    }
+                });
+            }
+        });
+
+        $('#btnLuu').click(function () {
+            if (checkFormUpdate()) {
+                var fields = [
+                    'MA_LK',
+                    'MA_BN',
+                    'HO_TEN',
+                    'NGAY_SINH',
+                    'GIOI_TINH',
+                    'CMND',
+                    'DIENTHOAI',
+                    'TEN_DOANKSK',
+                    'CAN_NANG',
+                    'CHIEU_CAO',
+                    'HUYET_AP',
+                    'MACH',
+                    'KHAM_LAM_SANG',
+                    'PHAN_LOAI',
+                    'KET_LUAN',
+                    'TU_VAN'
+                ];
+
+                var values = [
+                    $('#FormUpdate_MA_LK').val(),
+                    $('#FormUpdate_MA_BN').val(),
+                    $('#FormUpdate_HO_TEN').val(),
+                    $('#FormUpdate_NGAY_SINH').val(),
+                    $("select#FormUpdate_GIOI_TINH option").filter(":selected").val(),
+                    $('#FormUpdate_CMND').val(),
+                    $('#FormUpdate_DIENTHOAI').val(),
+                    $('#FormUpdate_TEN_DOANKSK').val(),
+                    $('#FormUpdate_CAN_NANG').val(),
+                    $('#FormUpdate_CHIEU_CAO').val(),
+                    $('#FormUpdate_HUYET_AP').val(),
+                    $('#FormUpdate_MACH').val(),
+                    $('#FormUpdate_KHAM_LAM_SANG').val(),
+                    $('#FormUpdate_PHAN_LOAI').val(),
+                    $('#FormUpdate_KET_LUAN').val(),
+                    $('#FormUpdate_TU_VAN').val()
+                ];
+
+                var url = "@Url.Action("AddOrUpdateKhamSucKhoe", "Users", new { area = "Admin" })";
+                sendDataToURL(url, { id: ttbnData != null ? ttbnData.id : "", fields: fields, values: values }, true, null)
+                    .then(function (res) {
+                        console.log(res);
+                    if (res) {
+                        if (res.isError == true) {
+                            notification("top right", "error", "fadeIn animated bx bx-error", "", res.message);
+                        }
+                        else {
+                            ttbnData = { id: res };
+                            notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Cập nhật thành công.");
+                            window.location.href = "@Url.Action("KhamSucKhoeUpdate", "Users", new { area = "Admin" })?Id=" + res.message;
+                        }
+                    }
+                });
+            };
+        });
+
+        $('.nav-tabs a').on('shown.bs.tab', function () {
+            switch ($(this).attr("href")) {
+                case "#tab1":
+                    if (typeof tableCDHA !== 'undefined') {
+                        tableCDHA.columns.adjust();
+                    }
+                    break;
+                case "#tab2":
+                    if (typeof tableXNNT !== 'undefined') {
+                        tableXNNT.columns.adjust();
+                    }
+                    break;
+                case "#tab3":
+                    if (typeof tableCTM !== 'undefined') {
+                        tableCTM.columns.adjust();
+                    }
+                    break;
+
+                case "#tab4":
+                    if (typeof tableXNK !== 'undefined') {
+                        tableXNK.columns.adjust();
+                    }
+                    break;
+            }
+        });
+    });
+
+    function checkFormUpdate() {
+        let check = true;
+        let error = '';
+
+        if (isNullOrEmpty($('#FormUpdate_MA_LK').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mã lượt khám';
+        }
+
+        if (isNullOrEmpty($('#FormUpdate_MA_BN').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mã bệnh';
+        }
+
+
+        if (isNullOrEmpty($('#FormUpdate_HO_TEN').val())) {
+            check = false;
+            error = 'Bạn chưa nhập họ tên';
+        }
+
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+
+</script>
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+                <div class="panel widget light-widget">
+                    <div class="panel-body" id="panelBody">
+                        <form id="formUpdate">
+                            <div class="row d-flex">
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_MA_BN">@Html.Raw("Mã bệnh nhân")</label>
+                                    <input id="FormUpdate_MA_BN" name="FormUpdate_MA_BN" class="form-control" placeholder="Mã bệnh nhân" value="@(Model.TTBN != null ? Model.TTBN.MA_BN : string.Empty)">
+                                </div>
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_MA_LK">@Html.Raw("Mã lượt khám")</label>
+                                    <input id="FormUpdate_MA_LK" name="FormUpdate_MA_LK" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.MA_LK : string.Empty)">
+                                </div>
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_HO_TEN">@Html.Raw("Họ và tên")</label>
+                                    <input id="FormUpdate_HO_TEN" name="FormUpdate_HO_TEN" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.HO_TEN : string.Empty)">
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_NGAY_SINH">@Html.Raw("Ngày sinh")</label>
+                                    <input id="FormUpdate_NGAY_SINH" name="FormUpdate_NGAY_SINH" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.NGAY_SINH : string.Empty)">
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_GIOI_TINH">@Html.Raw("Giới tính")</label>
+                                    <select id="FormUpdate_GIOI_TINH">
+                                        <option value="1" @(Model.TTBN != null ? (Model.TTBN.GIOI_TINH == 1 ? "selected" : "") :"selected")>Nam</option>
+                                        <option value="2" @(Model.TTBN != null ? (Model.TTBN.GIOI_TINH == 2 ? "selected" : "") :"")>Nữ</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_CMND">@Html.Raw("CMND")</label>
+                                    <input id="FormUpdate_CMND" name="FormUpdate_CMND" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.CMND: string.Empty)">
+                                </div>
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_DIENTHOAI">@Html.Raw("Điện thoại")</label>
+                                    <input id="FormUpdate_DIENTHOAI" name="FormUpdate_DIENTHOAI" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.DIENTHOAI: string.Empty)">
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_TEN_DOANKSK">@Html.Raw("Tên DOANKSK")</label>
+                                    <input id="FormUpdate_TEN_DOANKSK" name="FormUpdate_TEN_DOANKSK" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.TEN_DOANKSK : string.Empty)">
+                                </div>
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_CAN_NANG">@Html.Raw("Câng nặng")</label>
+                                    <input id="FormUpdate_CAN_NANG" name="FormUpdate_CAN_NANG" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.CAN_NANG : string.Empty)" />
+                                </div>
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_CHIEU_CAO">@Html.Raw("Chiều cao")</label>
+                                    <input id="FormUpdate_CHIEU_CAO" name="FormUpdate_CHIEU_CAO" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.CHIEU_CAO : string.Empty)" />
+                                </div>
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_HUYET_AP">@Html.Raw("Huyết áp")</label>
+                                    <input id="FormUpdate_HUYET_AP" name="FormUpdate_HUYET_AP" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.HUYET_AP : string.Empty)" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_MACH">@Html.Raw("Mạch")</label>
+                                    <input id="FormUpdate_MACH" name="FormUpdate_MACH" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.MACH : string.Empty)" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_KHAM_LAM_SANG">@Html.Raw("Khám lâm sàng")</label>
+                                    <input id="FormUpdate_KHAM_LAM_SANG" name="FormUpdate_KHAM_LAM_SANG" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.KHAM_LAM_SANG : string.Empty)" />
+                                </div>
+
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_PHAN_LOAI">@Html.Raw("Phân loại")</label>
+                                    <input id="FormUpdate_PHAN_LOAI" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.PHAN_LOAI : string.Empty)" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_KET_LUAN">@Html.Raw("Kết luận")</label>
+                                    <input id="FormUpdate_KET_LUAN" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.KET_LUAN : string.Empty)" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 form-group">
+                                    <label class="form-label" for="FormUpdate_TU_VAN">@Html.Raw("Tư vấn")</label>
+                                    <input id="FormUpdate_TU_VAN" name="FormUpdate_TU_VAN" type="text" class="form-control" value="@(Model.TTBN != null ? Model.TTBN.TU_VAN : string.Empty)" />
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div class="panel-footer text-right">
+                        <button class="btn vd_btn vd_bg-grey" id="btnTroLai" type="button"><i class="append-icon fa fa-fw fa-arrow-left"></i>@Html.Raw(" Trở lại danh sách")</button>
+                        @if (Model.Menu_GroupPermission.SystemDelete == true && Model.TTBN != null)
+                        {
+                            <button class="btn vd_btn vd_bg-red" id="btnXoa" type="button"><i class="append-icon fa fa-fw fa-trash-o"></i>@Html.Raw(" Xóa")</button>
+                        }
+                        <button class="btn vd_btn vd_bg-green" id="btnLuu" type="button"><i class="append-icon fa fa-fw fa-floppy-o"></i>@Html.Raw(" Lưu")</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" @(Model.TTBN == null ? "hidden" : "")>
+            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+                <div class="panel vd_transaction-widget light-widget widget">
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab1" data-toggle="tab" class="text-uppercase">@Html.Raw("Xét nghiệm CDHA")</a></li>
+                            <li><a href="#tab2" data-toggle="tab" class="text-uppercase">@Html.Raw("XN nước tiểu")</a></li>
+                            <li><a href="#tab3" data-toggle="tab" class="text-uppercase">@Html.Raw("XN Công thức máu")</a></li>
+                            <li><a href="#tab4" data-toggle="tab" class="text-uppercase">@Html.Raw("XN Khác")</a></li>
+                        </ul>
+                        <br />
+                        <div class="tab-content mgbt-xs-20">
+                            <div class="tab-pane active" id="tab1">
+                                @Html.Partial("_PatialUpdate_CDHA")
+                            </div>
+                            <div class="tab-pane" id="tab2">
+                                @Html.Partial("_PatialUpdate_XNNT")
+                            </div>
+                            <div class="tab-pane" id="tab3">
+                               @Html.Partial("_PatialUpdate_XNCTM")
+                            </div>
+                            <div class="tab-pane" id="tab4">
+                                @Html.Partial("_PatialUpdate_XNK")
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_PatialUpdate_TabCDHA_AddOrUpdateModal")
+@Html.Partial("_PatialUpdate_TabXNNT_AddOrUpdateModal")
+@Html.Partial("_PatialUpdate_TabXNCTM_AddOrUpdateModal")
+@Html.Partial("_PatialUpdate_TabXNK_AddOrUpdateModal")
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

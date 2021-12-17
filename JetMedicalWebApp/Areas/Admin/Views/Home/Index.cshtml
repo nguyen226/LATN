@@ -1,0 +1,450 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.HomeViewModels
+@{
+    ViewBag.Title = "Trang chủ";
+}
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+<script>
+    $(function () {
+        "use strict";
+        // chart 3
+        var options = {
+            series: [{
+                name: 'Tổng lượt khám',
+                data: [231, 340, 468, 331, 492, 255, 600, 468, 331, 492, 255, 600, 231, 340, 468, 331, 492, 255, 600, 468, 331, 492, 255, 600]
+            }
+                , {
+                name: 'Nhập nội trú',
+                data: [1, 2, 5, 8, 4, 2, 1, 5, 0, 34, 52, 41, 11, 82, 5, 80, 34, 52, 41, 45, 80, 34, 52, 41]
+            }
+                , {
+                name: 'Ra viện',
+                data: [11, 82, 45, 80, 34, 52, 41, 45, 80, 34, 52, 41, 11, 82, 45, 80, 34, 52, 41, 45, 80, 34, 52, 41]
+            }
+            ],
+            chart: {
+                foreColor: '#9ba7b2',
+                height: 360,
+                type: 'area',
+                zoom: {
+                    enabled: true
+                },
+                toolbar: {
+                    show: true
+                },
+            },
+            colors: ["#0d6efd", "#20c997", '#f41127'],
+            title: {
+                text: 'TQ KCB',
+                align: 'left',
+                style: {
+                    fontSize: "12px",
+                    color: '#666'
+                }
+            },
+
+            dataLabels: {
+                enabled: true
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            xaxis: {
+                type: 'Text',
+                categories: ["1/11/2021", "2/11/2021", "3/11/2021", "4/11/2021", "5/11/2021", "6/11/2021", "7/11/2021", "8/11/2021", "9/11/2021", "10/11/2021", "11/11/2021", "12/11/2021", "1/11/2021", "2/11/2021", "3/11/2021", "4/11/2021", "5/11/2021", "6/11/2021", "7/11/2021", "8/11/2021", "9/11/2021", "10/11/2021", "11/11/2021", "12/11/2021"]
+            },
+            tooltip: {
+                x: {
+                    format: 'dd/MM/yy'
+                },
+            },
+          
+            yaxis: {
+                title: {
+                    text: "KCB NGOẠI TRÚ"
+                }
+            }
+        };
+        var chart = new ApexCharts(document.querySelector("#chartTQ"), options);
+        chart.render();
+
+
+    }
+    );
+
+
+</script>
+
+
+<script>
+    $(function () {
+        "use strict";
+
+        var e = {
+            series: [{
+                name: "KCB Trong ngày",
+                data: [114, 223, 110, 219, 229, 319, 422, 519, 412, 227, 419, 435]
+            }],
+            chart: {
+                foreColor: "#9ba7b2",
+                height: 310,
+                type: "area",
+                zoom: {
+                    enabled: !1
+                },
+                toolbar: {
+                    show: !0
+                },
+                dropShadow: {
+                    enabled: !0,
+                    top: 3,
+                    left: 14,
+                    blur: 4,
+                    opacity: .1
+                }
+            },
+            stroke: {
+                width: 5,
+                curve: "smooth"
+            },
+            xaxis: {
+                type: "text",
+                categories: ["1/11/2021", "2/11/2021", "3/11/2021", "4/11/2021", "5/11/2021", "6/11/2021", "7/11/2021", "8/11/2021", "9/11/2021", "10/11/2021", "11/11/2021", "12/11/2021"]
+            },
+            title: {
+                text: "KCB",
+                align: "left",
+                style: {
+                    fontSize: "16px",
+                    color: "#666"
+                }
+            },
+            fill: {
+                type: "gradient",
+                gradient: {
+                    shade: "light",
+                    gradientToColors: ["#0d6efd"],
+                    shadeIntensity: 1,
+                    type: "vertical",
+                    opacityFrom: .7,
+                    opacityTo: .2,
+                    stops: [0, 100, 100, 100]
+                }
+            },
+            markers: {
+                size: 5,
+                colors: ["#0d6efd"],
+                strokeColors: "#fff",
+                strokeWidth: 2,
+                hover: {
+                    size: 7
+                }
+            },
+            dataLabels: {
+                enabled: !1
+            },
+            colors: ["#0d6efd"],
+            yaxis: {
+                title: {
+                    text: "KCB NGOẠI TRÚ"
+                }
+            }
+        };
+        // chart_noitru
+        var options = {
+            series: [{
+                name: 'BN',
+                type: 'column',
+                data: [123, 211, 322, 427, 313, 122, 237, 221, 244, 222, 230]
+            }, {
+                name: 'CLS',
+                type: 'area',
+                data: [44, 44, 41, 67, 22, 43, 21, 41, 56, 27, 43]
+            }, {
+                name: 'CHI PHÍ (ĐVT: Triệu)',
+                type: 'line',
+                data: [130, 125, 136, 130, 145, 135, 164, 152, 159, 136, 139]
+            }],
+            chart: {
+                foreColor: '#9ba7b2',
+                height: 350,
+                type: 'line',
+                stacked: false,
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: true
+                },
+            },
+            dataLabels: {
+                enabled: true
+            },
+            colors: ["#0d6efd", "#17a00e", "#f41127"],
+            stroke: {
+                width: [0, 2, 5],
+                curve: 'smooth'
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '50%'
+                }
+            },
+            fill: {
+                opacity: [0.85, 0.25, 1],
+                gradient: {
+                    inverseColors: false,
+                    shade: 'light',
+                    type: "vertical",
+                    opacityFrom: 0.85,
+                    opacityTo: 0.55,
+                    stops: [0, 100, 100, 100]
+                }
+            },
+            labels: ['KHOA 1', 'KHOA 2', 'KHOA 3', 'KHOA 4', 'KHOA 5', 'KHOA 6', 'KHOA 7', 'KHOA 8', 'KHOA 9', 'KHOA 10', 'KHOA 11'],
+            markers: {
+                size: 0
+            },
+            xaxis: {
+                type: 'text'
+            },
+            yaxis: {
+                title: {
+                    text: 'KCB NỘI TRÚ',
+                },
+               
+                min: 0
+            },
+           
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function (y) {
+                        if (typeof y !== "undefined") {
+                            return y.toFixed(0) + "";
+                        }
+                        return y;
+                    }
+                }
+            }
+        };
+        var chart = new ApexCharts(document.querySelector("#chart_noitru"), options);
+        chart.render();
+
+
+        // chart_pkngoaitru
+        var options = {
+            series: [{
+                name: 'BN',
+                type: 'column',
+                data: [123, 211, 322, 427, 313, 122, 237, 221, 244, 222, 230]
+            }, {
+                name: 'CLS',
+                type: 'area',
+                data: [44, 44, 41, 67, 22, 43, 21, 41, 56, 27, 43]
+            }, {
+                name: 'CHI PHÍ (ĐVT: Triệu)',
+                type: 'line',
+                data: [130, 125, 136, 130, 145, 135, 164, 152, 159, 136, 139]
+            }],
+            chart: {
+                foreColor: '#9ba7b2',
+                height: 350,
+                type: 'line',
+                stacked: false,
+                zoom: {
+                    enabled: false
+                },
+                toolbar: {
+                    show: true
+                },
+            },
+            dataLabels: {
+                enabled: true
+            },
+            colors: ["#0d6efd", "#17a00e", "#f41127"],
+            stroke: {
+                width: [0, 2, 5],
+                curve: 'smooth'
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '50%'
+                }
+            },
+            fill: {
+                opacity: [0.85, 0.25, 1],
+                gradient: {
+                    inverseColors: false,
+                    shade: 'light',
+                    type: "vertical",
+                    opacityFrom: 0.85,
+                    opacityTo: 0.55,
+                    stops: [0, 100, 100, 100]
+                }
+            },
+            labels: ['PK 1', 'PK 2', 'PK 3', 'PK 4', 'PK 5', 'PK 6', 'PK 7', 'PK 8', 'PK 9', 'PK 10', 'PK 11'],
+            markers: {
+                size: 0
+            },
+            xaxis: {
+                type: 'text'
+            },
+            yaxis: {
+                title: {
+                    text: 'KCB NỘI TRÚ',
+                },
+
+                min: 0
+            },
+
+            tooltip: {
+                shared: true,
+                intersect: false,
+                y: {
+                    formatter: function (y) {
+                        if (typeof y !== "undefined") {
+                            return y.toFixed(0) + "";
+                        }
+                        return y;
+                    }
+                }
+            }
+        };
+        var chart = new ApexCharts(document.querySelector("#chart_pkngoaitru"), options);
+        chart.render();
+
+
+
+    });
+</script>
+<!-- highcharts js -->
+
+<script src="~/Content/snailsoft/assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>
+@*<script src="~/Content/snailsoft/assets/js/index2.js"></script>*@
+@*<script src="~/Content/snailsoft/assets/plugins/apexcharts-bundle/js/apexcharts.min.js"></script>*@
+@*<script src="~/Content/snailsoft/assets/plugins/apexcharts-bundle/js/apex-custom.js"></script>*@
+
+    <div class="card shadow-none bg-transparent border-bottom border-2">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-3">
+                    <h4 class="mb-3 mb-md-0">TỔNG QUAN</h4>
+                </div>
+                <div class="col-md-9">
+                    <form class="float-md-end">
+                        <div class="row row-cols-md-auto g-lg-3">
+                            <label for="inputFromDate" class="col-md-2 col-form-label text-md-end">From Date</label>
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" id="inputFromDate">
+                            </div>
+                            <label for="inputToDate" class="col-md-2 col-form-label text-md-end">To Date</label>
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" id="inputToDate">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*<div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0">NỘI TRÚ</p>
+                                <h5 class="mb-0">Tổng: 85,028</h5>
+                                <span class="mb-0">Viện phí: ----</span>
+                                <span class="mb-0">BHXH: ----</span>
+                            </div>
+
+                        </div>
+                        <div class="" id="chart2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0">NGOẠI TRÚ</p>
+                                <h5 class="mb-0">42,892</h5>
+                                <span class="mb-0">Viện phí: ----</span>
+                                <span class="mb-0">BHXH: ----</span>
+                            </div>
+
+                        </div>
+                        <div class="" id="chart3"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0">XÉT NGHIỆM</p>
+                                <h5 class="mb-0">17,869</h5>
+                                <span class="mb-0">Viện phí: ----</span>
+                                <span class="mb-0">BHXH: ----</span>
+                            </div>
+
+                        </div>
+                        <div class="" id="chart4"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0">CĐHA</p>
+                                <h5 class="mb-0">5146</h5>
+                                <span class="mb-0">Viện phí: ----</span>
+                                <span class="mb-0">BHXH: ----</span>
+                            </div>
+
+                        </div>
+                        <div class="" id="chart5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    <div class="card">
+        <div class="card-body">
+            <div id="chartTQ"></div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <div id="chart_noitru"></div>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-2">
+        <div class="col">
+            <h6 class="mb-0 text-uppercase">PHÒNG KHÁM NGOẠI TRÚ</h6>
+            <hr />
+            <div class="card radius-10">
+                <div class="card-body">
+                    <div id="chart_pkngoaitru"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <h6 class="mb-0 text-uppercase">NỘI TRÚ</h6>
+            <hr />
+            <div class="card">
+                <div class="card-body">
+                  
+                </div>
+            </div>
+        </div>
+
+    </div>

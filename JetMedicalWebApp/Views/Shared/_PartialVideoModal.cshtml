@@ -1,0 +1,21 @@
+﻿<script>
+    $(document).ready(function () {
+        $('#myModalVideo').on('hidden.bs.modal', function (e) {
+            $('#iframeViewVideoModal').attr("src", $("#iframeViewVideoModal").attr("src"));
+        })
+    });
+    function openVideo(that) {
+        $('#iframeViewVideoModal').attr('src', $(that).data('url'));
+        $('#myModalVideo').modal();
+    }
+</script>
+
+<div class="modal fade" id="myModalVideo" role="dialog">
+    <div class="modal-dialog modalsp">
+        <div class="modal-content">
+            <div class="khung_video_iframe">
+                <iframe id="iframeViewVideoModal" width="100%" height="400px" src="https://www.youtube.com/embed/PZAEqPVjUH8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</div>

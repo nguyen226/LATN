@@ -1,0 +1,49 @@
+
+/* monica.css */
+:root{
+    /* Monica.js changable variables */
+
+    /* Title background color */
+    --bgColor: #ececec;
+    /* Title border color */
+    --borderColor: #bababa;
+    /* Title border-radius */
+    --borderRadius: 0;
+    /* Font color */
+    --fontColor: #2d2d2d;
+    /* Title font size */
+    --titleSize: 24px;
+    /* Title font weight */
+    --titleWeight: 600;
+    /* Content body font size */
+    --bodySize: 18px;
+    /* Content body font weight */
+    --bodyWeight: 300;
+    /* Content max-height */
+    --contentHeight: 300px;
+}
+
+.monica *{
+    margin: 0;
+}
+
+.monicaTitle{
+    cursor: pointer;
+    color:#00b2bd;
+    font-size: 15px;
+    font-family: 'SFU_B';
+    margin-bottom: 10px;
+    padding: 10px 0 30px 0;
+}
+
+.monicaTitle:not(:first-of-type){
+    margin-top: 20px;
+}
+
+.moniceContent{
+    display: none;
+}
+
+.monicaActive{
+    max-height: var(--contentHeight);
+}

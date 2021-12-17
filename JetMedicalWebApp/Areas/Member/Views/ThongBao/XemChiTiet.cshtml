@@ -1,0 +1,18 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.LichSuGuiChienDichViewModels
+@{
+    ViewBag.Title = "Nội dung thông báo";
+    Layout = "~/Areas/Member/Views/Shared/_LayoutChiTiet.cshtml";
+}
+<div class="row">
+    <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+        <div class="panel widget light-widget">
+            <div class="panel-body" id="panelBody">
+                <div class="row d-flex">
+                    <div class="col-sm-12 col-md-12 col-lg-12 form-group">
+                        @Html.Raw(Model.LichSuGuiChienDich.NoiDung != null ? Model.LichSuGuiChienDich.NoiDung.Replace("&nbsp;", " ") :string.Empty)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

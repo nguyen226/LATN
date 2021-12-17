@@ -1,0 +1,95 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        $('#btnExecuteAddNewDataRowXNK').click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdate_XNK()) {
+                var fields = [
+                    'MA_LK',
+                    'TEN_XNK',
+                    'KQ_XNK',
+                ];
+
+                var values = [
+                    ttbnData.maLK,
+                    $('#formAddNewDataRowXNK_TEN_XNK').val(),
+                    $('#formAddNewDataRowXNK_KQ_XNK').val()
+                ];
+
+
+
+                var url = "@Url.Action("AddOrUpdate", "KSK_XNK", new { area = "Admin" })";
+
+                sendDataToURL(url, { id: selectedDataRow != null ? selectedDataRow.KSK_XNK_ID : "",fields: fields, values: values }, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Lưu thành công.");
+                        $('#formAddNewDataRowXNK')[0].reset();
+                        resetDataXNK();
+                    }
+                });
+            }
+        });
+    });
+
+    function resetDataXNK() {
+        selectedDataRow = null;
+        tableXNK.draw();
+    }
+    function checkFormUpdate_XNK() {
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmpty($('#formAddNewDataRowXNK_TEN_XNK').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tên';
+        }
+
+        if (isNullOrEmpty($('#formAddNewDataRowXNK_KQ_XNK').val())) {
+            check = false;
+            error = 'Bạn chưa nhập kết quả';
+        }
+
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+</script>
+
+<div class="modal fade" id="modalAddNewDataRowXNK" tabindex="-1" role="dialog" aria-labelledby="modalAddNewDataRowXNK" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title" id="modalAddNewDataRowXNKLabel">@Html.Raw("Cập nhật")</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formAddNewDataRowXNK">
+             
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">@Html.Raw("Tên XNK")</label>
+                        <div class="col-sm-9 controls">
+                            <input class="input-border-btm" id="formAddNewDataRowXNK_TEN_XNK" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">@Html.Raw("Kết quả")</label>
+                        <div class="col-sm-9 controls">
+                            <input class="input-border-btm" id="formAddNewDataRowXNK_KQ_XNK" type="text">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn vd_btn vd_bg-green" id="btnExecuteAddNewDataRowXNK"><i class="append-icon fa fa-fw fa-floppy-o"></i>@Html.Raw(" Lưu")</button>
+                <button type="button" class="btn vd_btn vd_bg-grey" data-dismiss="modal"><i class="append-icon fa fa-fw fa-ban"></i>@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

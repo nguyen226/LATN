@@ -1,0 +1,159 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+
+        $("#imagePreview").click(function (e) {
+            e.preventDefault();
+            var finder = new CKFinder();
+            finder.selectActionFunction = function (url) {
+                if ($('#imgAvatar').hasClass("d-none")) {
+                    $('#imgAvatar').removeClass("d-none");
+                }
+                $('#imgAvatar').attr('src', url);
+            };
+            finder.popup();
+        });
+
+
+        $('#btnExecuteAddNewDataRowBanner').click(function (e) {
+            e.preventDefault();
+
+            var values = {
+                id: $('#Id').val(),
+                title: $('#Title').val(),
+                text:  $('#Text').val(),
+                position: $('#Position').val(),
+                isactive: $('#Isactive').is(':checked'),
+                url: $('#Avatar').val(),
+                languageId:$('#selectLanguageId').val(),
+            };
+
+            var data = {
+                listItem: [values]
+            };
+
+            var url = "@Url.Action("AddOrUpdate", "Banner", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    $('#form')[0].reset();
+                    $('#modalUpdateBanner').modal('hide');
+                    resetCheckboxAndDatatable()
+                }
+            });
+        });
+    });
+
+    function browserImage(that) {
+        var inputElm = $('#' + $(that).data('colname'));
+        var imageElm = $('#' + $(that).data('previewimage'));
+
+        var finder = new CKFinder();
+        finder.selectActionFunction = function (url) {
+            inputElm.val(url);
+            imageElm.attr('src', url);
+        };
+        finder.popup();
+    }
+</script>
+
+
+<div class="modal fade" id="modalUpdateBanner" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <h5 class="modal-title">@Html.Raw("Cập nhật")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-body">
+                    <ul class="nav nav-tabs nav-primary" role="tablist">
+                        <li class="active">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tab1" role="tab" aria-selected="true">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon">
+                                        <i class='bx bx-home font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title">Thông tin</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <br />
+                    <div class="tab-content py-3">
+                        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+                            <div class="panel widget light-widget">
+                                <div class="panel-body" id="panelBody">
+                                    <div class="row">
+                                        <form id="form" class="form-horizontal" action="#" role="form">
+                                            <div hidden>
+                                                <div class="form-label">Id</div>
+                                                <input type="number" value="0" id="Id" class="form-control">
+                                                <input type="text" id="code" class="form-control">
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <select class="form-select" id="selectLanguageId">
+                                                    @foreach (var item in CommonConstants.GetDanhSachNgonNgu())
+                                                    {
+                                                        <option value="@item.Id">@Html.Raw(item.Name)</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Title</div>
+                                                <input type="text" id="Title" class="form-control">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Text</div>
+                                                <textarea class="form-control" cols="20" id="Text" name="Text" placeholder="Text" rows="3"></textarea>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Position</div>
+                                                <input type="number" id="Position" class="form-control" placeholder="Descriptions">
+                                            </div>
+
+
+                                            <div class="col-6">
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" id="Isactive">
+                                                    <label class="form-check-label" for="Isactive">Active</label>
+                                                </div>
+                                            </div>
+
+
+
+
+                                            <div class="col-12">
+                                                <div class="form-label">Ảnh</div>
+                                                <div class="row">
+                                                    <div class="col-md-12" data-colname="Avatar" data-previewimage="imgAvatar" onclick="browserImage(this)" style="min-height: 130px;">
+                                                        <input id="Avatar" name="Avatar" type="hidden" value="">
+                                                        <img id="imgAvatar" src="@CommonConstants.FileNoImage" height="130" style="width: 100%; height:auto;" onclick="browserImage(this)">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn btn-primary" id="btnExecuteAddNewDataRowBanner">@Html.Raw(" Lưu")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

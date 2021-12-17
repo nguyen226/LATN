@@ -1,0 +1,11 @@
+﻿<div class="vd_head-section clearfix">
+    <div class="vd_panel-header">
+        <ul class="breadcrumb">
+            <li><a href="/">@Html.Raw("Trang chủ")</a></li>
+            <li>@Html.Raw("Quản trị website")</li>
+            <li class="active"><a href="@Url.Action("Index", "DaoTao", new { area = "Admin" })">@Html.Raw("Đào tạo")</a></li>
+        </ul>
+        @Html.Partial("_PartialContentHeaderMenu")
+    </div>
+</div>
+    

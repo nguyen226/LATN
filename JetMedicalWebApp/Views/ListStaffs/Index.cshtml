@@ -1,0 +1,188 @@
+﻿@using JetMedicalWebApp.Entities.EntityDto
+@using JetMedicalWebApp.Common
+
+@model JetMedicalWebApp.Models.BaseViewModel
+
+@{
+    Layout = "~/Views/Shared/_StaffLayout.cshtml";
+}
+
+<style>
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #00B0AE !important;
+        border-radius: 4px;
+    }
+</style>
+
+<script>
+    var trangHienTai = '@Model.PageIndex';
+    var url = '@Model.Url';
+    var filterText = '@Model.Text';
+    var filterPhongBan = '@Model.PhongBanId';
+    var TextPhongBan = '@Model.TextPhongBan';
+    $(document).ready(function () {
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn chuyên khoa";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Department", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = "id, name, languageId, isActive";
+                var condition = 'languageId==@CommonConstants.TiengViet AND isActive == true';
+                if(params.term) {
+                    condition += " AND name.Contains(\"" + params.term + "\")";
+                }
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 25,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+
+                data.unshift({
+                    id: "-1",
+                    text: "Không chọn"
+                })
+
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+        $('#phongBan').select2(dropdownlistSelect2Option);
+
+        if (filterPhongBan > 0) {
+            $('#phongBan').append('<option value=' + filterPhongBan + ' selected>' + TextPhongBan + '<option>');
+        }
+
+        $('#timKiemBacSiText').val(filterText);
+        $('#timKiemBacSi').click(function (e) {
+            e.preventDefault();
+            reloadTrang(1, $('#timKiemBacSiText').val(), $('#phongBan').val());
+        });
+        $('#phongBan').change(function (e) {
+            e.preventDefault();
+            reloadTrang(1, $('#timKiemBacSiText').val(), $('#phongBan').val());
+        });
+    });
+
+
+
+    function reloadTrang(trang, timKiem, phongBanId) {
+        console.log(url, trangHienTai);
+        window.location.href = url + "?ten=" + timKiem + "&phongBanId=" + phongBanId + "&pageIndex=" + trang;
+    }
+
+    function chuyenTrang(el) {
+        console.log($(el).data('trang'),filterText, filterPhongBan)
+        window.location.href = url + "?ten=" + filterText + "&phongBanId=" + filterPhongBan + "&pageIndex=" + $(el).data('trang');
+    }
+
+</script>
+
+<div class="col-lg-12">
+    <div class="timkiem" id="chuyengia-timkiem">
+        <input type="text" id="timKiemBacSiText" name="txtSearch" placeholder="Tên bác sỹ..." class="txt-search">
+        <button type="submit" id="timKiemBacSi"><img src="/Content/Website/Assets/images/search.svg"></button>
+    </div>
+    <div class="chuyengia-timkiem-phongban" >
+        <select id="phongBan" name="phongBan" class="form-control"></select>
+    </div>
+</div>
+
+<div class="content_gt_bv199">
+    <div class="xoamargin">
+        @{
+            List<StaffDto> news = (List<StaffDto>)ViewData["staffs"];
+            if (news.Count() > 0)
+            {
+                foreach (StaffDto item in news)
+                {
+                    @Html.Raw("<div class='khung_tin'>")
+                    @Html.Raw("<div class='khung_t_tinkham'><div class='img_effect'><a href='/" + Model.IDicResource["STAFF"] + "/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_sf_" + item.id + "'>")
+                    @Html.Raw("<img class='staffimg' src='" + item.img + "' alt='" + item.fullname + "'> </a></div>")
+                    @Html.Raw("<div class='ct_tin center_dn'>")
+                    @Html.Raw("<h4 class='title_xanh'>")
+                    @Html.Raw("<a href='/" + Model.IDicResource["STAFF"] + "/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_sf_" + item.id + "'>")
+                    @Html.Raw(item.brandname + " " + item.fullname + "</a> </h4>")
+                    @Html.Raw("<div class='der_dn'>")
+                    @Html.Raw(item.position + " </div></div></div></div>")
+                }
+            }
+            else
+            {
+                @Html.Raw(Model.Resource != null ? Model.Resource.name : "Nội dung đang cập nhật");
+            }
+        }
+    </div>
+</div>
+
+@if (Model.TongSoTrang > 1)
+{
+    NewsCategoryDto newsCategory = (NewsCategoryDto)ViewData["categori"];
+    int pageStart = Model.PageIndex - 3 > 1 ? Model.PageIndex - 3 : 1;
+    int pageEnd = Model.PageIndex + 3 < Model.TongSoTrang ? Model.PageIndex + 3 : Model.TongSoTrang;
+    <div class="pagination">
+        <ul class="page-number">
+            <li class="paginate_button @(Model.PageIndex == 1 || Model.PageIndex < 1 ? "d-none" : "")">
+                <a href="@(Model.PageIndex == 1 || Model.PageIndex < 1 ? "javascript:void(0);" : Model.Url + "?pageIndex=" + (Model.PageIndex - 1))">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            </li>
+            @if (pageStart > 1)
+            {
+                <li><a href='javascript:void(0);' data-trang="1" onclick="chuyenTrang(this)">1</a></li>
+            }
+            @if (pageStart > 2)
+            {
+                <li class="active"><a href="#">...</a></li>
+            }
+            @for (int n = pageStart; n <= pageEnd; n++)
+            {
+                if (n == Model.PageIndex)
+                {
+                    <li class="active"><a id="@n" href="#">@n.ToString()</a></li>
+                }
+                else
+                {
+                    <li><a href='javascript:void(0);' data-trang="@n" onclick="chuyenTrang(this)">@n.ToString()</a></li>
+                }
+            }
+            @if (pageEnd < Model.TongSoTrang - 1)
+            {
+                <li><a href="#">...</a></li>
+            }
+            @if (pageEnd < Model.TongSoTrang)
+            {
+                <li><a href='javascript:void(0);' data-trang="@Model.TongSoTrang" onclick="chuyenTrang(this)">@Model.TongSoTrang</a></li>
+            }
+            <li class="paginate_button @(Model.PageIndex == Model.TongSoTrang || Model.PageIndex > Model.TongSoTrang ? "d-none" : "")">
+                <a href="javascript:void(0);"
+                   @if (Model.PageIndex == Model.TongSoTrang || Model.PageIndex < Model.TongSoTrang) { <text>
+                   data-trang="@(Model.PageIndex + 1)" onclick="chuyenTrang(this)"
+                   </text>  }>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+}
+
+
+
+
+

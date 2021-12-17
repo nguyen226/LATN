@@ -1,0 +1,94 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.LoginViewModels
+@{
+    Layout = "~/Areas/Member/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<div class="content">
+    <div class="container">
+        <!-- Middle Content Start -->
+        <div class="vd_content-wrapper">
+            <div class="vd_container">
+                <div class="vd_content clearfix">
+                    <div class="vd_content-section clearfix">
+                        <div class="vd_login-page">
+                            <div class="heading clearfix">
+                                <div class="logo">
+                                    <h2 class="mgbt-xs-5"><img src="@Url.Content("~/Upload/logo/Logo.png")" alt="logo"></h2>
+                                </div>
+                            </div>
+                            <div class="panel widget">
+                                @using (Html.BeginForm("Login", "Home", "Member", FormMethod.Post, new { @class = "form-horizontal", area = "Member" }))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    if (!string.IsNullOrEmpty(Model.Message))
+                                    {
+                                        <div class="alert alert-danger">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="icon-cross"></i></button>
+                                            <span class="vd_alert-icon"><i class="fa fa-exclamation-circle vd_red"></i></span><strong>Thông báo!</strong>
+                                            @Html.Raw(Model.Message)
+                                        </div>
+                                    }
+
+                                    <div class="form-group  mgbt-xs-20">
+                                        <div class="col-md-12">
+                                            <div class="label-wrapper sr-only">
+                                                <label class="control-label" for="email">Email / SĐT</label>
+                                            </div>
+                                            <div class="vd_input-wrapper" id="email-input-wrapper">
+                                                <span class="menu-icon"> <i class="fa fa-envelope"></i> </span>
+                                                @*<input type="email" placeholder="Email" id="email" name="email" class="required" required>*@
+                                                @Html.TextBoxFor(m => m.Username, new { @class = "form-control required", placeholder = "Email / SĐT", autofocus = "true" })
+
+                                            </div>
+                                            <div class="label-wrapper">
+                                                <label class="control-label sr-only" for="password">Mật khẩu</label>
+                                            </div>
+                                            <div class="vd_input-wrapper" id="password-input-wrapper">
+                                                <span class="menu-icon"> <i class="fa fa-lock"></i> </span>
+                                                @Html.PasswordFor(m => m.Password, new { @class = "form-control required", placeholder = "Mật khẩu" })
+                                                @*<input type="password" placeholder="Password" id="password" name="password" class="required" required>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                        <div id="vd_login-error" class="alert alert-danger hidden"><i class="fa fa-exclamation-circle fa-fw"></i> Please fill the necessary field </div>
+                                            <div class="form-group">
+                                                <div class="col-md-12 text-center mgbt-xs-5">
+                                                    <button class="btn vd_bg-green vd_white width-100" style="background-color:#00AB9D !important" type="submit" id="login-submit">Đăng nhập</button>
+                                                </div>
+                                            </div>
+                                }
+                            </div>
+                            <!-- Panel Widget -->
+                        </div>
+                        <!-- vd_login-page -->
+                    </div>
+                    <!-- .vd_content-section -->
+
+                </div>
+                <!-- .vd_content -->
+            </div>
+            <!-- .vd_container -->
+        </div>
+        <!-- .vd_content-wrapper -->
+        <!-- Middle Content End -->
+
+    </div>
+    <!-- .container -->
+</div>
+<!-- .content -->
+<!-- Footer Start -->
+<footer class="footer-2" id="footer">
+    <div class="vd_bottom ">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="copyright text-center">
+                        Copyright &copy;2020
+                    </div>
+                </div>
+            </div><!-- row -->
+        </div><!-- container -->
+    </div>
+</footer>
+<!-- Footer END -->

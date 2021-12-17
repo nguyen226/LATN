@@ -1,0 +1,394 @@
+﻿@using JetMedicalWebApp.Common
+<script>
+    $(document).ready(function () {
+        $('.datepicker2').datepicker({
+            autoclose: true,
+            format: "dd/mm/yyyy",
+            language: 'vi',
+            todayHighlight: true,
+
+        });
+
+        hideAlertErrorCapNhatHoSoYTe();
+
+        var dropdownlistSelect2TinhOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2TinhOption.placeholder = "Tỉnh";
+        dropdownlistSelect2TinhOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Province", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'ProvinceID, ProvinceName, IsActive';
+                var condition = params.term ? ' ProvinceName.Contains(\\' + params.term + '\\) AND IsActive = True' : ' IsActive = True ';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'ProvinceName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.ProvinceID,
+                        text: item.ProvinceName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#tinh').select2(dropdownlistSelect2TinhOption);
+
+        var dropdownlistSelect2HuyenOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2HuyenOption.placeholder = "Huyện";
+        dropdownlistSelect2HuyenOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "District", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'ProvinceID, DistrictID, DistrictName, IsActive';
+                var condition = ' IsActive = True AND ProvinceID.Contains(\\' + $('#tinh').val() + '\\)';
+                condition += params.term ? ' AND (DistrictName.Contains(\\' + params.term + '\\))' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'DistrictName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.DistrictID,
+                        text: item.DistrictName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#huyen').select2(dropdownlistSelect2HuyenOption);
+
+        var dropdownlistSelect2NhomMauOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2NhomMauOption.placeholder = "Nhóm máu";
+        dropdownlistSelect2NhomMauOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "BloodType", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'BloodTypeID, BloodName';
+                var condition = params.term ? ' BloodName.Contains(\\' + params.term + '\\)' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'BloodName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.BloodTypeID,
+                        text: item.BloodName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#nhomMau').select2(dropdownlistSelect2NhomMauOption);
+
+        var dropdownlistSelect2CongTyOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CongTyOption.placeholder = "Công ty";
+        dropdownlistSelect2CongTyOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Company", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'CompanyID, ComCode, ComName';
+                var condition = params.term ? ' ComCode.Contains(\\' + params.term.trim() + '\\) OR ComName.Contains(\\' + params.term.trim() + '\\)' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'ComCode asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.CompanyID,
+                        text: item.ComCode + " - " + item.ComName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#congTy').select2(dropdownlistSelect2CongTyOption);
+
+        $("#btnCapNhatUserInfo").click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdateUserInfo()) {
+                var url = "@Url.Action("AddOrUpdate", "UserInfo", new { area = "Member" })";
+                var radios = document.getElementsByName('gender');
+                var sexValue = true;
+                for (var i = 0, length = radios.length; i < length; i++) {
+                    if (radios[i].checked) {
+                        // do whatever you want with the checked radio
+                        sexValue = radios[i].value
+                        break;
+                    }
+                }
+
+                var fields = [
+                    'UserID',
+                    'FirstName',
+                    'LastName',
+                    'DateOfBirth',
+                    'CMND',
+                    'BHYT',
+                    'Sex',
+                    'Address',
+                    'Height',
+                    'Occupation',
+                    'weight',
+                    'BloodTypeID',
+                    'ProvinceID',
+                    'DistrictID',
+                    'Ma_Cong_Ty',
+                    'IsDefault'
+                ];
+                var values = [
+                    userId,
+                    userFirstName,
+                    userlastName,
+                    $('#dateOfBirthUserInfo').val(),
+                    $('#cmndUserInfo').val(),
+                    $('#baoHiemYTeUserInfo').val(),
+                    sexValue,
+                    $('#diaChi').val(),
+                    $('#chieuCao').val(),
+                    $('#ngheNghiep').val(),
+                    $('#cangNang').val(),
+                    $('#nhomMau').val(),
+                    $('#tinh').val(),
+                    $('#huyen').val(),
+                    $('#congTy').val(),
+                    true
+                ];
+
+                var data = new FormData();
+
+                data.append("id", '');
+                data.append("fields", JSON.stringify(fields));
+                data.append("values", JSON.stringify(values));
+
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        if (!isNaN(parseInt(res))) {
+                            $('.formCapNhatHoSoYTeThanhCong').fadeIn().show();
+                            $('.formCapNhatHoSoYTe').fadeOut().hide();
+                        }
+                        else {
+                            showAlertErrorCapNhatHoSoYTe(res);
+                        }
+                    }
+                    else {
+                        showAlertErrorCapNhatHoSoYTe('Bạn không được phép cập nhật dữ liệu');
+                    }
+                });
+            }
+        });
+    });
+
+    function resetFormCapNhatHoSoYTe() {
+        hideAlertErrorCapNhatHoSoYTe();
+        $('.formCapNhatHoSoYTe').fadeIn().show();
+        $('.formCapNhatHoSoYTeThanhCong').fadeOut().hide();
+
+        $('#formCapNhatHoSoYTe')[0].reset();
+        $('#congTy').val('').trigger('change');
+        $('#nhomMau').val('').trigger('change');
+        $('#tinh').val('').trigger('change');
+        $('#huyen').val('').trigger('change');
+    }
+
+    function hideAlertErrorCapNhatHoSoYTe() {
+        $('#formErrorCapNhatHoSoYTe').fadeOut().hide();
+        $('#formCapNhatHoSoYTeLabel').text('');
+    }
+
+    function showAlertErrorCapNhatHoSoYTe(msg) {
+        $('#formErrorCapNhatHoSoYTe').fadeIn().show();
+        $('#formCapNhatHoSoYTeLabel').text(msg);
+    }
+
+    function showModalCapNhatThongTinYTe() {
+        resetFormCapNhatHoSoYTe();
+        $('#capNhatHoSoYTeModal').modal();
+    }
+
+    function checkFormUpdateUserInfo() {
+        hideAlertErrorCapNhatHoSoYTe();
+
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmptySelect2($('#nhomMau').val())) {
+            error = "Chưa chọn nhóm máu.";
+            check = false;
+        }
+
+        if (isNullOrEmptySelect2($('#tinh').val())) {
+            error = "Chưa chọn tinh.";
+            check = false;
+        }
+
+        if (isNullOrEmptySelect2($('#huyen').val())) {
+            error = "Chưa chọn huyện.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#dateOfBirthUserInfo').val())) {
+            error = "Chưa nhập ngày sinh.";
+            check = false;
+        }
+
+        if (!check) {
+            showAlertErrorCapNhatHoSoYTe(error);
+        }
+
+        return check;
+    }
+</script>
+
+<div class="modal fade" id="capNhatHoSoYTeModal" role="dialog">
+    <div class="modal-dialog modal-md modalsp">
+        <div class="modal-content">
+            <button type="button" class="btn-close-modal" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+            <div class="khung_register">
+                <div class="formCapNhatHoSoYTe">
+                    <form id="formCapNhatHoSoYTe" class="frm shopping form-group">
+                        <div class="text-center">
+                            <img src="/Content/Website/Assets/images/logo.svg">
+                        </div>
+                        <h2>CẬP NHẬT HỒ SƠ Y TẾ</h2>
+                        <div class="alert d-none" id="formErrorCapNhatHoSoYTe">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            <strong>Lỗi!</strong> <span id="formCapNhatHoSoYTeLabel"></span>.
+                        </div>
+                        <div class="form-group row d-flex">
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <input type="email" id="dateOfBirthUserInfo" class="datepicker2" placeholder="Ngày sinh" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <input type="text" id="baoHiemYTeUserInfo" placeholder="BHYT">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <input type="text" id="cmndUserInfo" placeholder="CMND">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <select id="nhomMau" name="nhomMau" class="form-control select2"></select>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from_radio">
+                                    <div class="vd_radio radio-success">
+                                        <input type="radio" class="radio" checked value="True" id="gioiTinhNam" name="gender">
+                                        <label for="gioiTinhNam"> Nam </label>
+                                        <input type="radio" class="radio" value="False" id="gioiTinhNu" name="gender">
+                                        <label for="gioiTinhNu"> Nữ </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <select id="tinh" name="tinh" class="form-control select2"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <select id="huyen" name="huyen" class="form-control select2"></select>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <input type="text" id="diaChi" placeholder="Địa chỉ">
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <input type="number" id="chieuCao" placeholder="Chiều cao(cm)">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <input type="number" id="cangNang" placeholder="Câng nặng(kg)">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <input type="text" id="ngheNghiep" placeholder="Nghề nghiệp">
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-6 col-md-3 form-group">
+                                <div class="box_group_from">
+                                    <select id="congTy" name="congTy" class="form-control select2"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="form-group">
+                        <button id="btnCapNhatUserInfo" class="send_mail btn regs"><i class="fa fa-dk"></i> CẬP NHẬT HỒ SƠ</button>
+                    </div>
+                </div>
+                <div class="formCapNhatHoSoYTeThanhCong d-none frm shopping form-group">
+                    <div class="text-center">
+                        <img src="/Content/Website/Assets/images/logo.svg">
+                    </div>
+                    <h2>CẬP NHẬT THÀNH CÔNG</h2>
+                    <p>Bạn đã cập nhật thành công hồ sơ y tế</p>
+                        
+                    <div class="form-group">
+                        <button type="button" data-dismiss="modal" onclick="window.location.reload()" aria-hidden="true" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐÓNG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

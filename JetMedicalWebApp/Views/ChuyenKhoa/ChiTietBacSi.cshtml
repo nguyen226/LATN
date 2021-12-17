@@ -1,0 +1,97 @@
+﻿@using JetMedicalWebApp.Common
+@using JetMedicalWebApp.Entities.EntityDto
+@{
+    Layout = "~/Views/Shared/_ChuyenKhoaChiTietLayout.cshtml";
+
+}
+
+@{
+    int memberId = -1;
+    if (ViewData.ContainsKey("MemberId"))
+    {
+        memberId = (int)ViewData["MemberId"];
+    }
+}
+
+<script>
+    function dangKyKham(that) {
+        var staffId = $(that).data("staffid");
+        var staffName = $(that).data("name");
+
+        @if (memberId > 0)
+        {
+            <text>
+        resetFormDatLichKhamTheoPhongBan();
+        $('#datLichKhamTheoPhongBanModal').modal();
+            $('.timepicker').timepicker({
+                showMeridian: false,
+                scrollbar: true,
+            });
+
+        $('#formDatLichKhamTheoPhongBan_BacSi').append('<option value="' + staffId + '" selected>' + staffName + '</option>').trigger('change');
+            </text>
+        }
+        else
+        {
+            <text>
+                loginForm();
+            </text>
+        }
+    }
+</script>
+
+<div class="content_gt_bv199" id="chuyengia">
+    <h4>@Html.Raw(ViewBag.brandname) - @Html.Raw(ViewBag.Title)</h4>
+    <span class="span-chuyengia">
+        <img width="33%" src="@Html.Raw(ViewBag.img)" alt="@ViewBag.Title" class="img-chuyengia">
+    </span>
+
+    @Html.Raw(HttpUtility.HtmlDecode(ViewBag.Description))
+</div>
+
+@if (ViewBag.Isexamination)
+{
+    <div class="col-lg-12 more_tatca mb-2">
+        <a href="javascript:void(0)" data-toggle="modal" data-staffid="@ViewBag.StaffId" data-name="@Html.Raw(ViewBag.Title)" onclick="dangKyKham(this)" class="more_blue click_view"><i class="fa fa-dk"></i> ĐĂNG KÝ KHÁM</a>
+    </div>
+}
+
+
+<div class="col-lg-12">
+    <h3 class="title_center">
+        CÁC CHUYÊN GIA KHÁC
+    </h3>
+    <div class="box_khambenh">
+        <div class="xoamargin">
+            <div class="slide_goikham">
+                @{
+                    if (ViewData.ContainsKey("StaffDetailsOther") && ViewData.ContainsKey("IDicResource"))
+                    {
+                        List<StaffDto> staffDetails = (List<StaffDto>)ViewData["StaffDetailsOther"];
+                        Dictionary<string, string> iDicResource = (Dictionary<string, string>)ViewData["IDicResource"];
+                        foreach (var item in staffDetails)
+                        {
+                            <div class="khung_tin">
+                                <div class="khung_t_tinkham">
+                                    <div class="img_effect staff-detail">
+                                        <a href="@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_sf_@item.id">
+                                            <img class='staffimg' alt="@item.fullname" src='@(item.img)'>
+                                        </a>
+                                    </div>
+                                    <div class="ct_tin center_dn">
+                                        <h4 class="title_xanh">
+                                            <a href="@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_sf_@item.id">
+                                                @item.brandname @item.fullname
+                                            </a>
+                                        </h4>
+                                        <div class="der_dn">@item.position</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

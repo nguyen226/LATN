@@ -1,0 +1,179 @@
+﻿@using JetMedicalWebApp.Common
+
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        $('#nameVN').on('keyup', function () {
+            var slug = toSlug($(this).val());
+            $('#slugVN').val(slug);
+        });
+
+        $('#name').on('keyup', function () {
+            var slug = toSlug($(this).val());
+            $('#slug').val(slug);
+        });
+
+
+        $('#name').on('keyup', function () {
+            var slug = toSlug($(this).val());
+            $('#slug').val(slug);
+        });
+
+
+        $('#btnExecuteAddNewDataRowNewsType').click(function (e) {
+            e.preventDefault();
+
+            var values = {
+                id: $('#IdVN').val(),
+                code: $('#codeVN').val(),
+                name: $('#nameVN').val(),
+                slug: $('#slugVN').val(),
+                show: $('#showVN').val(),
+                orderBy: $('#orderByVN').val(),
+                isactive: $('#activeVN').is(':checked'),
+                isMennu: $('#menuVN').is(':checked'),
+                iscate: $('#isCateVN').is(':checked'),
+                languageCode: $('#languageCode').val(),
+                languageId: $('#selectLanguageId').val()
+            };
+
+            var data = {
+                listItem: [values]
+            };
+
+            var url = "@Url.Action("AddOrUpdate", "NewsType", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    Lobibox.notify('warning', {
+                        pauseDelayOnHover: true,
+                        continueDelayOnInactiveTab: false,
+                        position: 'top right',
+                        icon: 'bx bx-error',
+                        msg: res
+                    });
+
+                }
+                else {
+                    Lobibox.notify('success', {
+                        pauseDelayOnHover: true,
+                        continueDelayOnInactiveTab: true,
+                        position: 'top right',
+                        icon: 'bx bx-check-circle',
+                        msg: 'Thêm mới/cập nhật thành công.'
+                    });
+                    $('#formVN')[0].reset();
+                    $('#modalUpdateNewsType').modal('hide');
+                    resetCheckboxAndDatatable()
+                }
+            });
+        });
+    });
+</script>
+
+
+<div class="modal fade" id="modalUpdateNewsType" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <h5 class="modal-title">@Html.Raw("Cập nhật")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-body">
+                    <ul class="nav nav-tabs nav-primary" role="tablist">
+                        <li class="active">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#tab1" role="tab" aria-selected="true">
+                                <div class="d-flex align-items-center">
+                                    <div class="tab-icon">
+                                        <i class='bx bx-home font-18 me-1'></i>
+                                    </div>
+                                    <div class="tab-title">Thông tin</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                    <br />
+                    <div class="tab-content py-3">
+                        <div class="tab-pane fade show active" id="tab1" role="tabpanel">
+                            <div class="panel widget light-widget">
+                                <div class="panel-body" id="panelBody">
+                                    <div class="row">
+                                        <form id="formVN" class="form-horizontal" action="#" role="form">
+                                            <div hidden>
+                                                <div class="form-label">Id</div>
+                                                <input type="number" value="0" id="IdVN" class="form-control">
+                                                <input type="text" id="languageCode" class="form-control">
+                                            </div>
+
+                                            <div class="mb-2">
+                                                <select class="form-select" id="selectLanguageId">
+                                                    @foreach (var item in CommonConstants.GetDanhSachNgonNgu())
+                                                    {
+                                                        <option value="@item.Id">@Html.Raw(item.Name)</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Mã</div>
+                                                <input type="text" id="codeVN" class="form-control" placeholder="Mã">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Tên</div>
+                                                <input type="text" id="nameVN" class="form-control" placeholder="Tên">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Alias</div>
+                                                <input type="text" id="slugVN" class="form-control" placeholder="Alias">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Show</div>
+                                                <input type="text" id="showVN" class="form-control" placeholder="show">
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="form-label">Odx</div>
+                                                <input type="number" id="orderByVN" class="form-control" placeholder="show">
+                                            </div>
+
+                                            <div class="col-6">
+
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" id="activeVN">
+                                                    <label class="form-check-label" for="activeVN">Kích hoạt</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" id="menuVN">
+                                                    <label class="form-check-label" for="menuVN">Menu</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-6">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="" id="isCateVN">
+                                                    <label class="form-check-label" for="isCateVN">Is cate</label>
+                                                </div>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn btn-primary" id="btnExecuteAddNewDataRowNewsType">@Html.Raw(" Lưu")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

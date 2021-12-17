@@ -1,0 +1,185 @@
+﻿@using JetMedicalWebApp.Entities.Entity
+@using JetMedicalWebApp.Entities.EntityDto
+@using JetMedicalWebApp.Common
+@{
+    Layout = "~/Views/Shared/_ServiceLayout.cshtml";
+    string url = HttpContext.Current.Request.Url.AbsoluteUri;
+}
+
+@section banner {
+    <div id="gop_top">
+        @Html.Partial("~/Views/Shared/Include/View/BannerService.cshtml")
+    </div>
+}
+
+
+@{
+    int memberId = -1;
+    if (ViewData.ContainsKey("MemberId"))
+    {
+        memberId = (int)ViewData["MemberId"];
+    }
+}
+<section class="back_all" style="position: relative;">
+    <!-- Content -->
+    <div id="khoangcach">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="xoamargin">
+                        <div class="col-lg-5">
+                            <div class="avatar_goikham">
+                                <img width="100%" src="@Model.avatar" alt="">
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="title_content title_gk">
+                                <h4>@Html.Raw(Model.title)</h4>
+                            </div>
+                            @{
+                                if (Model.priceSale > 0)
+                                {
+                                    <div class="price_gk">
+                                        <p class="price_sale">Giá: @string.Format("{0:#,0.#}", Model.priceSale) đ </p>
+                                        <p class="price_old">Giá cũ: @string.Format("{0:#,0.#}", Model.priceOld) đ</p>
+                                    </div>
+                                }
+                            }
+
+                            <div class="desript_gk">
+                                <p>
+                                    @Html.Raw(HttpUtility.HtmlDecode(Model.shorttitle))
+                                </p>
+                            </div>
+                            @{
+                                if (Model.priceSale > 0)
+                                {
+                                    <a href="javscript:void(0)" data-packageid="@Model.id" data-name="@Html.Raw(Model.title)" onclick="dangKyKham(this)" class="more_blue click_view"><i class="fa fa-dk"></i> ĐĂNG KÝ</a>
+                                }
+                            }
+
+                            <a href="javscript:void(0)" data-name="@Html.Raw(Model.title)" onclick="nhanTuVanGoiKham(this)" class="dktv"><i class="fa fa-dk"></i> NHẬN TƯ VẤN</a>
+                            <div class="lienhe">
+                                <p>Liên hệ đăng ký gói khám và nhận tư vấn qua hotline: <span class="hotline">1900 98 68 68</span></p>
+                                <p>Email: <span class="email">cskh@benhvien199.vn</span></p>
+                            </div>
+
+
+                            <div class="menu-tags  mgbt-xs-15">
+                                <i class="fa fa-tags"></i>
+                                <strong class="tag-item">Tags</strong>
+                                @{
+                                    var tags = (List<Tag>)ViewBag.Tags;
+
+                                    if (tags != null)
+                                    {
+                                        if (tags.Count > 0)
+                                        {
+                                            foreach (var item in tags.Where(m => !string.IsNullOrEmpty(m.TagId)))
+                                            {
+                                                <a href='/tag/@Utilities.urlConvert(Utilities.VnConcert(item.TagId).ToLower())'><span class="labeltag vd_bg-blue">@item.Name</span></a>
+                                            }
+                                        }
+                                    }
+                                }
+                            </div>
+
+
+
+                            @*<div class="follow_us">
+            <h5>Chia sẻ: </h5>
+            <div class="mxh_fl">
+                <a href=""><img src="~/Content/Website/Assets/images/fb.svg"></a>
+                <a href=""><img src="~/Content/Website/Assets/images/yt.svg"></a>
+                <a href=""><img src="~/Content/Website/Assets/images/tw.svg"></a>
+                <a href=""><img src="~/Content/Website/Assets/images/gg.svg"></a>
+                <a href=""><img src="~/Content/Website/Assets/images/insta.svg"></a>
+            </div>
+        </div>*@
+                        </div>
+                        <div class="col-lg-12">
+                            <h3 class="title_center">
+                                CHI TIẾT DỊCH VỤ
+                            </h3>
+                            <div class="content_gt_bv199">
+                                @Html.Raw(HttpUtility.HtmlDecode(Model.description))
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <h3 class="title_center">
+                                CÁC GÓI KHÁM KHÁC
+                            </h3>
+                            <div class="box_khambenh">
+                                <div class="xoamargin">
+                                    <div class="slide_goikham">
+                                        @{
+                                            List<NewsContentDto> newsOther = new List<NewsContentDto>();
+                                            if (ViewData.ContainsKey("newsOther"))
+                                            {
+                                                newsOther = (List<NewsContentDto>)ViewData["newsOther"];
+                                                foreach (var item in newsOther)
+                                                {
+                                                    <div class="khung_tinkham">
+                                                        <div class="khung_t_tinkham">
+                                                            <div class="img_effect">
+                                                                <a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.title).ToLower()))_pdt_@item.id">
+                                                                    <img src="@item.avatar" alt="@item.title" property="og:image" class="img_project">
+                                                                </a>
+                                                            </div>
+                                                            <div class="text_tinkham">
+                                                                <h4 class="title_xanh"><a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.title).ToLower()))_pdt_@item.id">@item.title</a></h4>
+                                                                <div class="price">
+                                                                    <p class="price_old">@string.Format("{0:#,0.#}", Model.priceOld) đ</p>
+                                                                    <p class="price_sale"> @string.Format("{0:#,0.#}", Model.priceSale) đ</p>
+                                                                </div>
+                                                                <a href="javascript:void(0)" data-packageid="@item.id" data-name="@Html.Raw(item.title)" onclick="dangKyKham(this)" class="more_blue click_view"><i class="fa fa-dk"></i>  Đăng ký</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function dangKyKham(that) {
+        var packageId = $(that).data("packageid");
+        var packageName = $(that).data("name");
+
+        @if (memberId > 0)
+        {
+            <text>
+                resetFormDatLichKham();
+                $('#datLichKhamModal').modal();
+            $('.timepicker').timepicker({
+                showMeridian: false,
+                scrollbar: true,
+            });
+
+            $('#formDatLichKham_GoiKham').append('<option value="' + packageId + '" selected>' + packageName + '</option>');
+            </text>
+        }
+        else
+        {
+            <text>
+                loginForm();
+            </text>
+        }
+    }
+
+
+    function nhanTuVanGoiKham(that) {
+         var packageName = $(that).data("name");
+        $('input[name="formDangKyNhanTuVan_TieuDe"]').val("Tôi muốn nhận tư vấn " + packageName);
+         $('#nhanTuVanModal').modal();
+    }
+</script>

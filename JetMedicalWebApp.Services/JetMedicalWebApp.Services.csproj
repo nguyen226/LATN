@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F28F63DF-1473-49AE-9113-809BE21C7FDC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JetMedicalWebApp.Services</RootNamespace>
+    <AssemblyName>JetMedicalWebApp.Services</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Linq.Dynamic, Version=1.0.6132.35681, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Linq.Dynamic.1.0.7\lib\net40\System.Linq.Dynamic.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="KSK_XNCTMService.cs" />
+    <Compile Include="KSK_XNKService.cs" />
+    <Compile Include="KSK_XNNTService.cs" />
+    <Compile Include="KSK_CDHAService.cs" />
+    <Compile Include="ServiceService.cs" />
+    <Compile Include="TagService.cs" />
+    <Compile Include="NhanTuVanService.cs" />
+    <Compile Include="SignedAppointmentService.cs" />
+    <Compile Include="PackageServiceService.cs" />
+    <Compile Include="resourceService.cs" />
+    <Compile Include="CauHinhEmailService.cs" />
+    <Compile Include="Company_GroupPermissionService.cs" />
+    <Compile Include="ContactService.cs" />
+    <Compile Include="BannerService.cs" />
+    <Compile Include="FeedbackService.cs" />
+    <Compile Include="SignedServiceService.cs" />
+    <Compile Include="KSK_TTBENHNHANService.cs" />
+    <Compile Include="VideoService.cs" />
+    <Compile Include="NewsTypeService.cs" />
+    <Compile Include="StaffService.cs" />
+    <Compile Include="AppSlideService.cs" />
+    <Compile Include="CompanyService.cs" />
+    <Compile Include="LichSuGuiChienDichService.cs" />
+    <Compile Include="ICD10Service.cs" />
+    <Compile Include="NewsCategoryService.cs" />
+    <Compile Include="NewsContentService.cs" />
+    <Compile Include="XML4Service.cs" />
+    <Compile Include="XML3Service.cs" />
+    <Compile Include="XML2Service.cs" />
+    <Compile Include="XML1Service.cs" />
+    <Compile Include="RegisterServiceService.cs" />
+    <Compile Include="DistrictService.cs" />
+    <Compile Include="ChienDichService.cs" />
+    <Compile Include="PatientGroup_UsersService.cs" />
+    <Compile Include="PatientGroupService.cs" />
+    <Compile Include="GroupPermissionService.cs" />
+    <Compile Include="Users_GroupPermissionService.cs" />
+    <Compile Include="NotificationService.cs" />
+    <Compile Include="MenuService.cs" />
+    <Compile Include="ProvinceService.cs" />
+    <Compile Include="GroupsService.cs" />
+    <Compile Include="KhoaService.cs" />
+    <Compile Include="DepartmentService.cs" />
+    <Compile Include="BloodTypeService.cs" />
+    <Compile Include="UserInfoService.cs" />
+    <Compile Include="UsersService.cs" />
+    <Compile Include="AppHistoryService.cs" />
+    <Compile Include="Menu_GroupPermissionService.cs" />
+    <Compile Include="InternalService.cs" />
+    <Compile Include="Service References\HoaDonV1Demo\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\HoaDonDienTuVinaProductionV1_WebService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\HoaDonDienTuVinaProduction_WebService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\HoaDonDienTuVinaV1_WebService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="AppConfigService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.getInvoiceByInvocieNumberResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\ServiceCreateInvoiceCode1.wsdl" />
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.AddSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.AdjustedCreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.AdjustedInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.ArrayOfString.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.CreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.CreateSignInvoiceCode1ChecksumResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.CreateSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.DeleteInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.getInvoiceByInvocieNumberResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.getInvoiceInfoResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.getInvoiceListResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.GetStatusInvoiceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.GetXMlFileResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.Ivoice.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.ReplaceInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.sentEmailCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.TestConnectionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonV1Demo\JetMedicalWebApp.Services.HoaDonV1Demo.UpdateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="App.config" />
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\ServiceCreateInvoiceCode1.wsdl" />
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.AddSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.AdjustedCreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.AdjustedInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.ArrayOfString.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.CreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.CreateSignInvoiceCode1ChecksumResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.CreateSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.DeleteInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.getInvoiceInfoResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.getInvoiceListResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.GetStatusInvoiceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.GetXMlFileResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.Ivoice.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.ReplaceInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.sentEmailCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.TestConnectionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProductionV1_WebService.UpdateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\ServiceCreateInvoiceCode3.wsdl" />
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.AddSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.AdjustedCreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.AdjustedInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.ArrayOfString.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.CreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.CreateSignInvoiceCode1ChecksumResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.CreateSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.DeleteInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.getInvoiceInfoResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.getInvoiceListResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.GetStatusInvoiceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.GetXMlFileResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.Ivoice.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.ReplaceInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.sentEmailCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.TestConnectionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaProduction_WebService.UpdateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\ServiceCreateInvoiceCode1.wsdl" />
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.AddSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.AdjustedCreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.AdjustedInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.ArrayOfString.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.CreateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.CreateSignInvoiceCode1ChecksumResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.CreateSignInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.DeleteInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.getInvoiceByInvocieNumberResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.getInvoiceInfoResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.getInvoiceListResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.GetStatusInvoiceResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.GetXMlFileResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.Ivoice.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.ReplaceInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.sentEmailCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.TestConnectionResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\JetMedicalWebApp.Services.HoaDonDienTuVinaV1_WebService.UpdateInvoiceCode1Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JetMedicalWebApp.Common\JetMedicalWebApp.Common.csproj">
+      <Project>{19d5c1b0-3870-49c3-9952-bc90067b1ab1}</Project>
+      <Name>JetMedicalWebApp.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JetMedicalWebApp.DAL\JetMedicalWebApp.DAL.csproj">
+      <Project>{2dc5e3dc-41f4-4778-b160-e60b27c78453}</Project>
+      <Name>JetMedicalWebApp.DAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JetMedicalWebApp.Entities\JetMedicalWebApp.Entities.csproj">
+      <Project>{7070da2f-c71e-400a-a74a-b32a27df03ef}</Project>
+      <Name>JetMedicalWebApp.Entities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\HoaDonDienTuVinaProductionV1_WebService\" />
+    <WCFMetadataStorage Include="Service References\HoaDonDienTuVinaProduction_WebService\" />
+    <WCFMetadataStorage Include="Service References\HoaDonDienTuVinaV1_WebService\" />
+    <WCFMetadataStorage Include="Service References\HoaDonV1Demo\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaV1_WebService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\ServiceCreateInvoiceCode3.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProduction_WebService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\ServiceCreateInvoiceCode1.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonDienTuVinaProductionV1_WebService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonV1Demo\ServiceCreateInvoiceCode1.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonV1Demo\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonV1Demo\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\HoaDonV1Demo\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

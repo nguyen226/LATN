@@ -1,0 +1,239 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    var tableDichVu;
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (tableDichVu) !== 'undefined') {
+                tableDichVu.columns.adjust();
+            }
+        });
+        khoiTaoDatatableDichVu();
+
+        $('#btnThemMoiRowDataDichVu').click(function (e) {
+            e.preventDefault();
+            $("#modalAddNewDataRowDichVuLabel").text("Thêm mới");
+
+            selectedDataRow = null;
+
+            $('#formAddNewDataRowDichVu')[0].reset();
+
+            $('#modalAddNewDataRowDichVu').modal('show');
+        });
+
+        $('#btnDeleteDataRowDichVu').click(function (e) {
+            e.preventDefault();
+
+            var selectedDataRowId = $(tableDichVu.$('input:checkbox[name="selectedDataDtTableDichVuId"]').map(function () {
+                return $(this).prop("checked") ? tableDichVu.row($(this).closest('tr')).index() : null;
+            })).toArray();
+
+            if (selectedDataRowId.length > 0) {
+                $('#confirmDeleteDtTableDichVuDataRowModal').modal('show');
+            }
+            else {
+                hienThiThongBaoModal('Thông báo', 'Bạn chưa chọn dòng dữ liệu cần xóa.');
+            }
+        });
+
+        $('#btnExecuteDeleteDichVuDataRow').click(function (e) {
+            e.preventDefault();
+
+            selectedDataRowId = $(tableDichVu.$('input:checkbox[name="selectedDataDtTableDichVuId"]').map(function () {
+                return $(this).prop("checked") ? tableDichVu.row($(this).closest('tr')).index() : null;
+            })).toArray();
+
+            var times = 0;
+            $.each(selectedDataRowId, function (index, item) {
+                tableDichVu.row(item - times).remove().draw();
+
+                times++;
+            });
+
+            $('#confirmDeleteDtTableDichVuDataRowModal').modal('hide');
+        });
+
+        $("#btnRefreshDataDichVu").click(function () {
+            tableDichVu.draw();
+        });
+
+        $("#quickSearchDonDichVu").change(function () {
+            tableDichVu.draw();
+        });
+    });
+
+    function khoiTaoDatatableDichVu() {
+        let selectedFields = "Id, MA_DICH_VU, TEN_DICH_VU, MA_LK, DON_VI_TINH, NGAY_KQ, STRNGAY_KQ, XML3_01";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "XML3", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearchDonDichVu').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(MA_DICH_VU LIKE N'%" + $('#quickSearchDonDichVu').val().trim() + "%' ORTEN_DICH_VU LIKE N'%" + $('#quickSearchDonDichVu').val().trim() + "%' OR NGAY_KQ LIKE N'%" + $('#quickSearchDonDichVu').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+                stringFilter += "MA_LK=N'" + (xML1Data != null ? xML1Data.id : -1) + "'";
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableDichVu.columns.adjust();
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                "searchable": false
+            },
+            {
+                "targets": [3,4],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [5],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            },
+            {
+                "targets": [6],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            },
+            {
+                "targets": [7],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowDelete)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "MA_DICH_VU", "name": "MA_DICH_VU", "autoWidth": true, "title": "Mã dịch vụ" },
+            { "data": "TEN_DICH_VU", "name": "TEN_DICH_VU", "autoWidth": true, "title": "Tên dịch vụ" },
+            { "data": "DON_VI_TINH", "name": "DON_VI_TINH", "autoWidth": true, "title": "ĐVT" },
+            { "data": "STRNGAY_KQ", "name": "NGAY_KQ", "autoWidth": true, "title": "Ngày KQ" },
+            {
+                "data": "XML3_01", "name": "XML3_01", "autoWidth": true, "title": "FPD đơn", "render": function (data, type, full, meta) {
+                    return !isNullOrEmpty(data) ? '<a target="_blank" href="' + data + '">Tải file</a>' : '';
+                }
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<button class="btn menu-icon vd_bg-green btnViewXML4"> <i class="fa fa-eye"></i> </button>';
+                    return html;
+                }, width: "30px"
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<button data-original-title="edit" data-toggle="tooltip" data-placement="top" class="btn menu-icon vd_bg-yellow btnEdit"> <i class="fa fa-pencil"></i> </button>';
+                    return html;
+                }, width: "30px"
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<a data-original-title="delete" data-toggle="tooltip" data-placement="top" class="btn menu-icon vd_bg-red" onclick=deleteDataRowDonDichVu(' + row.Id + ')> <i class="fa fa-trash-o"></i> </a>';
+                    return html;
+                }, width: "30px"
+            }
+        ]
+
+        tableDichVu = $('#dtTableDichVu').DataTable(datatableOption);
+
+        $('#dtTableDichVu tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableDichVu.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#dtTableDichVu tbody').on('click', 'tr td.menu-action > .btnEdit', function () {
+            selectedDataRow = tableDichVu.row($(this).parents('tr')).data();
+
+            $('#formAddNewDataRowDichVu_MA_DICH_VU').val(selectedDataRow.MA_DICH_VU);
+            $('#formAddNewDataRowDichVu_TEN_DICH_VU').val(selectedDataRow.TEN_DICH_VU);
+            $('#formAddNewDataRowDichVu_DON_VI_TINH').val(selectedDataRow.DON_VI_TINH);
+            $('#formAddNewDataRowDichVu_NGAY_KQ').val(selectedDataRow.STRNGAY_KQ);
+            $('#formAddNewDataRowDichVu_XML3_01_Text').val(selectedDataRow.XML3_01);
+
+            $("#modalAddNewDataRowDichVuLabel").text("Cập nhật");
+
+            $('#modalAddNewDataRowDichVu').modal('show');
+        });
+
+        $('#dtTableDichVu tbody').on('click', 'tr td.menu-action > .btnViewXML4', function () {
+            selectedDataRow = tableDichVu.row($(this).parents('tr')).data();
+            xemXML4($('#FormUpdate_MA_LK').val(), selectedDataRow.MA_DICH_VU);
+        });
+    }
+
+    function deleteDataRowDonDichVu(id) {
+        selectedDataRow = {
+            Id: id,
+            url: '@Url.Action("DeleteByIds", "XML3", new { area = "Admin" })',
+            table: tableDichVu
+        };
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+
+    function xemXML4(maLuotKham,maDichVu) {
+        viewUrl('@Url.Action("XemChiTietXML4", "XML1", new { area = "Admin" })?maLK=' + maLuotKham + '&maDichVu=' + maDichVu)
+    }
+</script>
+
+
+
+
+<div class="col-sm-12 col-md-6">
+    <div class="vd_menu-search table-search input-group input-border">
+        <input type="text" id="quickSearchDonDichVu" class="form-control" placeholder="Tìm kiếm">
+        <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+    </div>
+</div>
+
+<div class="col-sm-12 col-md-6 themChiTietXML1 float-right">
+    <div id="btnRefreshDataDichVu" class="btn buttons-excel buttons-html5 btn-secondary" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới"> <i class="bx bx-refresh"></i> </div>
+    <div id="btnThemMoiRowDataDichVu" class="btn buttons-excel buttons-html5 btn-primary" data-placement="bottom" data-toggle="tooltip" data-original-title="Thêm"> <i class="bx bx-plus"></i> </div>
+</div>
+
+<div class="col-sm-12">
+            <table id="dtTableDichVu" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+</div>

@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7070DA2F-C71E-400A-A74A-B32A27DF03EF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JetMedicalWebApp.Entities</RootNamespace>
+    <AssemblyName>JetMedicalWebApp.Entities</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EntityDto\KSK_CDHADto.cs" />
+    <Compile Include="EntityDto\KSK_TTBENHNHANDto.cs" />
+    <Compile Include="EntityDto\KSK_XNCTMDto.cs" />
+    <Compile Include="EntityDto\KSK_XNKDto.cs" />
+    <Compile Include="EntityDto\KSK_XNNTDto.cs" />
+    <Compile Include="EntityDto\ServiceDto.cs" />
+    <Compile Include="EntityDto\Service_TagDto.cs" />
+    <Compile Include="EntityDto\TagDto.cs" />
+    <Compile Include="EntityDto\NhanTuVanDto.cs" />
+    <Compile Include="EntityDto\SignedAppointmentDto.cs" />
+    <Compile Include="EntityDto\PackageServiceDto.cs" />
+    <Compile Include="EntityDto\ResourceDto.cs" />
+    <Compile Include="EntityDto\DataThongKeDto.cs" />
+    <Compile Include="EntityDto\CauHinhEmailDto.cs" />
+    <Compile Include="EntityDto\Company_GroupPermissionDto.cs" />
+    <Compile Include="EntityDto\BaoCaoDto.cs" />
+    <Compile Include="EntityDto\ContactDto.cs" />
+    <Compile Include="EntityDto\BannerDto.cs" />
+    <Compile Include="EntityDto\feedbackDto.cs" />
+    <Compile Include="EntityDto\SignedServiceDto.cs" />
+    <Compile Include="EntityDto\StaffDto.cs" />
+    <Compile Include="EntityDto\BaseEntityDto.cs" />
+    <Compile Include="EntityDto\AppHistoryDto.cs" />
+    <Compile Include="EntityDto\ChienDichDto.cs" />
+    <Compile Include="EntityDto\SmtpConfigurationDto.cs" />
+    <Compile Include="EntityDto\EmailMessageDto.cs" />
+    <Compile Include="EntityDto\LichSuGuiChienDichDto.cs" />
+    <Compile Include="EntityDto\GroupsDto.cs" />
+    <Compile Include="EntityDto\NewsContentDto.cs" />
+    <Compile Include="EntityDto\NewsCategoryDto.cs" />
+    <Compile Include="EntityDto\NewsTypeDto.cs" />
+    <Compile Include="EntityDto\ICD10Dto.cs" />
+    <Compile Include="EntityDto\KhoaDto.cs" />
+    <Compile Include="EntityDto\PatientGroupDto.cs" />
+    <Compile Include="EntityDto\PatientGroup_UsersDto.cs" />
+    <Compile Include="EntityDto\RegisterServiceDto.cs" />
+    <Compile Include="EntityDto\ThoiGianKhamBenhDto.cs" />
+    <Compile Include="EntityDto\Users_GroupPermissonDto.cs" />
+    <Compile Include="EntityDto\Menu_GroupPermissionDto.cs" />
+    <Compile Include="EntityDto\MenuDto.cs" />
+    <Compile Include="EntityDto\GroupPermissionDto.cs" />
+    <Compile Include="EntityDto\VideoDto.cs" />
+    <Compile Include="EntityDto\XML2Dto.cs" />
+    <Compile Include="EntityDto\NewsContent_TagDto.cs" />
+    <Compile Include="EntityDto\XML3Dto.cs" />
+    <Compile Include="EntityDto\XML4Dto.cs" />
+    <Compile Include="EntityDto\XML1Dto.cs" />
+    <Compile Include="EntityDto\UsersDto.cs" />
+    <Compile Include="EntityDto\UserInfoDto.cs" />
+    <Compile Include="EntityDto\ProvinceDto.cs" />
+    <Compile Include="EntityDto\NotificationDto.cs" />
+    <Compile Include="EntityDto\NhomChienDichDto.cs" />
+    <Compile Include="EntityDto\DistrictDto.cs" />
+    <Compile Include="EntityDto\DepartmentDto.cs" />
+    <Compile Include="EntityDto\CompanyDto.cs" />
+    <Compile Include="EntityDto\BloodTypeDto.cs" />
+    <Compile Include="EntityDto\AppSlideDto.cs" />
+    <Compile Include="EntityDto\AppConfigDto.cs" />
+    <Compile Include="Entity\KSK_XNCTM.cs" />
+    <Compile Include="Entity\KSK_XNNT.cs" />
+    <Compile Include="Entity\KSK_XNK.cs" />
+    <Compile Include="Entity\KSK_CDHA.cs" />
+    <Compile Include="Entity\Service.cs" />
+    <Compile Include="Entity\Service_Tag.cs" />
+    <Compile Include="Entity\NewsContent_Tag.cs" />
+    <Compile Include="Entity\Tag.cs" />
+    <Compile Include="Entity\NhanTuVan.cs" />
+    <Compile Include="Entity\SignedAppointment.cs" />
+    <Compile Include="Entity\CauHinhEmail.cs" />
+    <Compile Include="Entity\AppHistory.cs" />
+    <Compile Include="Entity\AppConfig.cs" />
+    <Compile Include="Entity\BaseEntity.cs" />
+    <Compile Include="Entity\Company_GroupPermission.cs" />
+    <Compile Include="Entity\Contact.cs" />
+    <Compile Include="Entity\banner.cs" />
+    <Compile Include="Entity\PackageService.cs" />
+    <Compile Include="Entity\resource.cs" />
+    <Compile Include="Entity\feedback.cs" />
+    <Compile Include="Entity\SignedService.cs" />
+    <Compile Include="Entity\Staff.cs" />
+    <Compile Include="Entity\BloodType.cs" />
+    <Compile Include="Entity\LichSuGuiChienDich.cs" />
+    <Compile Include="Entity\NewsType.cs" />
+    <Compile Include="Entity\NewsCategory.cs" />
+    <Compile Include="Entity\NewsContent.cs" />
+    <Compile Include="Entity\ICD10.cs" />
+    <Compile Include="Entity\ChienDich.cs" />
+    <Compile Include="Entity\Groups.cs" />
+    <Compile Include="Entity\Khoa.cs" />
+    <Compile Include="Entity\Department.cs" />
+    <Compile Include="Entity\Company.cs" />
+    <Compile Include="Entity\PatientGroup.cs" />
+    <Compile Include="Entity\PatientGroup_Users.cs" />
+    <Compile Include="Entity\RegisterService.cs" />
+    <Compile Include="Entity\Users_GroupPermisson.cs" />
+    <Compile Include="Entity\Menu_GroupPermission.cs" />
+    <Compile Include="Entity\GroupPermission.cs" />
+    <Compile Include="Entity\Menu.cs" />
+    <Compile Include="Entity\UserInfo.cs" />
+    <Compile Include="Entity\Video.cs" />
+    <Compile Include="Entity\KSK_TTBENHNHAN.cs" />
+    <Compile Include="Entity\XML4.cs" />
+    <Compile Include="Entity\XML3.cs" />
+    <Compile Include="Entity\XML2.cs" />
+    <Compile Include="Entity\XML1.cs" />
+    <Compile Include="Entity\Users.cs" />
+    <Compile Include="Entity\Province.cs" />
+    <Compile Include="Entity\Notification.cs" />
+    <Compile Include="Entity\NhomChienDich.cs" />
+    <Compile Include="Entity\District.cs" />
+    <Compile Include="Entity\AppSlide.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

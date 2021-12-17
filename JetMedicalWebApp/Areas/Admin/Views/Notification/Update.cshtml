@@ -1,0 +1,388 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.NotificationViewModels
+@{
+    ViewBag.Title = "Mẫu thông báo";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/content/bootstrap-datepicker-1-6-4/css/bootstrap-datepicker3.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/ckeditor/ckeditor.js")"></script>
+    <script type="text/javascript" src='@Url.Content("~/Content/ckeditor/adapters/jquery.js")'></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/ckfinder/ckfinder.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/js/bootstrap-datepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/locales/bootstrap-datepicker.vi.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/customisedatepicker.js")"></script>
+}
+
+<script type="text/javascript">
+    var notificationData = null;
+    var lastFocusElement = '';
+    @if(Model.Notification != null)
+    {
+        <text>
+    notificationData = {
+        id: '@Model.Notification.NoID'
+    };
+    </text>
+    }
+
+    $(document).ready(function () {
+
+
+        CKEDITOR.replace('FormUpdate_NoHTML', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+
+        $('.datepicker').datepicker(initialDatepickerOption());
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn tin tức";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsContent", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name';
+                var condition = '!string.IsNullOrEmpty(name)' + (params.term ? ' AND (name.Contains(\\' + params.term.trim() + '\\))' : '');
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+        $('#FormUpdate_NewID').select2(dropdownlistSelect2Option);
+
+        $('[name="btnTroVeDanhSach"]').click(function () {
+            window.location.href = "@Url.Action("Index", "Notification", new { area = "Admin" })";
+        });
+
+        $('[name="btnAddNew"]').click(function () {
+            window.location.href = "@Url.Action("Update", "Notification", new { area = "Admin" })";
+        });
+
+        $('#btnXoa').click(function () {
+            $('#confirmDeleteDataRowModal').modal('show');
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            var data = { ids: notificationData != null ? notificationData.id : "" };
+            var url = "@Url.Action("DeleteByIds", "Notification", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    if (res == null) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                    }
+                    else if (res == "") {
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                        window.location.href = "@Url.Action("Index", "Notification", new { area = "Admin" })";
+                    }
+                }
+            });
+        });
+
+        $('#btnLuu').click(function () {
+            if (checkFormUpdate()) {
+                var fields = [
+                    'NoType',
+                    'CreateDate',
+                    'NoStatus',
+                    'NoTitle',
+                    'NoDes',
+                    'NoHTML',
+                    'NoCategory',
+                    'NewID'
+                ];
+                var noType = document.querySelector('input[name="FormUpdate_NoType"]:checked');
+                var noCategory = document.querySelector('input[name="FormUpdate_NoCategory"]:checked');
+
+                console.log(noCategory);
+                var values = [
+                    (noType != null ? noType.value : ''),
+                    $('#FormUpdate_CreatedDate').val(),
+                    $('#FormUpdate_NoStatus').is(':checked'),
+                    $('#FormUpdate_NoTitle').val(),
+                    $('#FormUpdate_NoDes').val(),
+                    CKEDITOR.instances.FormUpdate_NoHTML.getData(),
+                    (noCategory != null ? noCategory.value : ''),
+                    $('#FormUpdate_NewID').val()
+                ];
+
+                var formData = new FormData();
+
+                let filesUpload = $('#FormUpdate_Images').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    formData.append("file", filesUpload[0]);
+                }
+
+                formData.append("id", (notificationData != null ? notificationData.id : ""));
+                formData.append("fields", JSON.stringify(fields));
+                formData.append("values", JSON.stringify(values));
+
+                var url = "@Url.Action("AddOrUpdate", "Notification", new { area = "Admin" })";
+
+                sendDataFileToURL(url, formData, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else
+                    {
+                        notificationData = { id: res };
+                        showNotificationAndAskModal('Thông báo', 'Cập nhật thành công.');
+                    }
+                });
+            };
+        });
+
+        $('#FormUpdate_Images').on('change', function () {
+            let filesUploads = $('#FormUpdate_Images').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            $('#FormUpdate_ImagesText').val(fileName);
+            readImageURL(this, $('#FormUpdate_ImagesPreview'));
+        });
+
+        $('#FormUpdate_NoTitle').on('focus', function () {
+            lastFocusElement = $(this).attr('id');
+        });
+
+        $('#FormUpdate_NoDes').on('focus', function () {
+            lastFocusElement = $(this).attr('id');
+        });
+
+        CKEDITOR.instances.FormUpdate_NoHTML.on('focus', function () {
+            lastFocusElement = 'FormUpdate_NoHTML';
+        });
+    });
+
+    function checkFormUpdate() {
+        let check = true;
+        let error = '';
+
+        if (isNullOrEmpty($('#FormUpdate_CreatedDate').val())) {
+            check = false;
+            error = 'Bạn chưa nhập ngày tạo';
+        }
+
+        if (isNullOrEmpty($('#FormUpdate_NoTitle').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tiêu đề';
+        }
+
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+
+    function renderText(that) {
+        console.log(lastFocusElement);
+        if (typeof ($('#' + lastFocusElement)) != 'undefined') {
+
+            switch (lastFocusElement) {
+                case "FormUpdate_NoHTML":
+                    CKEDITOR.instances.FormUpdate_NoHTML.insertText($(that).data('value'));
+                    break;
+
+                default:
+                    $('#' + lastFocusElement).val($('#' + lastFocusElement).val() + $(that).data('value'))
+                    break;
+            }
+        }
+    }
+</script>
+
+
+@Html.Partial("_PartialContentHeader")
+
+
+
+<div class="card">
+    <div class="card-body">
+        <ul class="nav nav-tabs nav-primary" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-bs-toggle="tab" href="#formData_ThongTin" role="tab" aria-selected="false">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon">
+                            <i class='bx bx-home-alt font-18 me-1'></i>
+                        </div>
+                        Thông tin chung
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content py-3">
+            <div class="tab-pane fade show active" id="formData_ThongTin" role="tabpanel">
+                <div class="row g3">
+                    <form id="formUpdate">
+                        <div class="row d-flex">
+
+                            <div class="col-sm-12 col-md-9 col-lg-9 form-group">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+                                        <input type="radio" name="FormUpdate_NoType" id="FormUpdate_NoType_1" value="@CommonConstants.KieuChienDich_Gmail" @(Model.Notification != null ? Model.Notification.NoType == CommonConstants.KieuChienDich_Gmail ? "checked" : "" : "checked")>
+                                        <label for="FormUpdate_NoType_1"> Email </label>
+                                        <input type="radio" name="FormUpdate_NoType" id="FormUpdate_NoType_2" value="@CommonConstants.KieuChienDich_ThongBao" @(Model.Notification != null ? Model.Notification.NoType == CommonConstants.KieuChienDich_ThongBao ? "checked" : "" : "")>
+                                        <label for="FormUpdate_NoType_2"> @Html.Raw("Thông báo app") </label>
+                                        <input type="radio" name="FormUpdate_NoType" id="FormUpdate_NoType_3" value="@CommonConstants.KieuChienDich_TinNhan" @(Model.Notification != null ? Model.Notification.NoType == CommonConstants.KieuChienDich_TinNhan ? "checked" : "" : "")>
+                                        <label for="FormUpdate_NoType_3"> @Html.Raw("Tin nhắn") </label>
+
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 mt-2 form-group">
+                                        <label class="form-label" for="FormUpdate_CreatedDate">@Html.Raw("Ngày tạo")</label>
+                                        <input id="FormUpdate_CreatedDate" name="FormUpdate_CreatedDate" class="form-control datepicker" placeholder="Ngày tạo" value="@(Model.Notification != null ? Model.Notification.CreateDate : DateTime.Now.ToString("dd/MM/yyyy"))">
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 mt-2 form-group">
+                                        <label for="FormUpdate_NoStatus" class="form-label">@Html.Raw("Kích hoạt")</label>
+                                        <input class="form-check-input" type="checkbox" value="" @(Model.Notification != null ? Model.Notification.NoStatus ? "checked" : "" : "") id="FormUpdate_NoStatus">
+                                      
+                                    </div>
+
+
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_HoVaTen" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_HoVaTen)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_MaBenhNhan" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_MaBenhNhan)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_NgaySinh" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_NgaySinh)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_CMND" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_CMND)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_BHYT" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_BHYT)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_NgayVao" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_NgayVao)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_NgayRa" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_NgayRa)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_NgayTaiKham" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_NgayTaiKham)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_MaBenh" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_MaBenh)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_TenBenh" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_TenBenh)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_KetQuaDieuTri" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_KetQuaDieuTri)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_ChuanDoan" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_ChuanDoan)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_PhuongPhapDieuTri" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_PhuongPhapDieuTri)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_LoiDanThayThuoc" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_LoiDanThayThuoc)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_GhiChu" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_GhiChu)</span>
+                                        <span class="btn buttons-excel buttons-html5 btn-primary" data-value="@CommonConstants.UserInfo_FileDinhKem" onclick="renderText(this)">@Html.Raw(CommonConstants.UserInfo_FileDinhKem)</span>
+
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+                                        <label class="form-label" for="FormUpdate_NoTitle">@Html.Raw("Tiêu đề (*)")</label>
+                                        <input id="FormUpdate_NoTitle" name="FormUpdate_NoTitle" class="form-control" placeholder="Tiêu đề" value="@(Model.Notification != null ? Model.Notification.NoTitle : "")">
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+                                        <label class="form-label" for="FormUpdate_NoDes">@Html.Raw("Nội dung tóm tắt")</label>
+                                        <input id="FormUpdate_NoDes" name="FormUpdate_NoDes" class="form-control" placeholder="Nội dung tóm tắt" value="@(Model.Notification != null ? Model.Notification.NoDes : "")">
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+                                        <label class="form-label" for="FormUpdate_NoHTML">@Html.Raw("Nội dung chi tiết")</label>
+                                        <textarea name="FormUpdate_NoHTML" id="FormUpdate_NoHTML" class="form-control" data-rel="ckeditor" rows="3">@(Model.Notification != null ? Model.Notification.NoHTML : "")</textarea>
+                                    </div>
+
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+                                        <label class="form-label" for="FormUpdate_Images">@Html.Raw("Hình ảnh")</label>
+                                        <span class="input-group-addon btn buttons-excel buttons-html5 fileinput-button">
+                                            <input id="FormUpdate_Images" class="form-control" type="file" name="files[]">
+                                        </span>
+
+                                    </div>
+
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2" hidden>
+                                        <input id="FormUpdate_ImagesText" type="text" class="form-control" readonly value="@(Model.Notification != null ? Model.Notification.Image : "")">
+                                    </div>
+
+                                    <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+                                        <img id="FormUpdate_ImagesPreview" src="@(Model.Notification != null && !string.IsNullOrEmpty(Model.Notification.Image) ? Model.Notification.Image : CommonConstants.FileNoImage)" alt="image" />
+
+                                    </div>
+
+                                    <div class="col-sm-12 col-md-6 col-lg-6 form-group text-right">
+                                        <button class="btn buttons-excel buttons-html5 btn-primary" id="btnLuu" type="button"><i class="append-icon fa fa-fw fa-floppy-o"></i>@(Model.Notification != null ? Html.Raw(" Lưu") : Html.Raw(" Tạo mới"))</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3 form-group">
+                                <div class="panel widget vd_bd-grey">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title text-uppercase">@Html.Raw("Lựa chọn nếu thông báo app")</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="row" id="divLuaChonThongBaoApp">
+                                            <div class="col-sm-12 col-md-12 col-lg-12 mt-2">
+                                                @foreach (var item in CommonConstants.GetListNotificationType_App())
+                                                {
+                                                    <div class="vd_radio radio-success form-group">
+                                                        <input type="radio" name="FormUpdate_NoCategory" id="FormUpdate_NoCategory_@item.Id" value="@item.Id" @(Model.Notification != null ? Model.Notification.NoCategory == item.Id ? "checked" : "" : "")>
+                                                        <label for="FormUpdate_NoCategory_@item.Id"> @Html.Raw(item.Name) </label>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div class="col-sm-12 col-md-12 col-lg-12 mt-2">
+                                                <div class="form-label">@Html.Raw("ID Tin tức, dịch vụ")</div>
+                                                <select id="FormUpdate_NewID" name="FormUpdate_NewID" class="form-control select2">
+                                                    @if (Model.Notification != null)
+                                                    {
+                                                        <option value="@Model.Notification.NewID" selected>@Html.Raw(Model.Notification.NewTitle)</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

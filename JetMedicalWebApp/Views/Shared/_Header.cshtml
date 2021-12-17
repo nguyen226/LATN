@@ -1,0 +1,223 @@
+﻿
+
+@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Models.PartialViewModel
+
+<script>
+    $(document).ready(function () {
+        var userId = null;
+        var userFirstName = null;
+        var userlastName = null;
+
+        $('#btnRegisterMember').click(function () {
+            hideAlertErrorRegister();
+            resetFormRegister();
+
+            $('#modalRegister_Login .modal-dialog').removeClass('modal-fix-width-470');
+            $('#modalRegister_Login .modal-dialog').addClass('modal-md');
+
+            $('.dang-nhap').fadeOut().hide();
+            $('.dang-ky').fadeIn().show();
+
+            $('#modalRegister_Login').modal({ backdrop: 'static', keyboard: false });
+        });
+        $('#btnMemberLogin').click(function () {
+            loginForm();
+        });
+        $('#btnThongTinCaNhan').click(function () {
+            window.location.href = $(this).data('url');
+        })
+
+        $('#btnDangXuat').click(function () {
+            window.location.href = $(this).data('url') + '?returnUrl=' + window.location.href;
+        })
+    })
+
+    function reloadNgonNgu(idNgonNgu) {
+
+        var url = "@Url.Action("Language", "Home", new { area = "" })";
+        var data = {
+            id: idNgonNgu
+        };
+        sendDataToURL(url, data, true)
+        .then(function (res) {
+            location.reload();
+        });
+
+    }
+</script>
+<div id="top_header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="adrdess">
+                    <p><i class="fas fa-envelope-open-text"></i> Vanthu.bvtwqn@gmail.com <span><i class="fas fa-phone-volume"></i> HOTLINE: <span class="hotline">0967 951  313</span></span> </p>
+                </div>
+                <div class="menu_topleft">
+                    <div class="col-lg-7">
+                        @if (Model.MemberId > 0)
+                        {
+                            <div class="popup">
+                                <a href="javascript:void(0)" data-url="@Url.Action("Update", "Users", new { area = "Member", userId= (Model.MemberId > 0 ? Model.MemberId : -1)})" class="mr-2 button-regis" id="btnThongTinCaNhan">
+                                    Xin Chào: @Html.Raw(Model.MemberName)
+                                </a>
+                                <a href="javascript:void(0)" data-url="/dang-xuat" class="button-regis" id="btnDangXuat">
+                                    Thoát
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="popup">
+                                <a href="javascript:void(0)" class="button-regis" id="btnRegisterMember" class="register_popup"><i class="fa fa-user"></i> ĐĂNG KÝ </a>
+                            </div>
+                            <div class="popup">
+                                <a href="javascript:void(0)" class="mr-2 button-regis" class="login_popup" id="btnMemberLogin"><i class="fa fa-sign-in"></i> ĐĂNG NHẬP </a>
+                            </div>
+
+
+                        }
+                    </div>
+                    <div class="col-lg-3">
+                        <form action="/Search" method="GET" class="timkiem" id="desktop">
+                            <input name="txtSearch" placeholder="Tìm kiếm...">
+                            <button type="submit"><img src="~/Content/bvtwqn/images/search.svg"></button>
+                        </form>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="ngon_ngu">
+                            <a href="javascript:void(0)" onclick="reloadNgonNgu('@CommonConstants.TiengViet')">
+                                <img src="~/Content/Website/Assets/images/vi.svg" alt="">
+                            </a>
+                            <a href="javascript:void(0)" onclick="reloadNgonNgu('@CommonConstants.TiengAnh')">
+                                <img src="~/Content/Website/Assets/images/en.svg" alt="">
+                            </a>
+                        </div>
+                    </div>
+
+
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="bottom_header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="logo">
+                    <a href="/"><img src="~/Content/bvtwqn/images/logo.png"></a>
+                </div>
+                <div class="hotline_top">
+                    @*<a href="tel:02438373747"><img src="~/Content/bvtwqn/images/hotline.svg">0243.837.3747</a>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="gop_top">
+    <div id="nav">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="nav_header">
+
+                        <div id="nav_sticky" class="menu-content overlay">
+                            <nav class="menu">
+                                <ul>
+                                    <li class="menu__item">
+                                        <a href="/"><i class="fas fa-home"></i></a>
+                                    </li>
+                                    @{
+                                        if (Model.NewsTypes != null && Model.NewsTypes.Count() > 0)
+                                        {
+                                            int i = 0;
+                                            foreach (var item in Model.NewsTypes)
+                                            {
+                                                i++;
+                                                int id = item.id;
+                                                string code = item.code.ToUpper();
+                                                string name = item.name;
+                                                string show = item.show;
+                                                string slug = item.slug;
+                                                var categori = Model.NewsCategories.Where(m => m.typeId == item.id);
+
+                                                if (categori != null && categori.Count() > 1)
+                                                {
+                                                    <li class="menu__item">
+                                                                                            <a href='@if (id != 1042) {<text>javascript:void(0);</text>}
+                                                    else {
+                                                        <text>/chuyen-khoa/</text>
+                                                    }' class="menu__link">
+                                                                                                @name 
+                                                                                            @if (id != 1042)
+                                                                                            {<i class="fas fa-caret-down"></i>}
+
+                                                                                            </a>
+                                                        @if (id != 1042)
+                                                        {
+                                                            @Html.Raw("<ul class='menu__sub-menu'>");
+                                                            foreach (var _item in categori.Where(m => m.parentId == 0))
+                                                            {
+                                                                int childid = _item.id;
+                                                            
+                                                                var childcategori = Model.NewsCategories.Where(m => m.parentId == childid);
+                                                                if (childcategori.Count() > 1)
+                                                                {
+                                                                    @Html.Raw("<li class='menu__sub-menu__item'><a href=\"#\" class=\"menu__link\">" + _item.name + " <i class=\"fas fa-angle-double-right\"></i></a><ul class='menu__sub-menu'>");
+
+                                                                    foreach (var _childitem in childcategori)
+                                                                    {
+                                                                        @Html.Raw("<li class='menu__sub-menu__item sub-item2'><a href=\"/" + Utilities.VnConcert(_childitem.name).ToLower().Replace(' ', '-') + "_" + show + "_" + _childitem.id + "\" class=\"menu__link\">" + _childitem.name + "</a></li>");
+
+                                                                    }
+                                                                    @Html.Raw("</li></ul>");
+
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.Raw("<li class=\"menu__sub-menu__item\"><a class='menu__link' href=\"/" + Utilities.VnConcert(_item.name).ToLower().Replace(' ', '-') + "_" + show + "_" + _item.id + "\" title=\"\">" + _item.name + "</a></li>")
+
+                                                                }
+
+                                                            }
+                                                            @Html.Raw("</ul>");
+                                                        }
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                    @Html.Raw("<li class=\"menu__item\"><a class='menu__link' href=\"/" + Utilities.VnConcert(name).ToLower().Replace(' ', '-') + "_" + show + "_" + id + "\" title=\"\">" + name + "</a></li>")
+
+                                                }
+                                                if (i == 5)
+                                                {
+                                                    @Html.Raw("<li class=\"menu__item\"><a class='menu__link' href='/nhan-vien/danh-sach-chuyen-gia_st_0' title=\"\">Đội ngũ chuyên gia</a></li>")
+
+
+
+                                                }
+                                            }
+                                        }
+                                    }
+
+
+                                </ul>
+                            </nav>
+                        </div>
+                        <div id="nav-icon" class="menu-button visible-xs">
+                            <span class="burger-icon"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+

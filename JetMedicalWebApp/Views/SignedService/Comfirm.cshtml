@@ -1,0 +1,126 @@
+﻿@{
+    Layout = null;
+}
+<style>
+    .form-horizontal{
+        
+    }
+
+    .form-group{
+        height: 34px;
+        line-height: 34px;
+    }
+
+    .comfirm-left{
+        width: 25%;
+        float: left;
+        padding-left: 8px;
+    }
+
+    .comfirm-right{
+        width: 75%;
+        float:left;
+        padding-left: 8px;
+    }
+
+    .comfirm-left > .control-label{
+        font-weight: bold;
+        color: brown;
+    }
+
+    .comfirm-right > .control-label {
+        font-weight: bold;
+        color: darkgreen;
+    }
+
+    .info{
+    }
+
+    .btn-close{
+        padding: 6px;
+        width: 75px;
+        color: #FFF;
+        background: cadetblue;
+        border: 1px solid;
+        float: right;
+        margin-right: 15px;
+        margin-bottom: 6px;
+    }
+</style>
+<div class="form-horizontal">
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Mã Đk</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@Model.code</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Họ tên</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@Model.fullname</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Điện thoại</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@Model.mobile</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Hòm thư</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@Model.email</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Ngày khám</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@Model.date</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Mã gói</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@Model.packageCode</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Tên gói</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@Model.packageName</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="comfirm-left">
+            <label for="title" class="control-label">Giá gói</label>
+        </div>
+        <div class="comfirm-right">
+            <label for="title" class="control-label info">@string.Format("{0:#,0.#}", Model.packagePrice)</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <button class="btn-close" onclick="modal_close('serviceModal');">Đóng</button>
+    </div>
+</div>

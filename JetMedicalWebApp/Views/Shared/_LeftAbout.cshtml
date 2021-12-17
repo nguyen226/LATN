@@ -1,0 +1,81 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Models.PartialViewModel
+
+<div class="menu_gioithieu">
+    <ul>
+        @if (Model.NewsContents != null && Model.NewsContents.Count() > 0)
+        {
+            foreach (var item in Model.NewsContents)
+            {
+                if (item.categoriId == ViewBag.Id)
+                {
+                    @Html.Raw("<li class=\"\"><a  class=\"active_mn\" href='/" + Utilities.VnConcert(item.TypeName).ToLower().Replace(' ', '-') + "/" + Utilities.VnConcert(item.name).ToLower().Replace(' ', '-') + "_a_" + item.categoriId + "'>" + item.name + "</a></li>")
+                }
+                else
+                {
+                    @Html.Raw("<li class=\"\"><a  class=\"\" href='/" + Utilities.VnConcert(item.TypeName).ToLower().Replace(' ', '-') + "/" + Utilities.VnConcert(item.name).ToLower().Replace(' ', '-') + "_a_" + item.categoriId + "'>" + item.name + "</a></li>")
+                }
+            }
+        }
+    </ul>
+</div>
+
+<div class="video_hd">
+    <h3 class="title_center">
+        VIDEO HOẠT ĐỘNG
+    </h3>
+    <div class="xoamargin">
+        <div class="slider_video">
+            @if (Model.Videos != null)
+            {
+                if (Model.Videos.Count() > 0)
+                {
+                    foreach (var item in Model.Videos)
+                    {
+                        <div class="khung_video">
+                            <div class="khung_t_tinkham">
+                                <div class="img_effect">
+                                    <a href="#" data-toggle="modal" data-target="#myModalVideo" data-url="@(!string.IsNullOrEmpty(item.url) ? item.url.Replace("watch?v=", "embed/").Replace("&start_radio=1", "").Replace("&", "?") : "")" onclick="openVideo(this)" id="myModalVideo" class="img_video">
+                                        <img src="@item.avatar" alt="">
+                                    </a>
+                                </div>
+                                <div class="ct_tin">
+                                    <h4 class="title_xanh">@Html.Raw(item.title)</h4>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+<div class="baiviet_hot">
+    <h3 class="title_center">
+        DỊCH VỤ
+    </h3>
+    <div class="xoamargin">
+    @if (Model.Packages != null && Model.Packages.Count() > 0)
+    {
+        foreach (var item in Model.Packages.OrderByDescending(x => x.created_at))
+        {
+            <div class="khung_tintuc">
+                <div class="img_effect">
+                    <a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_pdt_@item.id">
+                        <img src='@item.avatar' />
+                    </a>
+                </div>
+                <div class="ct_tin">
+                    <h4 class="title_xanh"><a href="/@Html.Raw(Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()))_pdt_@item.id">@item.fullname</a></h4>
+                    <div class="time_tin">
+                        @item.created_at
+                    </div>
+                </div>
+            </div>
+            <div class="line"></div>
+        }
+    }
+    </div>
+</div>
+
+

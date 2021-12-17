@@ -1,0 +1,46 @@
+
+
+.the-article-tags {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    white-space: nowrap;
+    margin-top: 10px;
+    font-size: 0.75em;
+    color: #888;
+    line-height: 1.618;
+    float: left;
+    width: 100%;
+}
+
+.the-article-tags i {
+    font-size: 20px;
+    color: #ccc;
+    float: left;
+    margin-right: 10px;
+}
+
+.mgbt-xs-15 {
+    font-size: 13px;
+  
+    color: #505050 !important;
+}
+.vd_bg-blue {
+    background-color: #eee !important;
+    color: #505050 !important
+}
+    .vd_bg-blue:hover {
+        background-color: #00B0AE !important;
+        color: #FFF !important
+    }
+.labeltag {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 13px;
+    line-height: 1;
+    color: #505050 !important;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}

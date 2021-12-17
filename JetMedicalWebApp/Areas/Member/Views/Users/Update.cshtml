@@ -1,0 +1,580 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.UsersViewModels
+@{
+    Layout = "~/Areas/Member/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Người dùng - bệnh nhân";
+}
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/content/bootstrap-datepicker-1-6-4/css/bootstrap-datepicker3.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/js/bootstrap-datepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/locales/bootstrap-datepicker.vi.min.js")"></script>
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/customisedatepicker.js")"></script>
+}
+
+<script>
+    var user = null;
+    var userInfo = null;
+    @if(Model.Users != null)
+    {
+        <text>
+    user = {
+        id: '@Model.Users.UserID'
+    };
+    </text>
+    }
+
+    @if(Model.UserInfo != null)
+    {
+        <text>
+    userInfo = {
+        id: '@Model.UserInfo.USER_INFO_ID'
+    };
+    </text>
+    }
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker(initialDatepickerOption());
+
+        if (user == null) {
+            $("#btnCapNhatUserInfo").prop("disabled", true);
+        }
+        var dropdownlistSelect2TinhOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2TinhOption.placeholder = "Chọn Tỉnh";
+        dropdownlistSelect2TinhOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Province", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'ProvinceID, ProvinceName, IsActive';
+                var condition = params.term ? ' ProvinceName.Contains(\\' + params.term + '\\) AND IsActive = True' : ' IsActive = True ';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'ProvinceName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.ProvinceID,
+                        text: item.ProvinceName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#tinh').select2(dropdownlistSelect2TinhOption);
+
+        var dropdownlistSelect2HuyenOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2HuyenOption.placeholder = "Chọn huyện";
+        dropdownlistSelect2HuyenOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "District", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'ProvinceID, DistrictID, DistrictName, IsActive';
+                var condition = ' IsActive = True AND ProvinceID.Contains(\\' + $('#tinh').val() + '\\)';
+                condition += params.term ? ' AND (DistrictName.Contains(\\' + params.term + '\\))' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'DistrictName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.DistrictID,
+                        text: item.DistrictName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#huyen').select2(dropdownlistSelect2HuyenOption);
+
+        var dropdownlistSelect2NhomMauOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2NhomMauOption.placeholder = "Chọn nhóm máu";
+        dropdownlistSelect2NhomMauOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "BloodType", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'BloodTypeID, BloodName';
+                var condition = params.term ? ' BloodName.Contains(\\' + params.term + '\\)' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'BloodName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.BloodTypeID,
+                        text: item.BloodName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#nhomMau').select2(dropdownlistSelect2NhomMauOption);
+
+        var dropdownlistSelect2CongTyOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CongTyOption.placeholder = "Chọn công ty";
+        dropdownlistSelect2CongTyOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Company", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'CompanyID, ComCode, ComName';
+                var condition = params.term ? ' ComCode.Contains(\\' + params.term.trim() + '\\) OR ComName.Contains(\\' + params.term.trim() + '\\)' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'ComCode asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.CompanyID,
+                        text: item.ComCode + " - " + item.ComName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#congTy').select2(dropdownlistSelect2CongTyOption);
+
+        $("#btnCapNhatUser").click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdate()) {
+                var url = "@Url.Action("AddOrUpdate", "Users", new { area = "Member" })";
+                var fields = [
+                    'FirstName',
+                    'LastName',
+                    'EmailID',
+                    'Phone',
+                    'Password'
+                ];
+                var values = [
+                    $('#firstName').val(),
+                    $('#lastName').val(),
+                    $('#email').val(),
+                    $('#phone').val(),
+                    $('#password').val()
+                ];
+
+                var data = new FormData();
+
+                data.append("id", (user != null ? user.id : ''));
+                data.append("fields", JSON.stringify(fields));
+                data.append("values", JSON.stringify(values));
+
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        if (!isNaN(parseInt(res))) {
+                            window.location.href = "@Url.Action("Update", "Users", new { area = "Member" })?UserId=" + res;
+                        }
+                        else {
+                            notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", res);
+                        }
+                    }
+                    else {
+                        notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", 'Bạn không được phép cập nhật dữ liệu');
+                    }
+                });
+            }
+        });
+
+        $("#btnCapNhatUserInfo").click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdateUserInfo() && user != null) {
+                var url = "@Url.Action("AddOrUpdate", "UserInfo", new { area = "Member" })";
+                var radios = document.getElementsByName('gender');
+                var sexValue = true;
+                for (var i = 0, length = radios.length; i < length; i++) {
+                    if (radios[i].checked) {
+                        // do whatever you want with the checked radio
+                        sexValue = radios[i].value
+                        break;
+                    }
+                }
+                var fields = [
+                    'UserID',
+                    //'FirstName',
+                    //'LastName',
+                    'DateOfBirth',
+                    'CMND',
+                    'BHYT',
+                    'Sex',
+                    'Address',
+                    'Height',
+                    'Occupation',
+                    'weight',
+                    'BloodTypeID',
+                    'ProvinceID',
+                    'DistrictID',
+                    'Ma_Cong_Ty',
+                    'IsDefault'
+                ];
+                var values = [
+                    user.id,
+                    //$('#firstNameUserInfo').val(),
+                    //$('#lastNameUserInfo').val(),
+                    $('#dateOfBirthUserInfo').val(),
+                    $('#cmndUserInfo').val(),
+                    $('#baoHiemYTeUserInfo').val(),
+                    sexValue,
+                    $('#diaChi').val(),
+                    $('#chieuCao').val(),
+                    $('#ngheNghiep').val(),
+                    $('#cangNang').val(),
+                    $('#nhomMau').val(),
+                    $('#tinh').val(),
+                    $('#huyen').val(),
+                    $('#congTy').val(),
+                    $('#hoSoMacDinh').is(':checked')
+                ];
+
+                var data = new FormData();
+
+                data.append("id", (userInfo != null ? userInfo.id : ''));
+                data.append("fields", JSON.stringify(fields));
+                data.append("values", JSON.stringify(values));
+
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        if (!isNaN(parseInt(res))) {
+                            window.location.href = "@Url.Action("Update", "Users", new { area = "Member" })?UserId=" + user.id;
+                        }
+                        else {
+                            notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", res);
+                        }
+                    }
+                    else {
+                        notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", 'Bạn không được phép cập nhật dữ liệu');
+                    }
+                });
+            }
+        });
+
+        $("a[name='btnTroVeDanhSach']").click(function (e) {
+            e.preventDefault();
+            window.location.href = '@Url.Action("NguoiDung", "Users", new { area = "Member" })';
+        });
+
+    });
+
+    function checkFormUpdateUserInfo() {
+        var check = true;
+        var error = "";
+
+        if (isNullOrEmptySelect2($('#nhomMau').val())) {
+            error = "Chưa chọn nhóm máu.";
+            check = false;
+        }
+
+        if (isNullOrEmptySelect2($('#tinh').val())) {
+            error = "Chưa chọn tinh.";
+            check = false;
+        }
+
+        if (isNullOrEmptySelect2($('#huyen').val())) {
+            error = "Chưa chọn huyện.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#dateOfBirthUserInfo').val())) {
+            error = "Chưa nhập ngày sinh.";
+            check = false;
+        }
+
+        //if (isNullOrEmpty($('#firstNameUserInfo').val())) {
+        //    error = "Chưa nhập tên.";
+        //    check = false;
+        //}
+        //if (isNullOrEmpty($('#lastNameUserInfo').val())) {
+        //    error = "Chưa nhập họ.";
+        //    check = false;
+        //}
+
+        if (!check) {
+            notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", error);
+        }
+
+        return check;
+    }
+
+    function checkFormUpdate() {
+        var check = true;
+        var error = "";
+
+        if (!isNullOrEmpty($('#password').val()) || !isNullOrEmpty($('#confrimPassword').val())) {
+            if ($('#password').val() != $('#confrimPassword').val()) {
+                error = "Mật khẩu xác nhận không đúng.";
+                check = false;
+            }
+        }
+
+        if (isNullOrEmpty($('#firstName').val())) {
+            error = "Chưa nhập tên.";
+            check = false;
+        }
+        if (isNullOrEmpty($('#lastName').val())) {
+            error = "Chưa nhập họ.";
+            check = false;
+        }
+        if (isNullOrEmpty($('#email').val())) {
+            error = "Chưa nhập email.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#password').val()) && user == null) {
+            error = "Chưa nhập mật khẩu.";
+            check = false;
+        }
+
+        if (!check) {
+            notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", error);
+        }
+
+        return check;
+    }
+
+
+</script>
+
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel widget light-widget">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="mgbt-xs-15">Thông Tin User</h3>
+                                <form class="form-horizontal" action="#" role="form">
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Họ</div>
+                                            <input type="text" id="lastName" class="form-control" placeholder="Họ" value="@(Model.Users != null ? Model.Users.LastName : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Tên</div>
+                                            <input type="text" id="firstName" class="form-control" placeholder="Tên" value="@(Model.Users != null ? Model.Users.FirstName : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Email</div>
+                                            <input type="email" id="email" class="form-control" placeholder="email" value="@(Model.Users != null ? Model.Users.EmailID : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Số điện thoại</div>
+                                            <input type="text" id="phone" class="form-control" placeholder="số điện thoại" value="@(Model.Users != null ? Model.Users.Phone : "")">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Mật khẩu</div>
+                                            <input type="password" id="password" class="form-control" placeholder="mật khẩu" value="">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Xác nhận mật khẩu</div>
+                                            <input type="password" id="confrimPassword" class="form-control" placeholder="xác nhận mật khẩu" value="">
+                                        </div>
+                                    </div>
+                                    <div class="row text-right">
+                                        <div class="col-xs-12 text-right">
+                                            <button class="btn vd_btn vd_bg-green" id="btnCapNhatUser"><span class="menu-icon"><i class="fa fa-fw fa-check"></i></span> Cập nhật user</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row">
+
+                            <div class="col-sm-12">
+                                <h3 class="mgbt-xs-15">Hồ sơ y tế</h3>
+                                <form class="form-horizontal" action="#" role="form">
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Ngày sinh</div>
+                                            <input type="email" id="dateOfBirthUserInfo" class="form-control datepicker" placeholder="ngày sinh" value="@(Model.UserInfo != null ? Model.UserInfo.DateOfBirth : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">BHYT</div>
+                                            <input type="text" id="baoHiemYTeUserInfo" class="form-control" placeholder="BHYT" value="@(Model.UserInfo != null ? Model.UserInfo.BHYT : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">CMND</div>
+                                            <input type="text" id="cmndUserInfo" class="form-control" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.CMND : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Nhóm máu</div>
+                                            <select id="nhomMau" name="nhomMau" class="form-control select2">
+                                                @if (Model.BloodType != null)
+                                                {
+                                                    <option value="@Model.BloodType.BloodTypeID" selected>@Html.Raw(Model.BloodType.BloodName)</option>
+                                                }
+                                            </select>
+                                        </div>
+                                      
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <br />
+                                            <div class="vd_radio radio-success">
+                                                <input type="radio" @(Model.UserInfo != null ? (Model.UserInfo.Sex == true ? "checked" : "") : "checked") value="True" id="gioiTinhNam" name="gender">
+                                                <label for="gioiTinhNam"> Nam </label>
+                                                <input type="radio" @(Model.UserInfo != null ? (Model.UserInfo.Sex == false ? "checked" : "") : "") value="False" id="gioiTinhNu" name="gender">
+                                                <label for="gioiTinhNu"> Nữ </label>
+                                            </div>
+                                        </div>
+
+                                      
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Tỉnh</div>
+                                            <select id="tinh" name="tinh" class="form-control select2">
+                                                @if (Model.Province != null)
+                                                {
+                                                    <option value="@Model.Province.ProvinceID" selected>@Html.Raw(Model.Province.ProvinceName)</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Huyện/Xã</div>
+                                            <select id="huyen" name="huyen" class="form-control select2">
+                                                @if (Model.District != null)
+                                                {
+                                                    <option value="@Model.District.DistrictID" selected>@Html.Raw(Model.District.DistrictName)</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Địa chỉ</div>
+                                            <input type="text" id="diaChi" class="form-control" placeholder="Địa chỉ" value="@(Model.UserInfo != null ? Model.UserInfo.Address : "")">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Chiều cao(cm)</div>
+                                            <input type="number" id="chieuCao" class="form-control" placeholder="Chiều cao(cm)" value="@(Model.UserInfo != null ? Model.UserInfo.Height.ToString() : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Câng nặng(kg)</div>
+                                            <input type="number" id="cangNang" class="form-control" placeholder="Câng nặng(kg)" value="@(Model.UserInfo != null ? Model.UserInfo.weight.ToString() : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Nghề nghiệp</div>
+                                            <input type="text" id="ngheNghiep" class="form-control" placeholder="Nghề nghiệp" value="@(Model.UserInfo != null ? Model.UserInfo.Occupation : "")">
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <div class="form-label">Công ty</div>
+                                            <select id="congTy" name="congTy" class="form-control select2">
+                                                @if (Model.Company != null)
+                                                {
+                                                    <option value="@Model.Company.CompanyID" selected>@Html.Raw(Model.Company.ComCode + " - " + Model.Company.ComName)</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="col-sm-3">
+                                            <br />
+                                            <div class="vd_checkbox checkbox-success">
+                                                <input type="checkbox" id="hoSoMacDinh" value="1" checked disabled>
+                                                <label for="checkbox-3"> Hồ sơ mặc định</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row text-right">
+                                        <div class="col-xs-12 text-right">
+                                            <button class="btn vd_btn vd_bg-green" id="btnCapNhatUserInfo"><span class="menu-icon"><i class="fa fa-fw fa-check"></i></span> Cập nhật hồ sơ y tế</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- col-sm-12 -->
+                </div>
+                <!-- row -->
+            </div>
+        </div>
+        <!-- Panel Widget -->
+    </div>
+    <!-- col-sm-12-->
+</div>
+
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

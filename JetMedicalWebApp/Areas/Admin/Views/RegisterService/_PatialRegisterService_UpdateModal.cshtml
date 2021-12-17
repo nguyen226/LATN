@@ -1,0 +1,75 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+        $('#btnExecuteAddNewDataRowDichVu').click(function (e) {
+            e.preventDefault();
+
+            var fields = [
+                    'Status',
+                    'MA_LK'
+            ];
+
+            var values = [
+                $('#FormUpdateRegisterService_Status').val(),
+                $('#FormUpdateRegisterService_MA_LK').val()
+            ];
+
+            var data = {
+                id: selectedDataRow != null ? selectedDataRow.RegisterID : null,
+                fields: fields,
+                values: values
+            };
+
+            var url = "@Url.Action("AddOrUpdate", "RegisterService", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Lưu thành công.");
+                    $('#FormUpdateRegisterService')[0].reset();
+                    $('#modalUpdateRegisterService').modal('hide');
+                    resetCheckboxAndDatatable()
+                }
+            });
+        });
+    });
+</script>
+
+<div class="modal fade" id="modalUpdateNhanTuVan" tabindex="-1" role="dialog" aria-labelledby="modalUpdateRegisterService" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title" id="modalUpdateRegisterServiceLabel">@Html.Raw("Cập nhật")</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="FormUpdateRegisterService">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">@Html.Raw("Mã lượt khám")</label>
+                        <div class="col-sm-9 controls">
+                            <input class="input-border-btm" id="FormUpdateRegisterService_MA_LK" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="FormUpdateRegisterService_Status">@Html.Raw("Trạng thái")</label>
+                        <div class="col-sm-9 controls">
+                            <select id="FormUpdateRegisterService_Status" name="FormUpdateRegisterService_Status" class="form-control select2-local">
+                                @foreach (var item in CommonConstants.GetListTrangThaiDangKy())
+                                {
+                                    <option value="@item.Id" @(item.IsDefault ? "selected" : "")>@Html.Raw(item.Name)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn vd_btn vd_bg-green" id="btnExecuteAddNewDataRowDichVu"><i class="append-icon fa fa-fw fa-floppy-o"></i>@Html.Raw(" Lưu")</button>
+                <button type="button" class="btn vd_btn vd_bg-grey" data-dismiss="modal"><i class="append-icon fa fa-fw fa-ban"></i>@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

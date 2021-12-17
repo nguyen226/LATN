@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JetMedicalWebApp.Web", "JetMedicalWebApp\JetMedicalWebApp.Web.csproj", "{5E3C9D80-6578-4A2B-B98F-DD44239B5EB7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JetMedicalWebApp.Common", "JetMedicalWebApp.Common\JetMedicalWebApp.Common.csproj", "{19D5C1B0-3870-49C3-9952-BC90067B1AB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JetMedicalWebApp.DAL", "JetMedicalWebApp.DAL\JetMedicalWebApp.DAL.csproj", "{2DC5E3DC-41F4-4778-B160-E60B27C78453}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JetMedicalWebApp.Entities", "JetMedicalWebApp.Entities\JetMedicalWebApp.Entities.csproj", "{7070DA2F-C71E-400A-A74A-B32A27DF03EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JetMedicalWebApp.Services", "JetMedicalWebApp.Services\JetMedicalWebApp.Services.csproj", "{F28F63DF-1473-49AE-9113-809BE21C7FDC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E3C9D80-6578-4A2B-B98F-DD44239B5EB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E3C9D80-6578-4A2B-B98F-DD44239B5EB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E3C9D80-6578-4A2B-B98F-DD44239B5EB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E3C9D80-6578-4A2B-B98F-DD44239B5EB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19D5C1B0-3870-49C3-9952-BC90067B1AB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19D5C1B0-3870-49C3-9952-BC90067B1AB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19D5C1B0-3870-49C3-9952-BC90067B1AB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19D5C1B0-3870-49C3-9952-BC90067B1AB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DC5E3DC-41F4-4778-B160-E60B27C78453}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DC5E3DC-41F4-4778-B160-E60B27C78453}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DC5E3DC-41F4-4778-B160-E60B27C78453}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DC5E3DC-41F4-4778-B160-E60B27C78453}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7070DA2F-C71E-400A-A74A-B32A27DF03EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7070DA2F-C71E-400A-A74A-B32A27DF03EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7070DA2F-C71E-400A-A74A-B32A27DF03EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7070DA2F-C71E-400A-A74A-B32A27DF03EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F28F63DF-1473-49AE-9113-809BE21C7FDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F28F63DF-1473-49AE-9113-809BE21C7FDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F28F63DF-1473-49AE-9113-809BE21C7FDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F28F63DF-1473-49AE-9113-809BE21C7FDC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,425 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.NewsContentViewModels
+@{
+    ViewBag.Title = "Đào tạo";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "id, categoriName, languageId,avatar,  code, name, shorttitle, position, ActivePhone,isactive, CreatedUserID, created_at";
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "NewsContent", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = ' TypeId IN (@CommonConstants.CategoryDaoTaoVN, @CommonConstants.CategoryDaoTaoEN) ';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(name LIKE N'%" + $('#quickSearch').val().trim() + "%' OR shorttitle LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                }
+
+
+                if (!isNullOrEmptySelect2($('#languageId').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(languageId = '" + $('#languageId').val() + "')";
+                }
+
+
+                if (xemHeThong == false && (xemCaNhan == true)) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += 'CreatedUserID =' + userId;
+                }
+
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.initComplete = function () {
+            this.api().columns().every(function (index) {
+                var headerName = $(this.header()).text();
+                var column = this;
+                if (index == 0) {
+                    $(column.header()).html('<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkbox-select-all">\
+                                <label for="checkbox-select-all"></label>\
+                            </div></div>');
+                }
+
+                table.columns.adjust();
+            });
+
+            $('#checkbox-select-all').off('change').on('change', function () {
+                $('#dtTable tbody input:checkbox[name="checkboxSelected"]').prop('checked', this.checked);
+            });
+        };
+
+        datatableOption.order = [[0, "DESC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0,1],
+                className: 'dt-body-center',
+                "orderable": false,
+                "searchable": false
+            },
+            {
+                "targets": [6,7],
+                className: 'dt-body-center',
+                "orderable": false,
+            },
+            {
+                "targets": [8],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowUpdate)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            },
+            {
+                "targets": [9],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowDelete)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            }
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "created_at", "name": "created_at", "autoWidth": true,
+                "render": function (data, type, full, meta) {
+                    return '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkboxSelected_' + full.id + '" name="checkboxSelected">\
+                                <label for="checkboxSelected_' + full.id + '"></label>\
+                            </div></div>';
+                }
+            },
+            {
+                "data": "avatar", "name": "avatar", "width": "20px", "title": "Hình ảnh", "render": function (data, type, full, meta) {
+                    let content = '<img id="FormUpdate_ImagesPreview" src="' + data + '" alt="image" />';
+                    return data != '' ? content : '';
+                }
+            },
+            { "data": "categoriName", "name": "categoriName", "autoWidth": true, "title": "Danh mục" },
+            {
+                "data": "name", "name": "name", "autoWidth": true, "title": "Tên", "render": function (data, type, full, meta) {
+                    let content = data.length > 70 ? data.substring(0, 70) + '...' : data;
+                    return content;
+                }
+            },
+            {
+                "data": "shorttitle", "name": "shorttitle", "autoWidth": true, "title": "Short Title", "render": function (data, type, full, meta) {
+                    let content = data.length > 70 ? data.substring(0, 70) + '...' : data;
+                    return content;
+                }
+            },
+            { "data": "position", "name": "position", "autoWidth": true, "title": "Position" },
+            {
+                "data": "isactive", "name": "isactive", "autoWidth": true, "title": "Kích hoạt", "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActive_' + full.id + '" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.id + '"' + (data == true ? ' checked ' : '') + ' data-field="isactive" data-value="' + !data + '">\
+                                    <label for="checkboxActive_' + full.id + '"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "ActivePhone", "name": "ActivePhone", "autoWidth": true, "title": "Active Phone", "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActivePhone_' + full.id + '" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.id + '"' + (data == true ? ' checked ' : '') + ' data-field="ActivePhone" data-value="' + !data + '">\
+                                    <label for="checkboxActivePhone_' + full.id + '"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(suaHeThong == true || (suaCaNhan == true && row.CreatedUserID == userId)){
+                        html ='<a data-original-title="edit" data-toggle="tooltip" data-placement="top" href="@Url.Action("Update", "DaoTao", new { area = "Admin" })?id=' + row.id + '" class="btn menu-icon vd_bg-yellow" href="#!"> <i class="fa fa-pencil"></i> </a>';
+                    }
+                    return html ;
+                }, "name": "btnEdit", width: "30px"
+            },
+            {
+                "data": "id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(xoaHeThong == true ||  (xoaCaNhan == true && row.CreatedUserID == userId)){
+                        html ='<a data-original-title="delete" data-toggle="tooltip" data-placement="top" class="btn menu-icon vd_bg-red" onclick=deleteDataRow(' + row.id + ')> <i class="fa fa-trash-o"></i> </a>';
+                    }
+                    return html ;
+                }, "name": "btnDelete", width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $("#btnRefreshData").click(function () {
+            table.draw();
+        });
+
+        $('#btnDelete').click(function () {
+            dataListId = [];
+            dataListId = $(table.$('input:checkbox[name="checkboxSelected"]').map(function () {
+                return $(this).prop("checked") ? table.rows($(this).closest('tr')).data()[0].id : null;
+            })).toArray();
+
+            if (dataListId.length > 0) {
+                $('#confirmDeleteDataRowModal').modal('show');
+            } else {
+                notification("top right", "info", "fadeIn animated bx bx-info-circle", "", "Bạn chưa chọn dòng nào để xóa.");
+            }
+        });
+
+        $('#btnAdd').click(function () {
+            window.location.href = '@Url.Action("Update", "DaoTao", new { area = "Admin" })';
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            if (dataListId.length > 0) {
+                var data = { ids: dataListId };
+                var url = "@Url.Action("DeleteByIds", "NewsContent", new { area = "Admin" })";
+
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                        if (res == null) {
+                            notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                        }
+                        else if (res == "") {
+                            $('#confirmDeleteDataRowModal').modal('hide');
+                            notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                            resetCheckboxAndDatatable();
+                        }
+                    }
+                });
+            }
+        });
+
+
+        @*var dropdownlistSelect2CategoryOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CategoryOption.placeholder = "Chọn danh mục";
+        dropdownlistSelect2CategoryOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsCategory", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name';
+                var condition = params.term ? ' name.Contains(\\' + params.term + '\\)' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'id asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                data.unshift({
+                    id: "-1",
+                    text: "Chọn danh mục"
+                })
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#categoriId').select2(dropdownlistSelect2CategoryOption);*@
+        $('#languageId').change(function (e) {
+            e.preventDefault();
+            resetCheckboxAndDatatable();
+        });
+
+        $('#quickSearch').keyup(function (e) {
+            e.preventDefault();
+            resetCheckboxAndDatatable();
+        });
+    });
+
+    function deleteDataRow(id) {
+        dataListId = [id];
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        $('#checkbox-select-all').prop('checked', false);
+        dataListId = [];
+        selectedDataRow = null;
+    }
+
+    function updateCellDatatable(that) {
+        var data = {
+            id : $(that).data("id"),
+            fields : [$(that).data("field")],
+            values : [$(that).data("value")],
+        };
+
+        var url = "@Url.Action("AddOrUpdateList", "NewsContent", new { area = "Admin" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+            }
+        });
+    }
+</script>
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+
+        <div class="panel widget light-widget">
+            <div class="panel-body">
+                <div class="row d-flex">
+                    <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                        <select id="languageId" name="languageId" class="form-control select2-local" style="height:30px;">
+                            <option value="-1" selected>@Html.Raw("Chọn ngôn ngữ")</option>
+                            @foreach (var item in CommonConstants.GetDanhSachNgonNgu())
+                            {
+                                <option value="@item.Id">@Html.Raw(item.Name)</option>
+                            }
+                        </select>
+                    </div>
+
+                    @*<div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                            <select id="categoriId" name="categoriId" class="form-control select2"></select>
+                        </div>*@
+
+                    <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                        <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                            <input type="text" id="quickSearch"  class="form-control" placeholder="tìm kiếm" onchange="resetCheckboxAndDatatable()">
+                            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-8 col-lg-8 form-group">
+                        <div class="vd_panel-menu">
+                            <div id="btnRefreshData" class="menu entypo-icon largerFont" data-placement="bottom" data-original-title="Làm mới"> <i class="icon-cycle"></i> </div>
+                            @if (Model.Menu_GroupPermission.AllowUpdate)
+                            {
+                                <div id="btnAdd" class="menu entypo-icon vd_green largerFont" data-placement="bottom" data-original-title="Thêm"> <i class="icon-plus3"></i> </div>
+                            }
+                            @if (Model.Menu_GroupPermission.AllowDelete)
+                            {
+                                <div id="btnDelete" class="menu entypo-icon vd_red largerFont" data-placement="bottom" data-original-title="Xóa"> <i class="icon-trash"></i> </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel widget light-widget">
+                    <div class="panel-body">
+                        <div class="row">
+                            <table id="dtTable" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")

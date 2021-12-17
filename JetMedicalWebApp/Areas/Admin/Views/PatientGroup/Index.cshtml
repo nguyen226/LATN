@@ -1,0 +1,259 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.PatientGroupViewModels
+@{
+    ViewBag.Title = "Nhóm người bệnh";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+
+        let selectedFields = "Id, Name, Note,CreatedDate, IsDisabled, (CreatedUsers != null ? CreatedUsers.UserID : -1) AS CreatedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "PatientGroup", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += 'Name.Contains("' + $('#quickSearch').val() + '")';
+                }
+
+                if (xemHeThong == false && (xemCaNhan == true)) {
+	                if (!isNullOrEmpty(stringFilter)) {
+		                stringFilter += ' AND ';
+	                }
+	                stringFilter += 'CreatedUserID =' + userId;
+                }
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+
+        datatableOption.order = [[0, "DESC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false,
+                "visible": false
+
+            },
+            {
+                "targets": [3],
+                className: 'dt-body-center',
+            },
+            {
+                "targets": [4],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && (!Model.Menu_GroupPermission.SystemView && !Model.Menu_GroupPermission.PersonalView))
+                {
+                    <text>
+                    visible: false
+                </text>
+                }
+            },
+            {
+                "targets": [5],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && (!Model.Menu_GroupPermission.SystemEdit))
+                    {
+                        <text>
+                        visible: false
+                    </text>
+                    }
+                }
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "Id", "name": "Id", "autoWidth": true
+            },
+            { "data": "Name", "name": "Name", "autoWidth": true, "title": "Tên" },
+            { "data": "Note", "name": "Note", "autoWidth": true, "title": "Ghi chú" },
+            { "data": "CreatedDate", "name": "CreatedDate", "autoWidth": true, "title": "Ngày tạo" },
+            {
+                "data": "Id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(xemHeThong ||  (xemCaNhan && row.CreatedUserID == userId)){
+                        html = '<div class="d-flex order-actions"><a class="btnXemChiTiet" onclick=xemChiTiet(' + row.Id + ')> <i class="bx bxs-user"></i>  </a></div>';
+                    }
+                    return html ;
+                },width: "30px"
+            },
+            {
+                "data": "IsDisabled", "name": "IsDisabled", "autoWidth": true, "title": "Active", width: "30px",
+                "render": function (data, type, full, meta) {
+                    let stringdisable = 'disabled';
+                    if(suaHeThong == true || (suaCaNhan == true && row.CreatedUserID == userId)){
+                        stringdisable = '';
+                    }
+
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" '+stringdisable+' id="checkboxDisabled_' + full.Id + '" value="" ' + (data == false ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.Id + '"' + (data == false ? ' checked ' : '') + ' data-field="IsDisabled" data-value="' + !data + '">\
+                                    <label for="checkboxDisabled_' + full.Id + '"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $('#dtTable tbody').on('click', 'tr td.menu-action > .order-actions  > .btnXemChiTiet', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+            viewUrl('@Url.Action("ThongTinChiTiet", "PatientGroup", new { area = "Admin" })?id=' + selectedDataRow.id);
+        });
+
+        $("#btnRefreshData").click(function () {
+            resetCheckboxAndTable();
+        });
+
+        $("#btnAdd").click(function () {
+            window.open('@Url.Action("Index", "XML1", new { area = "Admin" })', '_blank');
+        });
+
+
+    });
+
+    function xemChiTiet(id) {
+        viewUrl('@Url.Action("ThongTinChiTiet", "PatientGroup", new { area = "Admin" })?id=' + id);
+    }
+
+    function resetCheckboxAndTable() {
+        table.draw();
+        dataListId = [];
+        selectedDataRow = null;
+    }
+
+    function updateCellDatatable(that) {
+        var data = {
+            id : $(that).data("id"),
+            fields : [$(that).data("field")],
+            values : [$(that).data("value")],
+            userIDs: []
+        };
+
+        var url = "@Url.Action("AddOrUpdate", "PatientGroup", new { area = "Admin" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+            }else{
+                resetCheckboxAndTable();
+            }
+        });
+    }
+</script>
+
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    Search:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearch" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
+
+                            @if (Model.Menu_GroupPermission.SystemEdit == true || Model.Menu_GroupPermission.PersonalEdit == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnAdd" tabindex="0" aria-controls="example2" type="button"><span>Thêm mới</span></button>
+                            }
+
+                        
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

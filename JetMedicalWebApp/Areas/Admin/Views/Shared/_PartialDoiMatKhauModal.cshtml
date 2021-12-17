@@ -1,0 +1,101 @@
+﻿@using JetMedicalWebApp.Common
+
+<script>
+    $(document).ready(function () {
+        $('#btnExecuteDoiMatKhau').off('click').on('click', function () {
+            var userId = '@(Request.Cookies.Get(CommonConstants.CookieUserID) != null ? Request.Cookies.Get(CommonConstants.CookieUserID).Value : "")';
+            if (checkFormDoiMatKhau()) {
+                if (!isNullOrEmpty(userId)) {
+                    var data = {
+                        userId: '@(Request.Cookies.Get(CommonConstants.CookieUserID) != null ? Request.Cookies.Get(CommonConstants.CookieUserID).Value : "")',
+                        matKhauCu: $('#formDoiMatKhau_MatKhauCu').val(),
+                        matKhauMoi: $('#formDoiMatKhau_MatKhauMoi').val()
+                    };
+                    var url = "@Url.Action("DoiMatKhau", "Users", new { area = "Admin" })";
+
+                    sendDataToURL(url, data, true, null)
+                    .then(function (res) {
+                        if (res) {
+                            if (!isNaN(parseInt(res))) {
+                                $('#doiMatKhauModal').modal('hide');
+                            notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Đổi mật khẩu thành công.");
+                            }
+                            else {
+                                notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                            }
+                        }
+                        else {
+                            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", 'Bạn không được phép cập nhật dữ liệu');
+                        }
+                    });
+                }
+                else {
+                    notification("top right", "info", "fadeIn animated bx bx-info-circle", "", "Không tìm thấy người dùng.");
+                }
+            }
+        });
+    })
+
+    function checkFormDoiMatKhau() {
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmpty($('#formDoiMatKhau_MatKhauCu').val())) {
+            error = 'Bạn chưa nhập mật khẩu cũ';
+        }
+
+        if (isNullOrEmpty($('#formDoiMatKhau_MatKhauMoi').val())) {
+            error = 'Bạn chưa nhập mật khẩu mới';
+        }
+        else {
+            if ($('#formDoiMatKhau_MatKhauMoi').val() != $('#formDoiMatKhau_NhapLaiMatKhauMoi').val()) {
+                error = 'Mật khẩu mới không khớp';
+            }
+        }
+
+        if (!isNullOrEmpty(error)) {
+            check = false;
+            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", error);
+        }
+        return check;
+    }
+</script>
+
+<div class="modal fade" id="doiMatKhauModal" tabindex="-1" role="dialog" aria-labelledby="doiMatKhauModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+                <h4 class="modal-title" id="doiMatKhauModalLabel">@Html.Raw("Đổi mật khẩu")</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="formDoiMatKhau">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="formDoiMatKhau_MatKhauCu">Mật khẩu cũ</label>
+                        <div class="col-sm-9 controls">
+                            <input class="input-border-btm" id="formDoiMatKhau_MatKhauCu" type="password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="formDoiMatKhau_MatKhauMoi">Mật khẩu mới</label>
+                        <div class="col-sm-9 controls">
+                            <input class="input-border-btm" id="formDoiMatKhau_MatKhauMoi" type="password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="formDoiMatKhau_NhapLaiMatKhauMoi">Nhập lại mật khẩu</label>
+                        <div class="col-sm-9 controls">
+                            <input class="input-border-btm" id="formDoiMatKhau_NhapLaiMatKhauMoi" type="password">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn vd_btn vd_bg-green" id="btnExecuteDoiMatKhau"><i class="append-icon fa fa-fw fa-check"></i>@Html.Raw(" Đồng ý")</button>
+                <button type="button" class="btn vd_btn vd_bg-grey" data-dismiss="modal"><i class="append-icon fa fa-fw fa-ban"></i>@Html.Raw(" Hủy bỏ")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>

@@ -1,0 +1,110 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.XML1ViewModels
+@{
+    ViewBag.Title = "XML4";
+    Layout = "~/Views/Shared/_LayoutChiTiet.cshtml";
+
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+
+<script type="text/javascript">
+    var maLK = '@Model.XML3.MA_LK';
+    var maDichVu = '@Model.XML3.MA_DICH_VU';
+    var tableCanLamSang2;
+    $(document).ready(function () {
+        khoiTaoDatatable();
+    });
+    
+    function khoiTaoDatatable() {
+        let selectedFields = "Id, MA_DICH_VU, MA_MAY, MA_LK, TEN_CHI_SO, GIA_TRI, KET_LUAN, MO_TA, NGAY_KQ, STRNGAY_KQ, XML4_01";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "XML4", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+                stringFilter += "MA_LK='" + maLK + "' AND MA_DICH_VU='"+maDichVu+"'";
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableCanLamSang2.columns.adjust();
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [4],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [7],
+                className: 'dt-body-center',
+                "orderable": false,
+                "searchable": false,
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "MA_DICH_VU", "name": "MA_DICH_VU", "autoWidth": true, "title": "Mã dịch vụ" },
+            { "data": "MA_MAY", "name": "MA_MAY", "autoWidth": true, "title": "Mã máy" },
+            { "data": "TEN_CHI_SO", "name": "TEN_CHI_SO", "autoWidth": true, "title": "Chỉ số" },
+            { "data": "GIA_TRI", "name": "GIA_TRI", "autoWidth": true, "title": "Giá trị" },
+            { "data": "STRNGAY_KQ", "name": "NGAY_KQ", "autoWidth": true, "title": "Ngày" },
+            { "data": "MO_TA", "name": "MO_TA", "autoWidth": true, "title": "Mô tả" },
+            { "data": "KET_LUAN", "name": "KET_LUAN", "autoWidth": true, "title": "Kết luận" },
+            {
+                "data": "XML4_01", "name": "XML4_01", "autoWidth": true, "title": "FPD đơn", "render": function (data, type, full, meta) {
+                    return !isNullOrEmpty(data) ? '<a target="_blank" href="@CommonConstants.DuongDanThuMucTapTin/' + data + '">Tải file</a>' : '';
+                }
+            }
+        ]
+
+        tableCanLamSang2 = $('#dtTableCanLamSang2').DataTable(datatableOption);
+    }
+</script>
+
+<div class="vd_content clearfix">
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+                <div class="panel vd_transaction-widget light-widget widget">
+                    <div class="panel-body">
+                        <div class="row">
+                            <table id="dtTableCanLamSang2" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

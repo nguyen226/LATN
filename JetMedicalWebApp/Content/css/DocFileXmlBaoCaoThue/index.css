@@ -1,0 +1,126 @@
+﻿#page-print {
+    margin-left: 25px;
+    width: 18.5cm;
+    font-family: "Times New Roman",Times, serif;
+    font-size: 12px;
+}
+
+#page-print .header-content {
+    width: 100%;
+}
+
+#page-print .header-content .title {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    /*margin-top: 15px;*/
+}
+
+#page-print .header-content .titleSmall {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#page-print .header-content .logo {
+    height: 120px;
+    width: 120px;
+    margin-top: -45px;
+}
+
+#page-print .header-content .ma-khach-hang {
+    margin-left: 500px;
+    margin-top: -55px;
+    font-weight: bold;
+}
+
+#TableChiTiet thead th {
+    text-align: center;
+    font-weight: bold;
+    border: 0.2em solid #cfd1d3 !important;
+}
+
+#TableChiTiet td {
+    border: 0.2em solid #cfd1d3 !important;
+}
+
+.noi-dung-in-an-modal {
+    background-color: whitesmoke;
+    color: black;
+    width: 20cm !important;
+    margin: auto;
+    padding: 10px;
+    border: 1px solid;
+    box-shadow: 5px 10px #888888;
+}
+
+#pKhongMarginBottom {
+    text-align: center;
+    margin-bottom: 0px;
+}
+
+#pKhongMarginBottomTextLeft {
+    text-align: left;
+    margin-bottom: 0px;
+}
+
+.boldChu {
+    font-weight: bold;
+}
+
+.boldChu12px {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#boldChuVaCenter {
+    font-weight: bold;
+    text-align: center;
+}
+
+#tableThongTinNguoiNopThue, #tableThongTinDaiLyThue {
+    border: 0;
+}
+
+.textRight {
+    text-align: right;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.fontItalic {
+    font-style: italic;
+}
+
+.width1 {
+    width: 1%;
+}
+
+.tableMargin {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.marginTop20 {
+    margin-top: 20px;
+}
+
+.styleTableChiTiet {
+    width: 100%;
+    border: 0.3em solid #cfd1d3;
+}
+
+.height120 {
+    height: 120px;
+}
+
+.marginTop30 {
+    margin-top: 30px;
+}
+
+.w30h30 {
+    width: 30px;
+    height: 30px;
+}

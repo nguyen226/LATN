@@ -1,0 +1,245 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.NhanTuVanViewModels
+@{
+    Layout = "~/Areas/Member/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Nhận tư vấn";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "Id, HoVaTen,TrangThai, SoDienThoai,Email, TieuDe, NoiDung, CreatedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "NhanTuVan", new { area = "Member" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    var search = $('#quickSearch').val().trim();
+                    stringFilter += '(HoVaTen.Contains("' + search + '") OR SoDienThoai.Contains("' + search + '") OR Email.Contains("' + search + '") OR TieuDe.Contains("' + search + '"))';
+
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+                stringFilter += 'CreatedUserID =' + userId;
+
+
+                return stringFilter;
+
+                
+
+                return stringFilter;
+            }
+        };
+
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.order = [0, "DESC"];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [4,5],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [6,7],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "Id", "name": "Id", "autoWidth": true, "title": "Id" },
+            { "data": "HoVaTen", "name": "FullName", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "SoDienThoai", "name": "RegisterDate", "autoWidth": true, "title": "Số điện thoại" },
+            { "data": "Email", "name": "DepartmentName", "autoWidth": true, "title": "Email" },
+            { "data": "TieuDe", "name": "Phone", "autoWidth": true, "title": "Tiêu đề" },
+            {
+                "data": "TrangThai", "name": "TrangThai", "title": "Trạng thái", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    switch (data) {
+                        case 1:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Mới</span>';
+                            break;
+                        case 2:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Đã xử lý</span>';
+                            break;
+                    }
+                    return content;
+                }, width: "30px"
+            },
+            {
+                "data": "Status", "name": "Status", "title": "Action", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    content = '<a class="btn menu-icon vd_btn vd_bg-green btnView"><i class="fa fa-eye"></i></a>';
+                    return content;
+                }, width: "30px"
+            },
+            {
+                "data": "TrangThai", "name": "TrangThai", "title": "Action", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    switch (data) {
+                        case 2:
+                            content = '';
+                            break;
+
+                        default:
+                            content = '<a class="btn menu-icon vd_btn vd_bg-red btnDelete"><i class="icon-trash"></i></a>';
+                            break;
+                    }
+
+                    return content;
+                }, width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#dtTable tbody').on('click', 'tr td > .btnView', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+            console.log('a')
+            $('#FormUpdateNhanTuVan_HoVaTen').val(selectedDataRow.HoVaTen);
+            $('#FormUpdateNhanTuVan_SoDienThoai').val(selectedDataRow.SoDienThoai);
+            $('#FormUpdateNhanTuVan_Email').val(selectedDataRow.Email);
+            $('#FormUpdateNhanTuVan_TieuDe').val(selectedDataRow.TieuDe);
+            $('#FormUpdateNhanTuVan_NoiDung').val(selectedDataRow.NoiDung);
+            $('#modalUpdateNhanTuVan').modal();
+        });
+
+
+        $('#dtTable tbody').on('click', 'tr td > .btnDelete', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+            deleteById(selectedDataRow.Id);
+        });
+
+        $('#quickSearch').on('keyup', function (e) {
+            resetCheckboxAndDatatable();
+        });
+    });
+
+    function deleteById(id) {
+        var data = {
+            ids :[id]
+        };
+
+        var url = "@Url.Action("DeleteByIds", "NhanTuVan", new { area = "Member" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                notification("topright", "error", "fa fa-exclamation-triangle vd_yellow", "", res);
+            }else{
+                resetCheckboxAndDatatable();
+            }
+        });
+    }
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        selectedDataRow = null;
+    }
+</script>
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+                <div class="panel vd_transaction-widget light-widget widget">
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab1" data-toggle="tab" class="text-uppercase">@Html.Raw("Thông tin cần tư vấn")</a></li>
+                        </ul>
+                        <br />
+                        <div class="tab-content mgbt-xs-20">
+                            <div class="tab-pane active" id="tab1">
+                                <div class="panel widget light-widget">
+                                    <div class="panel-heading no-title">
+                                        <div class="vd_menu-search table-search input-group input-border">
+                                            <input type="text" id="quickSearch"  class="form-control" placeholder="Tìm kiếm" onchange="resetCheckboxAndDatatable()">
+                                            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                        </div>
+                                        <div class="vd_panel-menu">
+                                            <div id="btnRefreshDataDangKyDichVu" class="menu entypo-icon largerFont" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới" onclick="resetCheckboxAndDatatable()"> <i class="icon-cycle"></i> </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" id="panelBody">
+                                        <div class="row">
+                                            <table id="dtTable" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_PatialRegisterService_UpdateModal")

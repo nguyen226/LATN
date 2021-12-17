@@ -1,0 +1,94 @@
+﻿@using JetMedicalWebApp.Common
+
+<script>
+    var timeDatas = [];
+    var selectedTimeInputElement = null;
+    @foreach(var item in CommonConstants.GetListThoiGianKhamBenh())
+    {
+        <text>
+    var timeData = {
+        name: "@item.Name",
+        icon: "@item.Icon",
+        iconClass: "@item.IconClass",
+        times: []
+    };
+
+    @foreach(var time in item.Times.Where(m=>!string.IsNullOrEmpty(m)))
+    {
+        <text>
+    timeData.times.push("@time");
+    </text>
+    }
+
+    timeDatas.push(timeData);
+    </text>
+    }
+
+    function openTimepicker(that) {
+        selectedTimeInputElement = $(that);
+
+        var contentHtml = ''
+        $.each(timeDatas, function (i, v) {
+            contentHtml += '<div class="time-picker">';
+            contentHtml += '<label class="form-control-label time-label"><i class="' + v.icon + ' ' + v.iconClass + '"></i> ' + v.name + '</label>';
+            contentHtml += '<div class="d-flex">';
+            contentHtml += '<div class="mb-1">';
+
+            $.each(v.times, function (i_item, v_item) {
+                if (i_item % 4 == 0 && i_item > 0) {
+                    contentHtml += '</div>';
+                    contentHtml += '<div class="mb-1">';
+                }
+                contentHtml += '<a href="javascript:void(0)" class="button-time' + (selectedTimeInputElement.val() == v_item ? ' active' : '')+'" data-time="' + v_item + '" onclick="selectedTime(this)">' + v_item + '</a>';
+            });
+
+            contentHtml += '</div>';
+            contentHtml += '</div>';
+            contentHtml += '</div>';
+        });
+
+        $('#chonThoiGianContent').html(contentHtml);
+
+        $('#chonThoiGianModal').modal();
+    }
+
+    function selectedTime(that) {
+        if (selectedTimeInputElement) {
+            selectedTimeInputElement.val($(that).data('time'))
+        }
+
+        $('#chonThoiGianModal').modal('hide');
+    }
+</script>
+
+<div class="modal fade" id="chonThoiGianModal" role="dialog">
+    <div class="modal-dialog modal-fix-width-325 modalsp">
+        <div class="modal-content">
+            <div class="khung_register" id="chonThoiGianContent">
+                @*<div class="time-picker">
+                    <label class="form-control-label time-label"><i class="wi wi-day-cloudy morning"></i> Buổi sáng</label>
+                    <div class="d-flex">
+                        <div class="mb-1">
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                        </div>
+                        <div class="mb-1">
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                        </div>
+                        <div class="mb-1">
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                            <a href="javascript:void(0)" class="button-time">12:12</a>
+                        </div>
+                    </div>
+                </div>*@
+            </div>
+        </div>
+    </div>
+</div>

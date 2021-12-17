@@ -1,0 +1,354 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.PatientGroupViewModels
+@{
+    ViewBag.Title = "Thông tin chi tiết";
+    //Layout = "~/Views/Shared/_LayoutChiTiet.cshtml";
+}
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+<link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+<link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+@section FooterScript{
+<script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var patientGroup = null;
+    @if (Model.PatientGroup != null)
+    {
+        <text>
+    patientGroup = {
+        id: '@Model.PatientGroup.Id'
+    }
+    </text>
+    };
+
+    $(document).ready(function () {
+        initialSelect2Option();
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (tableChiTiet) !== 'undefined') {
+                tableChiTiet.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "Id, PatientGroupID, UsersID,HO_TEN,EmailID, Phone";
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "PatientGroup_Users", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = ' PatientGroupID = ' + (patientGroup != null ? patientGroup.id : -1);
+
+                if (!isNullOrEmpty($('#quickSearchHoTen').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(HO_TEN LIKE N'%" + $('#quickSearchHoTen').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchEmail').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(EmailID LIKE N'%" + $('#quickSearchEmail').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchPhone').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(Phone LIKE N'%" + $('#quickSearchPhone').val().trim() + "%')";
+                }
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableChiTiet.columns.adjust();
+        };
+
+
+        datatableOption.order = [[0, "DESC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [4],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowDelete)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            }
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "Id", "name": "Id", "autoWidth": true
+            },
+            { "data": "HO_TEN", "name": "HO_TEN", "autoWidth": true, "title": "Họ tên" },
+            { "data": "EmailID", "name": "EmailID", "autoWidth": true, "title": "Email" },
+            { "data": "Phone", "name": "Phone", "autoWidth": true, "title": "SĐT" },
+            {
+                "data": "id", "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<a data-original-title="delete" class="btn menu-icon vd_bg-red" onclick=deleteDataRow(' + row.Id + ')> <i class="fa fa-trash-o"></i> </a>';
+                    return html;
+                }, "name": "btnDelete", width: "30px"
+            }
+        ]
+
+        tableChiTiet = $('#dtTableChiTiet').DataTable(datatableOption);
+
+        $('#dtTableChiTiet tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableChiTiet.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            selectedDataRow = tableChiTiet.row($(this)).data();
+        });
+
+
+        $("#btnRefreshData").click(function () {
+            resetCheckboxAndTable();
+        });
+
+        $('#quickSearchHoTen, #quickSearchEmail, #quickSearchPhone').keyup(function (e) {
+            e.preventDefault();
+            resetCheckboxAndTable();
+        });
+
+
+        $("#btnThemNguoiDung").click(function () {
+
+            if (!isNullOrEmptySelect2($('#nguoiDung').val()) || !isNullOrEmptySelect2($('#congTy').val())) {
+
+                if (!isNullOrEmptySelect2($('#nguoiDung').val()) && !isNullOrEmptySelect2($('#congTy').val())) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", "Vui lòng chỉ chọn người dùng hoặc công ty");
+                } else {
+                    var data = {
+                        userId: $('#nguoiDung').val() !== null ? $('#nguoiDung').val() : -1,
+                        patientGroupId: patientGroup.id,
+                        companyId:$('#congTy').val() !== null ? $('#congTy').val() : -1
+                    }
+                    var url = "@Url.Action("AddUserToPatientGroup", "PatientGroup_Users", new { area = "Admin" })";
+                    sendDataToURL(url, data, true, null)
+                    .then(function (res) {
+                        if (res) {
+                            notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                        }
+                        else {
+                            notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Thêm thành công");
+                            resetCheckboxAndTable();
+                        }
+                    });
+                }
+            } else {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", "Vui lòng chọn người dùng hoặc công ty");
+            }
+
+        });
+
+
+        
+    });
+
+
+    function deleteDataRow(id) {
+        var dataListId = [id];
+
+        var data = { ids: dataListId };
+        var url = "@Url.Action("DeleteByIds", "PatientGroup_Users", new { area = "Admin" })";
+
+        sendDataToURL(url, data, true, null)
+        .then(function (res) {
+            if (res) {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+            }
+            else {
+                if (res == null) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                }
+                else if (res == "") {
+                    $('#confirmDeleteDataRowModal').modal('hide');
+                    notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                    resetCheckboxAndTable();
+                }
+            }
+        });
+    }
+
+    function resetCheckboxAndTable() {
+        tableChiTiet.draw();
+    }
+
+    function initialSelect2Option() {
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn User";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Users", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'UserID, (LastName + \" \" + FirstName) AS HoTen';
+                var condition = params.term ? ' HoTen.Contains(\\' + params.term + '\\)' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'UserID asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.UserID,
+                        text: item.HoTen
+                    }
+                });
+
+                data.unshift({
+                    id: -1,
+                    text: 'Không chọn'
+                });
+
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#nguoiDung').select2(dropdownlistSelect2Option);
+
+
+        var dropdownlistSelect2CtOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CtOption.placeholder = "Chọn công ty";
+        dropdownlistSelect2CtOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Company", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'CompanyID, ComName';
+                var condition = params.term ? ' ComName.Contains(\\' + params.term + '\\)' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'CompanyID asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.CompanyID,
+                        text: item.ComName
+                    }
+                });
+
+                data.unshift({
+                    id: -1,
+                    text: 'Không chọn'
+                });
+
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#congTy').select2(dropdownlistSelect2CtOption);
+    }
+</script>
+
+<div class="vd_content clearfix">
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+                <div class="panel widget light-widget">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-4 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchHoTen"  class="form-control" placeholder="họ tên" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchEmail"  class="form-control" placeholder="Email" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-4 col-xs-12">
+                                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                                    <input type="text" id="quickSearchPhone"  class="form-control" placeholder="số điện thoại" onchange="resetCheckboxAndTable()">
+                                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3 col-md-4 col-lg-4 form-group">
+                                <label class="form-label" for="nguoiDung">@Html.Raw("Người dùng")</label>
+                                <select id="nguoiDung" name="nguoiDung" class="form-control select2">
+                                </select>
+                            </div>
+
+                            <div class="col-sm-3 col-md-4 col-lg-4 form-group">
+                                <label class="form-label" for="congTy">@Html.Raw("Công ty")</label>
+                                <select id="congTy" name="congTy" class="form-control select2">
+                                </select>
+                            </div>
+
+                            <div class="col-sm-2 col-md-4 col-lg-4 form-group">
+                                <br />
+                                <button class="btn vd_btn vd_bg-green" id="btnThemNguoiDung" type="button"><i class="append-icon fa fa-fw fa-floppy-o"></i>@Html.Raw(" Thêm vào nhóm")</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table id="dtTableChiTiet" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

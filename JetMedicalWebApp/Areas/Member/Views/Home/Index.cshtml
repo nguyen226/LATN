@@ -1,0 +1,86 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.HomeViewModels
+@{
+    Layout = "~/Areas/Member/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Trang chủ";
+}
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+    @*<div class="vd_content-section clearfix">
+        <div class="row" id="bieuDo">
+            <div class="col-sm-12 col-md-12 col-lg-7 mgbt-md-20 mgbt-lg-0">
+                <div class="panel vd_interactive-widget light-widget widget">
+                    <div class="panel-body-list">
+                        <div class="vd_panel-menu">
+                            <select id="FilterTheoNamBieuDo" class="select2 select2-local">
+                                @for (int i = DateTime.Now.Year; i >= Model.NamBatDauSuDungPhamMem; i--)
+                                {
+                                    <option value="@i" @(i == DateTime.Now.Year ? "selected" : "")>@i</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="pd-20">
+                            <h5 class="mgbt-xs-20 mgtp-20"><span class="menu-icon append-icon"><i class="icon-graph"></i></span> <strong>Tổng lượt khám theo năm</strong> </h5>
+                            <div class="row mgbt-xs-0">
+                                <div class="col-sm-4 mgbt-xs-15 mgbt-sm-0">
+                                    <div class="item-left pd-15">
+                                        <div id="pie-chart-sex" class="pie-chart" style="height: 290px; padding: 0px; position: relative;">
+                                        </div>
+                                    </div>
+
+                                    <div class="vd_info br">
+                                        <h6 style="color:#1FAE66" id="tongSoGioiTinhNam"></h6>
+                                        <h6 style="color:#F85D2C" id="tongSoGioiTinhNu"></h6>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="item-right pd-15">
+                                        <div id="revenue-bar-chart" style="height: 290px;"> </div>
+                                    </div>
+                                    <strong id="tongLuotKhamTrongNam"><span class="append-icon"></span></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Panel Widget -->
+            </div>
+            <!-- col-md-8 -->
+            <div class="col-sm-12 col-md-12 col-lg-5">
+                <div class="panel vd_transaction-widget light-widget widget">
+                    <div class="panel-body">
+                        <!-- vd_panel-menu -->
+                        <h5 class="mgbt-xs-20 mgtp-20"><span class="menu-icon append-icon"> <i class="icon-pie"></i> </span> <strong>Thống kê 15 bệnh theo ICD</strong></h5>
+                        <div class="panel-body-list pd-15">
+                            <div id="pie-chart" class="pie-chart" style="height: 340px;">
+                            </div>
+                        </div>
+                       
+                    </div>
+                </div>
+            </div>
+            <!-- .col-md-4 -->
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mgbt-md-20 mgbt-lg-0">
+                <div class="panel widget">
+                    <div class="panel-body-list table-responsive">
+                        <table class="table no-head-border table-striped tableTheme" id="tableDichVu">
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mgbt-md-20 mgbt-lg-0">
+                <div class="panel widget">
+                    <div class="panel-body-list table-responsive">
+                        <table class="table no-head-border table-striped tableTheme" id="tableNewsContent">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+</div>

@@ -1,0 +1,245 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.ChienDichViewModels
+@{
+    ViewBag.Title = "Chiến dịch";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var listKieuChienDich = [];
+    @foreach (var item in CommonConstants.GetListKieuChienDich()) {
+        <text>
+    listKieuChienDich.push({
+        id: "@item.Id",
+        name: "@item.Name"
+    })
+    </text>
+    }
+
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "Id, Type,CreatedDate,Content, PatientGroupName, NotificationTitle, ModifiedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "ChienDich", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(PatientGroupName LIKE N'%" + $('#quickSearch').val().trim() + "%' OR NotificationTitle LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                }
+
+                if (xemHeThong == false && (xemCaNhan == true)) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += 'ModifiedUserID =' + userId;
+                }
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.initComplete = function () {
+            this.api().columns().every(function (index) {
+                var headerName = $(this.header()).text();
+                var column = this;
+                if (index == 0) {
+                    $(column.header()).html('<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkbox-select-all">\
+                                <label for="checkbox-select-all"></label>\
+                            </div></div>');
+                }
+
+                table.columns.adjust();
+            });
+
+            $('#checkbox-select-all').off('change').on('change', function () {
+                $('#dtTable tbody input:checkbox[name="checkboxSelected"]').prop('checked', this.checked);
+            });
+        };
+
+        datatableOption.order = [[0, "DESC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false,
+                "orderable": false
+
+            },
+            {
+                "targets": [6],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            },
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "Id", "name": "Id", "autoWidth": true,
+                "render": function (data, type, full, meta) {
+                    return '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkboxSelected_' + full.Id + '" name="checkboxSelected">\
+                                <label for="checkboxSelected_' + full.Id + '"></label>\
+                            </div></div>';
+                }
+            },
+            { "data": "PatientGroupName", "name": "PatientGroupName", "autoWidth": true, "title": "Nhóm người" },
+            { "data": "CreatedDate", "name": "CreatedDate", "autoWidth": true, "title": "Ngày tạo" },
+            { "data": "NotificationTitle", "name": "NotificationTitle", "autoWidth": true, "title": "Loại mẫu" },
+            { "data": "Content", "name": "Content", "autoWidth": true, "title": "Ghi chú" },
+            {
+                "data": "Type", "name": "Type", "autoWidth": true, "title": "Kiểu",
+                "render": function (data, type, full, meta) {
+                    let content = listKieuChienDich.find(m=>m.id == data);
+                    return content != null ? content.name : '';
+                }
+            },
+            {
+                "data": "Id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(xemHeThong == true || (xemCaNhan == true && row.ModifiedUserID == userId)){
+                        html ='<a class="btn menu-icon vd_bd-grey vd_grey btnXemChiTiet" onclick=xemChiTiet(' + row.Id + ')><i class="fa fa-eye"></i> </a>';
+                    }
+                    return html ;
+                },width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $("#btnRefreshData").click(function () {
+            table.draw();
+        });
+
+        $('#btnAdd').click(function () {
+            window.location.href = '@Url.Action("Update", "ChienDich", new { area = "Admin" })';
+        });
+    });
+
+    function xemChiTiet(id) {
+        viewUrl('@Url.Action("XemChiTiet", "ChienDich", new { area = "Admin" })?id=' + id);
+    }
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        $('#checkbox-select-all').prop('checked', false);
+        selectedDataRow = null;
+    }
+
+</script>
+
+@Html.Partial("_PartialContentHeader")
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    Search:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearch" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
+
+                            @if (Model.Menu_GroupPermission.SystemEdit == true || Model.Menu_GroupPermission.PersonalEdit == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnAdd" tabindex="0" aria-controls="example2" type="button"><span>Thêm mới</span></button>
+                            }
+
+                            @if (Model.Menu_GroupPermission.SystemDelete == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnDelete" tabindex="0" aria-controls="example2" type="button"><span>Xóa</span></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

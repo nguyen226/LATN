@@ -1,0 +1,317 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.UsersViewModels
+@{
+    ViewBag.Title = "Thêm lượt khám";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "UserID, HoTen, DateOfBirth, MA_BN, BHYT, Active, CMND, Address, CreatedUserID, ModifiedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "Users", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = ' MA_BN IS NOT NULl ';
+
+                if (!isNullOrEmpty($('#quickSearchMaBN').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(MA_BN LIKE N'%" + $('#quickSearchMaBN').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchCMND').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(CMND LIKE N'%" + $('#quickSearchCMND').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchBHYT').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(BHYT LIKE N'%" + $('#quickSearchBHYT').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchHoVaTen').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(HoTen LIKE N'%" + $('#quickSearchHoVaTen').val().trim() + "%')";
+                }
+
+
+                if (xemHeThong == false && (xemCaNhan == true)) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += 'ModifiedUserID =' + userId;
+                }
+
+                return stringFilter;
+
+            }
+        };
+
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.initComplete = function () {
+            this.api().columns().every(function (index) {
+                var headerName = $(this.header()).text();
+                var column = this;
+                if (index == 0) {
+                    $(column.header()).html('<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkbox-select-all">\
+                                <label for="checkbox-select-all"></label>\
+                            </div></div>');
+                }
+
+                table.columns.adjust();
+            });
+
+            $('#checkbox-select-all').off('change').on('change', function () {
+                $('#dtTable tbody input:checkbox[name="checkboxSelected"]').prop('checked', this.checked);
+            });
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all"
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false,
+                "orderable": false
+            },
+            {
+                "targets": [3],
+                className: 'dt-body-center',
+                "searchable": false,
+            },
+            {
+                "targets": [7],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                    visible: false
+                </text>
+                }
+            }
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "UserID", "name": "UserID", "autoWidth": true,
+                "render": function (data, type, full, meta) {
+                    return '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                            <input type="checkbox" id="checkboxSelected_' + full.UserID + '" name="checkboxSelected">\
+                            <label for="checkboxSelected_' + full.UserID + '"></label>\
+                        </div></div>';
+                }
+            },
+            { "data": "MA_BN", "name": "MA_BN", "autoWidth": true, "title": "Mã bệnh nhân" },
+            { "data": "HoTen", "name": "HoTen", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "DateOfBirth", "name": "DateOfBirth", "autoWidth": true, "title": "Ngày sinh" },
+            { "data": "BHYT", "name": "BHYT", "autoWidth": true, "title": "BHYT" },
+            { "data": "CMND", "name": "CMND", "autoWidth": true, "title": "CMND" },
+            { "data": "Address", "name": "Address", "autoWidth": true, "title": "Địa chỉ" },
+            {
+                "data": "UserID",  "mRender": function (data, type, row, meta) {
+                    var html = '';
+                    if(suaHeThong == true || ( suaCaNhan==true && row.CreatedUserID == userId)){
+                        return '<div class="d-flex order-actions"><a  href="@Url.Action("Update", "XML1", new { area = "Admin" })?maBN=' + row.MA_BN + '"> <i class="bx bxs-user"></i> </a></div>';
+                    }
+
+                    return html;
+                },width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $("#btnRefreshData").click(function () {
+            resetCheckboxAndTable();
+        });
+
+        $('#dtTable tbody').on('click', 'tr td.menu-action > .btnQuyen', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+        });
+
+        $('#quickSearchMaBN, #quickSearchCMND, #quickSearchBHYT, #quickSearchHoVaTen').keyup(function (e) {
+            e.preventDefault();
+            resetCheckboxAndTable();
+        });
+    });
+
+    function resetCheckboxAndTable() {
+        table.draw();
+        dataListId = [];
+        $('#checkbox-select-all').prop('checked', false);
+        selectedDataRow = null;
+    }
+</script>
+
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="breadcrumb-title pe-3">@Html.Raw("Khám - điều trị")</div>
+    <div class="ps-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 p-0">
+                <li class="breadcrumb-item">
+                    <a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"><a href="@Url.Action("ThemLuotKhamBenh", "Users", new { area = "Admin" })">@Html.Raw("Tạo mới KCB")</a></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-md-3">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    Mã BN:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearchMaBN" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-3">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    Tên BN:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearchHoVaTen" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-3">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    BHYT:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearchBHYT" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-3">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    CCCD/CMND:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearchCMND" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
+
+                            @if (Model.Menu_GroupPermission.SystemEdit == true || Model.Menu_GroupPermission.PersonalEdit == true)
+                            {
+                                <input id="btnImportExcel" hidden type="file" name="files[]" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                            }
+
+                            @if (Model.Menu_GroupPermission.SystemDelete == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnDelete" tabindex="0" aria-controls="example2" type="button"><span>Xóa</span></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

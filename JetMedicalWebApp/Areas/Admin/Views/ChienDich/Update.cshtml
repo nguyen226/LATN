@@ -1,0 +1,619 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.ChienDichViewModels
+@{
+    ViewBag.Title = "Chiến dịch";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src='@Url.Content("~/Content/theme/plugins/ckeditor/ckeditor.js")'></script>
+    <script type="text/javascript" src='@Url.Content("~/Content/theme/plugins/ckeditor/adapters/jquery.js")'></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+}
+
+<script type="text/javascript">
+    var chienDich = null;
+    var formData =null;
+
+    @if(Model.ChienDich != null)
+    {
+        <text>
+    chienDich = {
+        id: '@Model.ChienDich.Id'
+    };
+    </text>
+    }
+
+    var dataMau = {
+        UserInfo_HoVaTen:'Nguyen Van A',
+        UserInfo_MaBenhNhan:'BN_001',
+        UserInfo_NgaySinh:'20/11/2001',
+        UserInfo_CMND:'987654321',
+        UserInfo_BHYT:'123456789',
+        UserInfo_NgayVao:'20/10/2020',
+        UserInfo_NgayRa:'20/10/2020',
+        UserInfo_NgayTaiKham:'20/11/2020',
+        UserInfo_MaBenh:'A11',
+        UserInfo_KetQuaDieuTri:'Đỡ',
+        UserInfo_TenBenh:'Béo phì',
+        UserInfo_ChuanDoan:'Béo phì cấp độ 1',
+        UserInfo_PhuongPhapDieuTri:'Vận động nhiều',
+        UserInfo_LoiDanThayThuoc:'Ăn uống đầy đủ',
+        UserInfo_GhiChu: '',
+        UserInfo_FileDinhKem: 'https://abc.com.vn'
+    }
+
+    $(document).ready(function () {
+        //$('[data-rel^="ckeditor"]').ckeditor();
+
+        formData = new FormData();
+
+        initialSelect2Option();
+        $('.NoiDungTinTuc').hide();
+        $('.NoiDungSMS').hide();
+
+        $('[name="btnTroVeDanhSach"], #btnTroLai').click(function () {
+            window.location.href = "@Url.Action("Index", "ChienDich", new { area = "Admin" })";
+        });
+
+        $('[name="btnAddNew"]').click(function () {
+            window.location.href = "@Url.Action("Update", "ChienDich", new { area = "Admin" })";
+        });
+
+        $('#btnXoa').click(function () {
+            $('#confirmDeleteDataRowModal').modal('show');
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            var data = { ids: chienDich != null ? chienDich.id : "" };
+            var url = "@Url.Action("DeleteByIds", "ChienDich", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    if (res == null) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                    }
+                    else if (res == "") {
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                        window.location.href = "@Url.Action("Index", "ChienDich", new { area = "Admin" })";
+                    }
+                }
+            });
+        });
+
+        $('#btnLuu').click(function () {
+            if (checkFormUpdate()) {
+                var fields = [
+                    'PatientGroupID',
+                    'NotificationID',
+                    'Content',
+                    'Type'
+                ];
+
+                var values = [
+                    $('#FormUpdate_PatientGroupID').val(),
+                    $('#FormUpdate_NotificationID').val(),
+                    $('#FormUpdate_Content').val(),
+                   document.querySelector('input[name="FormUpdate_Type"]:checked').value,
+                ];
+
+
+                let filesUpload = $('#FileDinhKem').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    formData.append("file", filesUpload[0]);
+                }
+
+                formData.append("id", (chienDich != null ? chienDich.id : ""));
+                formData.append("fields", JSON.stringify(fields));
+                formData.append("values", JSON.stringify(values));
+
+                console.log(formData);
+                var url = "@Url.Action("AddOrUpdate", "ChienDich", new { area = "Admin" })";
+
+                sendDataFileToURL(url, formData, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    } else
+                    {
+                        showNotificationAndAskModal('Thông báo', 'Cập nhật thành công.');
+                    }
+                });
+            };
+        });
+
+        $('input[name="FormUpdate_Type"]').change(function () {
+            $('input[name="FormUpdate_Type"]').prop('checked', false);
+            $(this).prop('checked', true);
+
+            if ((document.querySelector('input[name="FormUpdate_Type"]:checked').value) === "3") {// SMS
+                $('.NoiDungEmail').hide();
+                $('.NoiDungTinTuc').hide();
+                $('.NoiDungSMS').show();
+            }else if((document.querySelector('input[name="FormUpdate_Type"]:checked').value) === "2") {// Gmail
+                console.log('gmail')
+                $('.NoiDungEmail').show();
+                $('.NoiDungTinTuc').hide();
+                $('.NoiDungSMS').hide();
+            } else {// Tin tuc
+                console.log('tin tuwcs')
+                $('.NoiDungEmail').hide();
+                $('.NoiDungTinTuc').show();
+                $('.NoiDungSMS').hide();
+            }
+
+
+        });
+
+
+        $('#FormUpdate_NotificationID').change(function () {
+            if(!isNullOrEmptySelect2($('#FormUpdate_NotificationID').val())){
+                //gọi lên server trả về dữ liệu và gán vào content
+                var url = '@Url.Action("GetById", "Notification", new { area = "Admin" })';
+                var data = {
+                    id: $('#FormUpdate_NotificationID').val()
+                }
+                $('.contentBaiViet').empty();
+
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        $('.contentTinTuc').empty();
+                        $('.contentBaiViet').empty();
+                        $('.contentSMS').empty();
+                        var html = '';
+                        if (!isNullOrEmpty(res.NoHTML)) {
+                            if(res.NoHTML.indexOf('{{HoVaTen}}')){
+                                res.NoHTML = res.NoHTML.replace('{{HoVaTen}}',dataMau.UserInfo_HoVaTen);
+                            }
+
+                            if(res.NoHTML.indexOf('{{MaBenhNhan}}')){
+                                res.NoHTML = res.NoHTML.replace('{{MaBenhNhan}}',dataMau.UserInfo_MaBenhNhan);
+                            }
+
+                            if(res.NoHTML.indexOf('{{NgaySinh}}')){
+                                res.NoHTML = res.NoHTML.replace('{{NgaySinh}}',dataMau.UserInfo_NgaySinh);
+                            }
+
+                            if(res.NoHTML.indexOf('{{CMND}}')){
+                                res.NoHTML = res.NoHTML.replace('{{CMND}}',dataMau.UserInfo_CMND);
+                            }
+
+                            if(res.NoHTML.indexOf('{{BHYT}}')){
+                                res.NoHTML = res.NoHTML.replace('{{BHYT}}',dataMau.UserInfo_BHYT);
+                            }
+
+                            if(res.NoHTML.indexOf('{{NgayVao}}')){
+                                res.NoHTML = res.NoHTML.replace('{{NgayVao}}',dataMau.UserInfo_NgayVao);
+                            }
+
+                            if(res.NoHTML.indexOf('{{NgayRa}}')){
+                                res.NoHTML = res.NoHTML.replace('{{NgayRa}}',dataMau.UserInfo_NgayRa);
+                            }
+
+                            if(res.NoHTML.indexOf('{{NgayTaiKham}}')){
+                                res.NoHTML = res.NoHTML.replace('{{NgayTaiKham}}',dataMau.UserInfo_NgayTaiKham);
+                            }
+                            if(res.NoHTML.indexOf('{{MaBenh}}')){
+                                res.NoHTML = res.NoHTML.replace('{{MaBenh}}',dataMau.UserInfo_MaBenh);
+                            }
+                            if(res.NoHTML.indexOf('{{KetQuaDieuTri}}')){
+                                res.NoHTML = res.NoHTML.replace('{{KetQuaDieuTri}}',dataMau.UserInfo_KetQuaDieuTri);
+                            }
+                            if(res.NoHTML.indexOf('{{TenBenh}}')){
+                                res.NoHTML = res.NoHTML.replace('{{TenBenh}}',dataMau.UserInfo_TenBenh);
+                            }
+                            if(res.NoHTML.indexOf('{{ChuanDoan}}')){
+                                res.NoHTML = res.NoHTML.replace('{{ChuanDoan}}',dataMau.UserInfo_ChuanDoan);
+                            }
+                            if(res.NoHTML.indexOf('{{PhuongPhapDieuTri}}')){
+                                res.NoHTML = res.NoHTML.replace('{{PhuongPhapDieuTri}}',dataMau.UserInfo_PhuongPhapDieuTri);
+                            }
+                            if(res.NoHTML.indexOf('{{LoiDanThayThuoc}}')){
+                                res.NoHTML = res.NoHTML.replace('{{LoiDanThayThuoc}}',dataMau.UserInfo_LoiDanThayThuoc);
+                            }if(res.NoHTML.indexOf('{{GhiChu}}')){
+                                res.NoHTML = res.NoHTML.replace('{{GhiChu}}',dataMau.UserInfo_GhiChu);
+                            }if(res.NoHTML.indexOf('{{FileDinhKem}}')){
+                                res.NoHTML = res.NoHTML.replace('{{FileDinhKem}}',dataMau.UserInfo_FileDinhKem);
+                            }
+                        }
+
+
+                        if (!isNullOrEmpty(res.NoTitle)) {
+                            if (res.NoTitle.indexOf('{{HoVaTen}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{HoVaTen}}', dataMau.UserInfo_HoVaTen);
+                            }
+
+                            if (res.NoTitle.indexOf('{{MaBenhNhan}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{MaBenhNhan}}', dataMau.UserInfo_MaBenhNhan);
+                            }
+
+                            if (res.NoTitle.indexOf('{{NgaySinh}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{NgaySinh}}', dataMau.UserInfo_NgaySinh);
+                            }
+
+                            if (res.NoTitle.indexOf('{{CMND}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{CMND}}', dataMau.UserInfo_CMND);
+                            }
+
+                            if (res.NoTitle.indexOf('{{BHYT}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{BHYT}}', dataMau.UserInfo_BHYT);
+                            }
+
+                            if (res.NoTitle.indexOf('{{NgayVao}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{NgayVao}}', dataMau.UserInfo_NgayVao);
+                            }
+
+                            if (res.NoTitle.indexOf('{{NgayRa}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{NgayRa}}', dataMau.UserInfo_NgayRa);
+                            }
+
+                            if (res.NoTitle.indexOf('{{NgayTaiKham}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{NgayTaiKham}}', dataMau.UserInfo_NgayTaiKham);
+                            }
+                            if (res.NoTitle.indexOf('{{MaBenh}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{MaBenh}}', dataMau.UserInfo_MaBenh);
+                            }
+                            if (res.NoTitle.indexOf('{{KetQuaDieuTri}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{KetQuaDieuTri}}', dataMau.UserInfo_KetQuaDieuTri);
+                            }
+                            if (res.NoTitle.indexOf('{{TenBenh}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{TenBenh}}', dataMau.UserInfo_TenBenh);
+                            }
+                            if (res.NoTitle.indexOf('{{ChuanDoan}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{ChuanDoan}}', dataMau.UserInfo_ChuanDoan);
+                            }
+                            if (res.NoTitle.indexOf('{{PhuongPhapDieuTri}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{PhuongPhapDieuTri}}', dataMau.UserInfo_PhuongPhapDieuTri);
+                            }
+                            if (res.NoTitle.indexOf('{{LoiDanThayThuoc}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{LoiDanThayThuoc}}', dataMau.UserInfo_LoiDanThayThuoc);
+                            } if (res.NoTitle.indexOf('{{GhiChu}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{GhiChu}}', dataMau.UserInfo_GhiChu);
+                            } if (res.NoTitle.indexOf('{{FileDinhKem}}')) {
+                                res.NoTitle = res.NoTitle.replace('{{FileDinhKem}}', dataMau.UserInfo_FileDinhKem);
+                            }
+                        }
+
+
+
+                        if (!isNullOrEmpty(res.NoDes)) {
+                            if (res.NoDes.indexOf('{{HoVaTen}}')) {
+                                res.NoDes = res.NoDes.replace('{{HoVaTen}}', dataMau.UserInfo_HoVaTen);
+                            }
+
+                            if (res.NoDes.indexOf('{{MaBenhNhan}}')) {
+                                res.NoDes = res.NoDes.replace('{{MaBenhNhan}}', dataMau.UserInfo_MaBenhNhan);
+                            }
+
+                            if (res.NoDes.indexOf('{{NgaySinh}}')) {
+                                res.NoDes = res.NoDes.replace('{{NgaySinh}}', dataMau.UserInfo_NgaySinh);
+                            }
+
+                            if (res.NoDes.indexOf('{{CMND}}')) {
+                                res.NoDes = res.NoDes.replace('{{CMND}}', dataMau.UserInfo_CMND);
+                            }
+
+                            if (res.NoDes.indexOf('{{BHYT}}')) {
+                                res.NoDes = res.NoDes.replace('{{BHYT}}', dataMau.UserInfo_BHYT);
+                            }
+
+                            if (res.NoDes.indexOf('{{NgayVao}}')) {
+                                res.NoDes = res.NoDes.replace('{{NgayVao}}', dataMau.UserInfo_NgayVao);
+                            }
+
+                            if (res.NoDes.indexOf('{{NgayRa}}')) {
+                                res.NoDes = res.NoDes.replace('{{NgayRa}}', dataMau.UserInfo_NgayRa);
+                            }
+
+                            if (res.NoDes.indexOf('{{NgayTaiKham}}')) {
+                                res.NoDes = res.NoDes.replace('{{NgayTaiKham}}', dataMau.UserInfo_NgayTaiKham);
+                            }
+                            if (res.NoDes.indexOf('{{MaBenh}}')) {
+                                res.NoDes = res.NoDes.replace('{{MaBenh}}', dataMau.UserInfo_MaBenh);
+                            }
+                            if (res.NoDes.indexOf('{{KetQuaDieuTri}}')) {
+                                res.NoDes = res.NoDes.replace('{{KetQuaDieuTri}}', dataMau.UserInfo_KetQuaDieuTri);
+                            }
+                            if (res.NoDes.indexOf('{{TenBenh}}')) {
+                                res.NoDes = res.NoDes.replace('{{TenBenh}}', dataMau.UserInfo_TenBenh);
+                            }
+                            if (res.NoDes.indexOf('{{ChuanDoan}}')) {
+                                res.NoDes = res.NoDes.replace('{{ChuanDoan}}', dataMau.UserInfo_ChuanDoan);
+                            }
+                            if (res.NoDes.indexOf('{{PhuongPhapDieuTri}}')) {
+                                res.NoDes = res.NoDes.replace('{{PhuongPhapDieuTri}}', dataMau.UserInfo_PhuongPhapDieuTri);
+                            }
+                            if (res.NoDes.indexOf('{{LoiDanThayThuoc}}')) {
+                                res.NoDes = res.NoDes.replace('{{LoiDanThayThuoc}}', dataMau.UserInfo_LoiDanThayThuoc);
+                            } if (res.NoDes.indexOf('{{GhiChu}}')) {
+                                res.NoDes = res.NoDes.replace('{{GhiChu}}', dataMau.UserInfo_GhiChu);
+                            } if (res.NoDes.indexOf('{{FileDinhKem}}')) {
+                                res.NoDes = res.NoDes.replace('{{FileDinhKem}}', dataMau.UserInfo_FileDinhKem);
+                            }
+                        }
+
+                        switch (res.NoType) {
+
+                            case 1: //App
+                                html += '<div class="contentTitle">' + res.NoTitle + '</div><div class="contentDetail"> ' + res.NoDes + '</div>';
+                                $('.contentTinTuc').append(html);
+                                break;
+
+                            case 2: //gmail
+                                html += '<div class="contentTitle">' + res.NoTitle + '</div><div class="contentDetail"> ' + res.NoHTML + '</div>\
+                                <div style="padding: 0 5px;height: 120px;">\
+                                <img style="margin: auto;top: 0px;right: 0px;bottom: 0px;left: 0px;max-width: 100%;max-height: 90%;" \
+                                src="' + res.Image + '">\
+                                </div>';
+
+                                $('.contentBaiViet').append(html);
+                                break;
+
+                            case 3://sms
+                                html += '<p>' + res.NoHTML + '</p>';
+                                $('.contentSMS').append(html);
+                                break;
+                        }
+
+
+                    }
+                });
+            }
+        });
+
+
+        $('#FileDinhKem').on('change', function () {
+            let filesUploads = $('#FileDinhKem').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            $('#FileDinhKem_Text').val(fileName);
+        });
+
+    });
+
+    function checkFormUpdate() {
+        let check = true;
+        let error = '';
+
+        if (isNullOrEmptySelect2($('#FormUpdate_PatientGroupID').val())) {
+            check = false;
+            error = 'Bạn chưa chọn nhóm người';
+        }
+
+        if (isNullOrEmpty($('#FormUpdate_NotificationID').val())) {
+            check = false;
+            error = 'Bạn chưa chọn loại mẫu';
+        }
+
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+
+    function initialSelect2Option() {
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Nhóm người bệnh";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "PatientGroup", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'Id, Name';
+                var condition = params.term ? ' Name.Contains(\\' + params.term + '\\)' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'Name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.Id,
+                        text: item.Name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#FormUpdate_PatientGroupID').select2(dropdownlistSelect2Option);
+
+        dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn loại mẫu";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Notification", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'NoID, NoTitle, NoType';
+                var condition = 'NoType = ' + document.querySelector('input[name="FormUpdate_Type"]:checked').value;
+                condition += params.term ? ' AND NoTitle.Contains(\\' + params.term + '\\)' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'NoTitle asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.NoID,
+                        text: item.NoTitle
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#FormUpdate_NotificationID').select2(dropdownlistSelect2Option);
+    }
+</script>
+
+
+
+
+<div class="d-flex justify-content-between">
+    @Html.Partial("_PartialContentHeader")
+    <div class="mb-3">
+        <button class="btn buttons-excel buttons-html5 btn-secondary" id="btnTroLai" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-arrow-back"></i><span> Trở lại danh sách</span></button>
+
+        @if (Model.Menu_GroupPermission.SystemEdit == true && Model.ChienDich == null) { 
+            <button class="btn buttons-excel buttons-html5 btn-danger" id="btnLuu" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-save"></i><span> Gửi chiến dịch</span></button>
+        }
+
+    </div>
+</div>
+
+
+
+<form id="formUpdate">
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs nav-primary" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#formData_ThongTin" role="tab" aria-selected="false">
+                        <div class="d-flex align-items-center">
+                            <div class="tab-icon">
+                                <i class='bx bx-home-alt font-18 me-1'></i>
+                            </div>
+                            <div class="tab-title">Thông tin</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content py-3">
+                <div class="tab-pane fade show active" id="formData_ThongTin" role="tabpanel">
+                    <div class="row g3">
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            <div class="row d-flex">
+                                <div class="col-sm-12 col-md-12 col-lg-12 form-group">
+                                    <label class="form-label" for="FormUpdate_PatientGroupID">@Html.Raw("Nhóm người")</label>
+                                    <select id="FormUpdate_PatientGroupID" name="FormUpdate_PatientGroupID" class="form-control select2">
+                                        @if (Model.PatientGroup != null)
+                                        {
+                                            <option value="@Model.PatientGroup.Id" selected>@Html.Raw(Model.PatientGroup.Name)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12 form-group">
+                                    <label class="form-label" for="FormUpdate_NotificationID">@Html.Raw("Loại mẫu")</label>
+                                    <select id="FormUpdate_NotificationID" name="FormUpdate_NotificationID" class="form-control select2">
+                                        @if (Model.Notification != null)
+                                        {
+                                            <option value="@Model.Notification.NoID" selected>@Html.Raw(Model.Notification.NoTitle)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12 form-group">
+                                    <label class="form-label" for="FormUpdate_Content">@Html.Raw("Ghi chú")</label>
+                                    <input id="FormUpdate_Content" name="FormUpdate_Content" class="form-control" placeholder="ghi chú" value="@(Model.ChienDich != null ? Model.ChienDich.Content : "")">
+                                </div>
+
+
+                                <div class="col-sm-12 col-md-12 col-lg-12 mt-2 form-group">
+
+                                    <label class="btn btn-primary" for="FileDinhKem"><i class="bx bx-cloud-upload mr-1"></i>File đính kèm</label>
+                                    <input id="FileDinhKem" type="file" name="FileDinhKem[]" class="form-control form-control-sm" hidden="" accept="application/*">
+
+                                    <input id="FileDinhKem_Text" type="text" readonly value="" class="mt-2 form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            <div class="row d-flex">
+                                <div class="col-sm-12 col-md-4 col-lg-4 form-group">
+                                    <label class="form-label" for="FormUpdate_Type">@Html.Raw("Chọn kiểu")</label>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12 form-group">
+                                    @foreach (var item in CommonConstants.GetListKieuChienDich())
+                                    {
+                                        <div class="vd_checkbox checkbox-success">
+                                            <input type="checkbox" name="FormUpdate_Type" id="FormUpdate_Type_@item.Id"
+                                                   value="@item.Id" @(Model.ChienDich != null ? Model.ChienDich.Type == item.Id ? "checked" : string.Empty : (item.IsDefault ? "checked" : string.Empty))>
+                                            <label for="FormUpdate_Type_@item.Id">@Html.Raw(item.Name)</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+
+                            <div class="NoiDungEmail">
+                                <div class="contentBaiViet">
+
+                                </div>
+                            </div>
+
+
+                            <div class="NoiDungSMS">
+                                <div class="contentSMS">
+                                </div>
+                            </div>
+
+
+                            <div class="NoiDungTinTuc">
+                                <div class="contentTinTuc">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

@@ -1,0 +1,22 @@
+﻿.select2{
+    width:100% !important;
+}
+
+.select2-container .select2-selection--single{
+    height:38px;
+}
+
+.select2-container--open {
+    z-index: 9999999;
+}
+
+.khung_dangky .select2-selection--single, 
+.khung_register .select2-selection--single {
+    padding: 10px;
+    height: 45px;
+}
+
+.khung_dangky .select2-container--default .select2-selection--single .select2-selection__arrow, 
+.khung_register .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 45px;
+}

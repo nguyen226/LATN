@@ -1,0 +1,48 @@
+﻿
+
+<div class="modal fade" id="modalUpdateRegisterService" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <h5 class="modal-title">@Html.Raw("Chi tiết")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-body">
+                    <form id="FormUpdateRegisterService" class="row g-3" action="#" role="form">
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Họ và tên")</label>
+                            <input class="form-control" id="FormUpdateNhanTuVan_HoVaTen" type="text">
+                        </div>
+
+
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("SĐT")</label>
+                            <input class="form-control" id="FormUpdateNhanTuVan_SoDienThoai" type="text">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Email")</label>
+                            <input class="form-control" id="FormUpdateNhanTuVan_Email" type="text">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Tiêu đề")</label>
+                            <input class="form-control" id="FormUpdateNhanTuVan_TieuDe" type="text" value="">
+
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="form-label">@Html.Raw("Chi tiết")</label>
+                            <textarea class="form-control" rows="10" id="FormUpdateNhanTuVan_NoiDung" type="text"></textarea>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+﻿.m-quick-sidebar {
+    padding: 0 !important;
+}
+
+.m-quick-sidebar__content {
+    height:100vh;
+    padding: 20px 30px 30px 30px;
+}
+#headerSidebar{
+    background: #00c5dc !important;
+}
+
+.titleUsername{
+    padding: 10px 0;
+    color:white;
+}
+
+.m-quick-sidebar__close{
+    top: 3px !important;
+}

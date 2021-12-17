@@ -1,0 +1,32 @@
+﻿<script>
+    var auto_resize_iframe_timer;
+    $(document).ready(function () {
+        $('#viewUrlModal').on('hide.bs.modal', function () {
+            $('#viewUrlModalContent').empty();
+            clearInterval(auto_resize_iframe_timer);
+        });
+    })
+
+    
+
+    function autoresize_frames() {
+        iframe = document.getElementById("iframeUrlContent");
+        if (typeof iframe != 'undefined') {
+            var framefenster_size = iframe.contentWindow.document.body.scrollHeight;
+            iframe.style.height = framefenster_size + 'px';
+        }
+    }
+</script>
+
+<div class="modal fade" id="viewUrlModal" tabindex="-1" role="dialog" aria-labelledby="viewUrlModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lgxx vd_bg-dark-green2">
+        <div class="modal-content mh-100px vd_bg-dark-green2">
+            <div class="modal-header vd_bg-dark-green2">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="modal-body pb-0 vd_bg-dark-green2">
+                <div class="row" id="viewUrlModalContent"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,401 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.AppSlideViewModels
+@{
+    ViewBag.Title = "Banner Mobile App";
+}
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoftDatalist.cshtml";
+}
+
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "Id, Images,NoCategory, NoContentName, Active,  Odx, CreatedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "AppSlide", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(NoContentName LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                }
+
+                if (xemHeThong == false && (xemCaNhan == true)) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += 'CreatedUserID =' + userId;
+                }
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.initComplete = function () {
+            this.api().columns().every(function (index) {
+                var headerName = $(this.header()).text();
+                var column = this;
+                if (index == 0) {
+                    $(column.header()).html('<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkbox-select-all">\
+                                <label for="checkbox-select-all"></label>\
+                            </div></div>');
+                }
+
+                table.columns.adjust();
+            });
+
+            $('#checkbox-select-all').off('change').on('change', function () {
+                $('#dtTable tbody input:checkbox[name="checkboxSelected"]').prop('checked', this.checked);
+            });
+        };
+
+        datatableOption.order = [[1, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [1,5],
+                className: 'dt-body-center'
+            },
+            {
+                "targets": [6],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowUpdate)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            },
+            {
+                "targets": [7],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowDelete)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            }
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "Id", "name": "Id", "autoWidth": true,
+                "render": function (data, type, full, meta) {
+                    return '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkboxSelected_' + full.Id + '" name="checkboxSelected">\
+                                <label for="checkboxSelected_' + full.Id + '"></label>\
+                            </div></div>';
+                }
+            },
+            { "data": "Odx", "name": "Odx", "autoWidth": true, "title": "Odx" },
+            {
+                "data": "NoCategory", "name": "NoCategory", "title": "Category", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    console.log(data);
+                    switch (data) {
+                        case @CommonConstants.NotificationType_App_TinTuc:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Tin tức</span>';
+                            break;
+                        case @CommonConstants.NotificationType_App_DichVu:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Dịch vụ</span>';
+                            break;
+                    }
+                    return content;
+                }, width: "30px"
+            },
+            { "data": "NoContentName", "name": "NoContentName", "autoWidth": true, "title": "Content" },
+            {
+                "data": "Images", "name": "Images", "width": "20px", "title": "Hình ảnh", "render": function (data, type, full, meta) {
+                    let content = '<img id="FormUpdate_ImagesPreview" src="' + data + '" alt="image" />';
+                    return data != '' ? content : '';
+                }
+            },
+            {
+                "data": "Active", "name": "Active", "width": "20px", "title": "Kích hoạt", "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxNoStatus_' + full.Id + '" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.Id + '"' + (data == true ? ' checked ' : '') + ' data-field="Active" data-value="' + !data + '">\
+                                    <label for="checkboxNoStatus_' + full.Id + '"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "Id", "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    if (suaHeThong == true || (suaCaNhan == true && row.CreatedUserID == userId)) {
+                        html = '<a class="btn menu-icon vd_bg-yellow" href="@Url.Action("Update", "AppSlide", new { area = "Admin" })?id=' + row.Id + '"> <i class="fa fa-pencil"></i> </a>';
+                    }
+                    return html;
+                }, "name": "btnEdit", "title": "Sửa", width: "30px"
+            },
+            {
+                "data": "Id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(xoaHeThong == true ||  (xoaCaNhan == true && row.CreatedUserID == userId)){
+                        html ='<a class="btn menu-icon vd_bg-red" onclick=deleteDataRow(' + data + ') href="javascript:void(0)"> <i class="fa fa-trash-o"></i> </a>';
+                    }
+                    return html ;
+                }, "name": "btnDelete", "title": "Xóa", width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $("#btnRefreshData").click(function () {
+            table.draw();
+        });
+
+        $('#btnAdd').click(function () {
+            window.location.href = '@Url.Action("Update", "AppSlide", new { area = "Admin" })';
+        });
+
+        $('#btnDelete').click(function () {
+            dataListId = [];
+            dataListId = $(table.$('input:checkbox[name="checkboxSelected"]').map(function () {
+                return $(this).prop("checked") ? table.rows($(this).closest('tr')).data()[0].Id : null;
+            })).toArray();
+
+            if (dataListId.length > 0) {
+                $('#confirmDeleteDataRowModal').modal('show');
+            } else {
+                notification("top right", "info", "fadeIn animated bx bx-info-circle", "", "Bạn chưa chọn dòng nào để xóa.");
+            }
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            if (dataListId.length > 0) {
+                var data = { ids: dataListId };
+                var url = "@Url.Action("DeleteByIds", "AppSlide", new { area = "Admin" })";
+
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                        if (res == null) {
+                            notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                        }
+                        else if (res == "") {
+                            $('#confirmDeleteDataRowModal').modal('hide');
+                            notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                            resetCheckboxAndDatatable();
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    function deleteDataRow(id) {
+        dataListId = [id];
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        $('#checkbox-select-all').prop('checked', false);
+        dataListId = [];
+        selectedDataRow = null;
+    }
+
+    function updateCellDatatable(that) {
+        var formData = new FormData();
+        formData.append("id", $(that).data("id"));
+        formData.append("fields", JSON.stringify([$(that).data("field")]));
+        formData.append("values", JSON.stringify([$(that).data("value")]));
+        var url = "@Url.Action("AddOrUpdate", "AppSlide", new { area = "Admin" })";
+
+        sendDataFileToURL(url, formData, false, null)
+        .then(function (res) {
+            if (res) {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+            }
+        });
+    }
+</script>
+
+<div class="page-content">
+
+    <!--breadcrumb-->
+    <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+        @*<div class="breadcrumb-title pe-3">QUẢN TRỊ WEBSITE</div>*@
+        <div class="ps-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 p-0">
+                    <li class="breadcrumb-item">
+                        <a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">BANNER MOBILE APP</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="ms-auto">
+
+            @*<div class="btn-group">
+                <button type="button" id="btnLuu" name="btnLuu" class="btn btn-primary px-3"><i class="fadeIn animated bx bx-save"></i>THÊM MỚI</button>
+            </div>*@
+        </div>
+    </div>
+    <!--end breadcrumb-->
+    <div class="row">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="d-lg-flex align-items-center mb-4 gap-3">
+                    <div class="position-relative">
+                        <input type="text" class="form-control ps-5 radius-30" placeholder="Search Order"> <span class="position-absolute top-50 product-show translate-middle-y"><i class="bx bx-search"></i></span>
+                    </div>
+                    <div class="ms-auto"><a href="javascript:;" class="btn btn-primary px-3"><i class="bx bxs-plus-square"></i>Add New</a></div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên Banner</th>
+                                <th>Hình ảnh</th>
+                                <th>Kiểu</th>
+                                <th>Trạng thái</th>
+                               
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <input class="form-check-input me-3" type="checkbox" value="" aria-label="...">
+                                        </div>
+                                        <div class="ms-2">
+                                            <h6 class="mb-0 font-14">1</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Banner san pham</td>
+
+                                <td> (hình ảnh)</td>
+                                <td>Sản phẩm</td>
+                                <td><div class="badge rounded-pill text-danger bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>Off</div></td>
+                                <td>
+                                    <div class="d-flex order-actions">
+                                        <a href="javascript:;" class=""><i class='bx bxs-edit'></i></a>
+                                        <a href="javascript:;" class="ms-3"><i class='bx bxs-trash'></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <input class="form-check-input me-3" type="checkbox" value="" aria-label="...">
+                                        </div>
+                                        <div class="ms-2">
+                                            <h6 class="mb-0 font-14">2</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Banner san pham</td>
+
+                                <td> (hình ảnh)</td>
+                                <td>Tin tức</td>
+                                <td><div class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>On</div></td>
+                                <td>
+                                    <div class="d-flex order-actions">
+                                        <a href="javascript:;" class=""><i class='bx bxs-edit'></i></a>
+                                        <a href="javascript:;" class="ms-3 btn btn-danger"><i class='bx bxs-trash'></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <input class="form-check-input me-3" type="checkbox" value="" aria-label="...">
+                                        </div>
+                                        <div class="ms-2">
+                                            <h6 class="mb-0 font-14">2</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>Banner san pham</td>
+
+                                <td> (hình ảnh)</td>
+                                <td>Tin tức</td>
+                                <td><div class="badge rounded-pill text-success bg-light-success p-2 text-uppercase px-3"><i class='bx bxs-circle me-1'></i>On</div></td>
+                                <td>
+                                    <div class="d-flex order-actions">
+                                        <a href="javascript:;" class=""><i class='bx bxs-edit'></i></a>
+                                        <a href="javascript:;" class="ms-3"><i class='bx bxs-trash'></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!--end row-->
+
+    </div>
+</div>

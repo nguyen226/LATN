@@ -1,0 +1,455 @@
+﻿<script>
+    var userId = -1;
+    $(document).ready(function () {
+        $('#btnFormDangKy').click(function () {
+            $('#modalRegister_Login .modal-dialog').removeClass('modal-fix-width-470');
+            $('#modalRegister_Login .modal-dialog').addClass('modal-md');
+
+            $('.dang-nhap').fadeOut().hide();
+            $('.kich-hoat').fadeOut().hide();
+            $('.welcome').fadeOut().hide();
+            $('.dang-ky').fadeIn().show();
+
+            hideAlertErrorRegister();
+        });
+
+        $('#btnKichHoat').click(function () {
+            $('.dang-nhap').fadeOut().hide();
+            $('.kich-hoat-dang-ky').fadeIn().show();
+
+            hideAlertErrorRegister();
+        });
+
+        $('#btnFormDangNhap').click(function () {
+            $('#modalRegister_Login .modal-dialog').addClass('modal-fix-width-470');
+            $('#modalRegister_Login .modal-dialog').removeClass('modal-md');
+
+            $('.dang-ky').fadeOut().hide();
+            $('.kich-hoat').fadeOut().hide();
+            $('.welcome').fadeOut().hide();
+            $('.dang-nhap').fadeIn().show();
+
+            hideAlertErrorRegister();
+        })
+
+        $('#formRegister_By').click(function () {
+            switch($(this).data("type"))
+            {
+                case 1:
+                    $('#formRegister_By_Text').text("Nếu bạn không có email?");
+                    $('#formRegister_By').text("ĐĂNG KÝ BẰNG SỐ ĐIỆN THOẠI");
+
+                    $('#formRegister_By').data("type", 2);
+
+                    $('.dang-ky-sdt').fadeOut().hide();
+                    $('.dang-ky-email').fadeIn().show();
+                    break;
+                case 2:
+                    $('#formRegister_By_Text').text("Nếu bạn không có số điện thoại?");
+                    $('#formRegister_By').text("ĐĂNG KÝ BẰNG EMAIL");
+
+                    $('#formRegister_By').data("type", 1);
+
+                    $('.dang-ky-email').fadeOut().hide();
+                    $('.dang-ky-sdt').fadeIn().show();
+                    break;
+            }
+
+            hideAlertErrorRegister();
+        })
+
+        $('#formRegister_Register').click(function () {
+            if (checkFormRegister()) {
+                var fields = [
+                   'FirstName',
+                   'LastName',
+                   'SoDienThoai',
+                   'Email',
+                   'Password'
+                ];
+                var values = [
+                    $('#formRegister_FirstName').val(),
+                    $('#formRegister_LastName').val(),
+                    $('#formRegister_SoDienThoai').val(),
+                    $('#formRegister_Email').val(),
+                    $('#formRegister_Password').val()
+                ];
+
+                var data = {
+                    fields: fields,
+                    values: values
+                }
+
+                sendDataToURL('/member-register', data, true).
+                then(function (res) {
+                    if (res) {
+                        if (res.success == true) {
+                            $('#modalRegister_Login .modal-dialog').addClass('modal-fix-width-470');
+                            $('#modalRegister_Login .modal-dialog').removeClass('modal-md');
+
+                            if (res.activePhone == true) {
+                                $('.kich-hoat').fadeIn().show();
+                            } else {
+                                $('.welcome').fadeIn().show();
+                            }
+
+                            $('.dang-ky').fadeOut().hide();
+
+                            userId = res.userId;
+                            userFirstName = $('#formRegister_FirstName').val();
+                            userlastName = $('#formRegister_LastName').val();
+                        }
+                        else
+                        {
+                            showAlertErrorRegister(res.message);
+                        }
+                    }
+                })
+            }
+        })
+
+        $('#btnDangNhap').click(function () {
+            if (checkFormLogin()) {
+                var data = {
+                    username: $('#formLogin_Username').val(),
+                    password: $('#formLogin_Password').val()
+                }
+
+                sendDataToURL('/member-login', data, true).
+                then(function (res) {
+                    if (res) {
+                        if (res.success == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            showAlertErrorRegister(res.message);
+                        }
+                    }
+                })
+            }
+        })
+
+        $('#btnSDTEmailActiveCode').click(function () {
+            if (checkFormActivateSDTEmail()) {
+                var data = {
+                    username: $('#formActiveSDTEmail_SDTEmail').val(),
+                    activeCode: $('#formActiveSDTEmail_ActiveCode').val()
+                }
+                sendDataToURL('/member-active-dang-nhap', data, true).
+                then(function (res) {
+                    if (res) {
+                        if (res.success == true) {
+                            userId = res.userId;
+                            userFirstName = res.userFirstName;
+                            userlastName = res.userlastName;
+
+                            $('.welcome').fadeIn().show();
+                            $('.kich-hoat-dang-ky').fadeOut().hide();
+                        }
+                        else {
+                            showAlertErrorRegister(res.message);
+                        }
+                    }
+                })
+            }
+        })
+
+        $('#btnActiveCode').click(function () {
+            if (checkFormActivate()) {
+                var data = {
+                    userId: userId,
+                    activeCode: $('#formActive_ActiveCode').val()
+                }
+
+                sendDataToURL('/member-active', data, true).
+                then(function (res) {
+                    if (res) {
+                        if (res.success == true) {
+                            $('.welcome').fadeIn().show();
+                            $('.kich-hoat').fadeOut().hide();
+                        }
+                        else {
+                            showAlertErrorRegister(res.message);
+                        }
+                    }
+                })
+            }
+        })
+
+        $('#btnCapNhatHoSoYTe').click(function () {
+            $('#modalRegister_Login').modal('hide');
+            //showModalCapNhatThongTinYTe();
+
+            if (!isNullOrEmpty(userId) && parseInt(userId) > 0) {
+                window.location.href = '@Url.Action("Update", "Users", new { area = "Member"})?userId=' + userId;
+            }
+        })
+    })
+
+    function checkFormRegister() {
+        var check = true;
+        var error = '';
+
+        hideAlertErrorRegister();
+
+        if (isNullOrEmpty($('#formRegister_FirstName').val())) {
+            check = false;
+            error = 'Bạn chưa nhập first name';
+        }
+
+        if (isNullOrEmpty($('#formRegister_FirstName').val())) {
+            check = false;
+            error = 'Bạn chưa nhập first name';
+        }
+
+        if (isNullOrEmpty($('#formRegister_SoDienThoai').val()) && isNullOrEmpty($('#formRegister_Email').val())) {
+            if (isNullOrEmpty($('#formRegister_SoDienThoai').val())) {
+                check = false;
+                error = 'Bạn chưa nhập số điện thoại';
+            }
+            else if (isNullOrEmpty($('#formRegister_Email').val())) {
+                check = false;
+                error = 'Bạn chưa nhập email';
+            }
+        }
+
+        if (isNullOrEmpty($('#formRegister_Password').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mật khẩu';
+        }
+        else if ($('#formRegister_Password').val() != $('#formRegister_RePassword').val())
+        {
+            check = false;
+            error = 'Mật khẩu không khớp';
+        }
+
+        if (!check) {
+            showAlertErrorRegister(error);
+        }
+
+        return check;
+    }
+
+    function checkFormLogin() {
+        var check = true;
+        var error = '';
+
+        hideAlertErrorRegister();
+
+        if (isNullOrEmpty($('#formLogin_Password').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mật khẩu';
+        }
+
+        if (isNullOrEmpty($('#formLogin_Username').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tên đăng nhập';
+        }
+
+        if (!check) {
+            showAlertErrorRegister(error);
+        }
+
+        return check;
+    }
+
+    function checkFormActivate() {
+        var check = true;
+        var error = '';
+
+        hideAlertErrorRegister();
+
+        if (isNullOrEmpty($('#formActive_ActiveCode').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mã kích hoạt';
+        }
+
+        if (!check) {
+            showAlertErrorRegister(error);
+        }
+
+        return check;
+    }
+
+    function checkFormActivateSDTEmail() {
+        var check = true;
+        var error = '';
+
+        hideAlertErrorRegister();
+        if (isNullOrEmpty($('#formActiveSDTEmail_ActiveCode').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mã kích hoạt';
+        }
+
+        if (isNullOrEmpty($('#formActiveSDTEmail_SDTEmail').val())) {
+            check = false;
+            error = 'Bạn chưa nhập SĐT/Email';
+        }
+
+        if (!check) {
+            showAlertErrorRegister(error);
+        }
+
+        return check;
+    }
+
+    function hideAlertErrorRegister() {
+        $('#formErrorMessage').fadeOut().hide();
+        $('#formErrorLabel').text('');
+    }
+
+    function showAlertErrorRegister(msg) {
+        $('#formErrorMessage').fadeIn().show();
+        $('#formErrorLabel').text(msg);
+    }
+
+    function resetFormRegister() {
+        $('#modalRegister_Login .modal-dialog').addClass('modal-fix-width-470');
+        $('#modalRegister_Login .modal-dialog').removeClass('modal-md');
+
+        $('.dang-ky').fadeOut().hide();
+        $('.kich-hoat').fadeOut().hide();
+        $('.kich-hoat-dang-ky').fadeOut().hide();
+        $('.welcome').fadeOut().hide();
+        $('.dang-nhap').fadeIn().show();
+
+        $('#formRegister_By_Text').text("Nếu bạn không có số điện thoại?");
+        $('#formRegister_By').text("ĐĂNG KÝ BẰNG EMAIL");
+
+        $('#formRegister_By').data("type", 1);
+
+        $('.dang-ky-email').fadeOut().hide();
+        $('.dang-ky-sdt').fadeIn().show();
+
+        $('#formLogin')[0].reset();
+        $('#formRegister')[0].reset();
+        $('#formActive')[0].reset();
+    }
+
+    function loginForm() {
+        hideAlertErrorRegister();
+
+        resetFormRegister();
+
+        $('#modalRegister_Login').modal({ backdrop: 'static', keyboard: false });
+    }
+</script>
+
+<div class="modal fade" id="modalRegister_Login" role="dialog">
+    <div class="modal-dialog modal-fix-width-470 modalsp">
+        <div class="modal-content">
+            <button type="button" class="btn-close-modal" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+            <div class="khung_register shopping">
+                <div class="alert d-none" id="formErrorMessage">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    <strong>Lỗi!</strong> <span id="formErrorLabel"></span>.
+                </div>
+
+                <div class="dang-nhap">
+                    <form id="formLogin" class="frm text-center form-group">
+                        <img src="/Content/Website/Assets/images/logo.svg">
+                        <h2>ĐĂNG NHẬP</h2>
+                        <div class="box_group_from">
+                            <input type="text" class="input-hoten" name="formLogin_Username" id="formLogin_Username" placeholder="Tên truy cập" required>
+                        </div>
+                        <div class="box_group_from">
+                            <input type="password" class="input-lock" name="formLogin_Password" id="formLogin_Password" placeholder="Mật khẩu" value="" required>
+                        </div>
+                    </form>
+                    <div id="box_send" class="form-group">
+                        <button id="btnDangNhap" class="send_mail btn regs"><i class="fa fa-sign-in "></i> ĐĂNG NHẬP</button>
+                    </div>
+                    <p>Bạn chưa có tài khoản <a href="#" id="btnFormDangKy"><b>Đăng ký ngay</b></a></p>
+                    <p>Kích hoạt tài khoản <a href="#" id="btnKichHoat"><b>Kích hoạt</b></a></p>
+                </div>
+
+                <div class="dang-ky d-none">
+                    <div class="row">
+                        <form id="formRegister" class="frm form-group text-center">
+                            <img src="/Content/Website/Assets/images/logo.svg">
+                            <h2>ĐĂNG KÝ TÀI KHOẢN</h2>
+                            <div class="col-md-12 dang-ky-sdt">
+                                <div class="box_group_from">
+                                    <input type="number" class="input-sdt" name="formRegister_SoDienThoai" id="formRegister_SoDienThoai" placeholder="Số Điện Thoại" value="" maxlength="20" required>
+                                </div>
+                            </div>
+                            <div class="col-md-12 dang-ky-email d-none">
+                                <div class="box_group_from">
+                                    <input type="email" class="input-email" name="formRegister_Email" id="formRegister_Email" placeholder="Email" value="" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box_group_from">
+                                    <input type="text" class="input-hoten" name="formRegister_FirstName" id="formRegister_FirstName" placeholder="First Name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box_group_from">
+                                    <input type="text" class="input-hoten" name="formRegister_LastName" id="formRegister_LastName" placeholder="Last Name" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box_group_from">
+                                    <input type="password" class="input-lock" name="formRegister_Password" id="formRegister_Password" placeholder="Mật Khẩu" value="" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box_group_from">
+                                    <input type="password" class="input-lock" name="formRegister_RePassword" id="formRegister_RePassword" placeholder="Nhập Lại Mật khẩu" value="" required>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="col-md-12 form-group text-center">
+                            <button id="formRegister_Register" class="send_mail btn regs form-group">ĐĂNG KÝ TÀI KHOẢN</button>
+                        </div>
+
+                        <div class="col-md-6 form-group text-center">
+                            <h5 id="formRegister_By_Text">Nếu bạn không có số điện thoại?</h5>
+                            <button id="formRegister_By" data-type="1" class="send_mail btn btn-warning regs form-group">ĐĂNG KÝ BẰNG EMAIL</button>
+                        </div>
+                        <div class="col-md-6 form-group text-center">
+                            <h5>Bạn đã có tài khoản</h5>
+                            <button id="btnFormDangNhap" data-type="1" class="send_mail btn regs form-group">ĐĂNG NHẬP</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kich-hoat d-none">
+                    <form id="formActive" class="frm text-center">
+                        <img src="/Content/Website/Assets/images/logo.svg">
+                        <h2>Kích hoạt tài khoản</h2>
+                        <div class="box_group_from">
+                            <input type="text" name="formActive_ActiveCode" id="formActive_ActiveCode" placeholder="Mã kích hoạt" required>
+                        </div>
+                    </form>
+                    <div>
+                        <button id="btnActiveCode" class="send_mail regs"><i class="fa fa-sign-in "></i> XÁC NHẬN</button>
+                    </div>
+                </div>
+
+                <div class="kich-hoat-dang-ky d-none">
+                    <form id="formActive" class="frm text-center">
+                        <img src="/Content/Website/Assets/images/logo.svg">
+                        <h2>Kích hoạt tài khoản</h2>
+                        <div class="box_group_from">
+                            <input type="text" name="formActiveSDTEmail_SDTEmail" id="formActiveSDTEmail_SDTEmail" placeholder="SĐT hoặc email" required>
+                            <input type="text" name="formActiveSDTEmail_ActiveCode" id="formActiveSDTEmail_ActiveCode" placeholder="Mã kích hoạt" required>
+                        </div>
+                    </form>
+                    <div>
+                        <button id="btnSDTEmailActiveCode" class="send_mail regs"><i class="fa fa-sign-in "></i> XÁC NHẬN</button>
+                    </div>
+                </div>
+
+                <div class="welcome d-none">
+                    <img src="/Content/Website/Assets/images/logo.svg">
+                    <h2>Kích hoạt tài khoản thành công</h2>
+                    <div>
+                        <button id="btnCapNhatHoSoYTe" class="send_mail btn regs">CẬP NHẬT HỒ SƠ Y TẾ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

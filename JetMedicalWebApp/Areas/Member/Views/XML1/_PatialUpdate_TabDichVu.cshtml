@@ -1,0 +1,133 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    var tableDichVu;
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (tableDichVu) !== 'undefined') {
+                tableDichVu.columns.adjust();
+            }
+        });
+        khoiTaoDatatableDichVu();
+
+        $("#btnRefreshDataDichVu").click(function () {
+            tableDichVu.draw();
+        });
+
+        $("#quickSearchDonDichVu").change(function () {
+            tableDichVu.draw();
+        });
+    });
+
+    function khoiTaoDatatableDichVu() {
+        let selectedFields = "Id, MA_DICH_VU, TEN_DICH_VU, MA_LK, DON_VI_TINH, NGAY_KQ, STRNGAY_KQ, XML3_01";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "XML3", new { area = "Member" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearchDonDichVu').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(MA_DICH_VU LIKE N'%" + $('#quickSearchDonDichVu').val().trim() + "%' ORTEN_DICH_VU LIKE N'%" + $('#quickSearchDonDichVu').val().trim() + "%' OR NGAY_KQ LIKE N'%" + $('#quickSearchDonDichVu').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+                stringFilter += "MA_LK=N'" + (xML1Data != null ? xML1Data.id : -1) + "'";
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            tableDichVu.columns.adjust();
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                "searchable": false
+            },
+            {
+                "targets": [3,4],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [5],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "MA_DICH_VU", "name": "MA_DICH_VU", "autoWidth": true, "title": "Mã dịch vụ" },
+            { "data": "TEN_DICH_VU", "name": "TEN_DICH_VU", "autoWidth": true, "title": "Tên dịch vụ" },
+            { "data": "DON_VI_TINH", "name": "DON_VI_TINH", "autoWidth": true, "title": "ĐVT" },
+            { "data": "STRNGAY_KQ", "name": "NGAY_KQ", "autoWidth": true, "title": "Ngày KQ" },
+            {
+                "data": "XML3_01", "name": "XML3_01", "autoWidth": true, "title": "FPD đơn", "render": function (data, type, full, meta) {
+                    return !isNullOrEmpty(data) ? '<a target="_blank" href="' + data + '">Tải file</a>' : '';
+                }
+            },
+            {
+                "mRender": function (data, type, row, meta) {
+                    let html = '';
+                    html = '<button class="btn menu-icon vd_bg-green btnViewXML4"> <i class="fa fa-eye"></i> </button>';
+                    return html;
+                }, width: "30px"
+            }
+        ]
+
+        tableDichVu = $('#dtTableDichVu').DataTable(datatableOption);
+
+        $('#dtTableDichVu tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                tableDichVu.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#dtTableDichVu tbody').on('click', 'tr td.menu-action > .btnViewXML4', function () {
+            selectedDataRow = tableDichVu.row($(this).parents('tr')).data();
+            xemXML4($('#FormUpdate_MA_LK').val(), selectedDataRow.MA_DICH_VU);
+        });
+    }
+
+    function xemXML4(maLuotKham,maDichVu) {
+        viewUrl('@Url.Action("XemChiTietXML4", "XML1", new { area = "Member" })?maLK=' + maLuotKham + '&maDichVu=' + maDichVu)
+    }
+</script>
+<div class="panel widget light-widget">
+    <div class="panel-heading no-title">
+        <div class="vd_menu-search table-search input-group input-border">
+            <input type="text" id="quickSearchDonDichVu"  class="form-control" placeholder="Tìm kiếm">
+            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+        </div>
+        <div class="vd_panel-menu themChiTietXML1">
+            <div id="btnRefreshDataDichVu" class="menu entypo-icon largerFont" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới"> <i class="icon-cycle"></i> </div>
+            <div id="btnThemMoiRowDataDichVu" class="menu entypo-icon largerFont vd_green" data-placement="bottom" data-toggle="tooltip" data-original-title="Thêm"> <i class="icon-plus3"></i> </div>
+        </div>
+    </div>
+    <div class="panel-body" id="panelBody">
+        <div class="row">
+            <table id="dtTableDichVu" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+        </div>
+    </div>
+</div>

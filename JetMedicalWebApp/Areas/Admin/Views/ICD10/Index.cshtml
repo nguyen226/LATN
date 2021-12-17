@@ -1,0 +1,545 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.ICD10ViewModels
+@{
+    ViewBag.Title = "Bệnh";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+
+        let selectedFields = "Id, Ma, Ten, NhomBenh, MoTa, ManTinh, ThuongGap, KhongBH, NgoaiDS, HieuLuc, (CreatedUsers != null ? CreatedUsers.UserID : -1) AS CreatedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "ICD10", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += '(Ma.Contains("' + $('#quickSearch').val().trim() + '") OR Ten.Contains("' + $('#quickSearch').val().trim() + '") OR NhomBenh.Contains("' + $('#quickSearch').val().trim() + '") OR MoTa.Contains("' + $('#quickSearch').val().trim() + '"))';
+                }
+
+                if (xemHeThong == false && (xemCaNhan == true)) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += 'CreatedUserID =' + userId;
+                }
+
+                return stringFilter;
+            }
+        };
+
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.initComplete = function () {
+            this.api().columns().every(function (index) {
+                var headerName = $(this.header()).text();
+                var column = this;
+                if (index == 0) {
+                    $(column.header()).html('<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkbox-select-all">\
+                                <label for="checkbox-select-all"></label>\
+                            </div></div>');
+                }
+
+                table.columns.adjust();
+            });
+
+            $('#checkbox-select-all').off('change').on('change', function () {
+                $('#dtTable tbody input:checkbox[name="checkboxSelected"]').prop('checked', this.checked);
+            });
+        };
+
+        datatableOption.order = [[0, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false,
+                "searchable": false
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center'
+            },
+            {
+                "targets": [2, 3, 4],
+                className: 'truncateText truncateText-350px',
+                "searchable": false
+            },
+            {
+                "targets": [5, 6, 7, 8, 9],
+                className: 'dt-body-center'
+            },
+            {
+                "targets": [10],
+                className: 'dt-body-center menu-action',
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            },
+            {
+                "targets": [11],
+                className: 'dt-body-center menu-action',
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowDelete)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            }
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "Id", "name": "Id", "autoWidth": true,
+                "render": function (data, type, full, meta) {
+                    return '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                            <input type="checkbox" Id="checkboxSelected_' + full.Id + '_' + full.Ma + '" name="checkboxSelected">\
+                            <label for="checkboxSelected_' + full.Id + '_' + full.Ma + '"></label>\
+                        </div></div>';
+                }
+            },
+            { "data": "Ma", "name": "Ma", "autoWidth": true, "title": "Mã" },
+            { "data": "Ten", "name": "Ten", "autoWidth": true, "title": "Tên" },
+            { "data": "NhomBenh", "name": "NhomBenh", "autoWidth": true, "title": "Nhóm bệnh" },
+            { "data": "MoTa", "name": "MoTa", "autoWidth": true, "title": "Mô tả" },
+            {
+                "data": "ManTinh", "name": "ManTinh", "autoWidth": true, "title": "Mãn tính",
+                "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActive_' + full.Id + '_ManTinh" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.Id + '"' + (data == true ? ' checked ' : '') + ' data-field="ManTinh" data-value="' + !data + '">\
+                                    <label for="checkboxActive_' + full.Id + '_ManTinh"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "ThuongGap", "name": "ThuongGap", "autoWidth": true, "title": "Thường gặp",
+                "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActive_' + full.Id + '_ThuongGap" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.Id + '"' + (data == true ? ' checked ' : '') + ' data-field="ThuongGap" data-value="' + !data + '">\
+                                    <label for="checkboxActive_' + full.Id + '_ThuongGap"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "KhongBH", "name": "KhongBH", "autoWidth": true, "title": "Không bảo hiểm",
+                "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActive_' + full.Id + '_KhongBH" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.Id + '"' + (data == true ? ' checked ' : '') + ' data-field="KhongBH" data-value="' + !data + '">\
+                                    <label for="checkboxActive_' + full.Id + '_KhongBH"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "NgoaiDS", "name": "NgoaiDS", "autoWidth": true, "title": "Ngoài danh sách",
+                "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActive_' + full.Id + '_NgoaiDS" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.Id + '"' + (data == true ? ' checked ' : '') + ' data-field="NgoaiDS" data-value="' + !data + '">\
+                                    <label for="checkboxActive_' + full.Id + '_NgoaiDS"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "HieuLuc", "name": "HieuLuc", "autoWidth": true, "title": "Hiệu lực",
+                "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActive_' + full.Id + '_HieuLuc" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.Id + '"' + (data == true ? ' checked ' : '') + ' data-field="HieuLuc" data-value="' + !data + '">\
+                                    <label for="checkboxActive_' + full.Id + '_HieuLuc"></label>\
+                                  </div></div>';
+                    return content;
+                }
+            },
+            {
+                "data": "Id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(suaHeThong == true  ||  (suaCaNhan == true && row.CreatedUserID == userId)){
+                        html = '<div class="d-flex order-actions"><a data-original-title="edit" data-toggle="tooltip" data-placement="top" class="btnEdit" href="javascript:void(0)"> <i class="bx bxs-edit"></i> </a></div>';
+                    }
+                    return html;
+                }, width: "30px"
+            },
+            {
+                "data": "Id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(xoaHeThong == true ||  (xoaCaNhan == true && row.CreatedUserID == userId)){
+                        html = '<div class="d-flex order-actions"><a data-original-title="delete" data-toggle="tooltip" data-placement="top" class="" onclick=deleteDataRow(' + row.Id + ')> <i class="bx bxs-trash"></i> </a></div>';
+                    }
+                    return html;
+                }, width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $('#dtTable tbody').on('click', 'tr td.menu-action > .order-actions >a.btnEdit', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+            $('#FormUpdate_Ma').val(selectedDataRow.Ma);
+            $('#FormUpdate_Ten').val(selectedDataRow.Ten);
+            $('#FormUpdate_MoTa').val(selectedDataRow.MoTa);
+            $('#FormUpdate_NhomBenh').val(selectedDataRow.NhomBenh);
+            $('#FormUpdate_ManTinh').prop('checked', selectedDataRow.ManTinh);
+            $('#FormUpdate_ThuongGap').prop('checked', selectedDataRow.ThuongGap);
+            $('#FormUpdate_KhongBH').prop('checked', selectedDataRow.KhongBH);
+            $('#FormUpdate_NgoaiDS').prop('checked', selectedDataRow.NgoaiDS);
+            $('#FormUpdate_HieuLuc').prop('checked', selectedDataRow.HieuLuc);
+
+            $('#addOrUpdateModal').modal('show');
+        });
+
+        $("#btnRefreshData").click(function () {
+            resetCheckboxAndTable();
+        });
+
+        $("#btnAdd").click(function () {
+            selectedDataRow = null;
+            $('#formUpdate')[0].reset();
+            $('#addOrUpdateModal').modal('show');
+        });
+
+        $("#btnThucHienLuu").click(function () {
+            addOrUpdate(selectedDataRow);
+        });
+
+        $('#btnDelete').click(function () {
+            dataListId = [];
+            dataListId = $(table.$('input:checkbox[name="checkboxSelected"]').map(function () {
+                return $(this).prop("checked") ? table.rows($(this).closest('tr')).data()[0].Id : null;
+            })).toArray();
+
+            if (dataListId.length > 0) {
+                $('#confirmDeleteDataRowModal').modal('show');
+            } else {
+                notification("topcenter", "", "fa fa-exclamation-triangle vd_yellow", "", "Bạn chưa chọn dòng nào để xóa.");
+            }
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            if (dataListId.length > 0) {
+                var data = { ids: dataListId };
+                var url = "@Url.Action("DeleteByIds", "ICD10", new { area = "Admin" })";
+
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công.");
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        resetCheckboxAndTable();
+                    }
+                });
+            }
+        });
+    });
+
+    function deleteDataRow(id) {
+        dataListId.push(id);
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+
+    function resetCheckboxAndTable() {
+        table.draw();
+        $('#formUpdate')[0].reset();
+        dataListId = [];
+        $('#checkbox-select-all').prop('checked', false);
+        selectedDataRow = null;
+    }
+
+    function addOrUpdate(selectedDataRow) {
+        if (checkFormUpdate()) {
+            var fields = [
+                'Ma',
+                'Ten',
+                'NhomBenh',
+                'MoTa',
+                'ManTinh',
+                'ThuongGap',
+                'KhongBH',
+                'NgoaiDS',
+                'HieuLuc'
+            ];
+            var values = [
+                $('#FormUpdate_Ma').val(),
+                $('#FormUpdate_Ten').val(),
+                $('#FormUpdate_NhomBenh').val(),
+                $('#FormUpdate_MoTa').val(),
+                $('#FormUpdate_ManTinh').is(':checked'),
+                $('#FormUpdate_ThuongGap').is(':checked'),
+                $('#FormUpdate_KhongBH').is(':checked'),
+                $('#FormUpdate_NgoaiDS').is(':checked'),
+                $('#FormUpdate_HieuLuc').is(':checked')
+            ];
+            var data = {
+                id: selectedDataRow != null ? selectedDataRow.Id : null,
+                fields: fields,
+                values: values
+            };
+            var url = "@Url.Action("AddOrUpdate", "ICD10", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                }
+                else {
+                    //$('#addOrUpdateModal').modal('hide');
+                    notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Cập nhật thành công.");
+                    resetCheckboxAndTable();
+                }
+            });
+        }
+    }
+
+    function updateCellDatatable(that) {
+        var data = {
+            id: $(that).data("id"),
+            fields: [$(that).data("field")],
+            values: [$(that).data("value")]
+        };
+
+        var url = "@Url.Action("AddOrUpdate", "ICD10", new { area = "Admin" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+            }
+        });
+    }
+
+    function checkFormUpdate() {
+        let check = true;
+        let error = '';
+
+        if (isNullOrEmpty($('#FormUpdate_Ma').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mã bệnh';
+        }
+
+        if (isNullOrEmpty($('#FormUpdate_Ten').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tên bệnh';
+        }
+
+        if (isNullOrEmpty($('#FormUpdate_NhomBenh').val())) {
+            check = false;
+            error = 'Bạn chưa nhập nhóm bệnh';
+        }
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+</script>
+
+@Html.Partial("_PartialContentHeader")
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    Search:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearch" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
+
+                            @if (Model.Menu_GroupPermission.SystemEdit == true || Model.Menu_GroupPermission.PersonalEdit == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnAdd" tabindex="0" aria-controls="example2" type="button"><span>Thêm mới</span></button>
+                            }
+
+                            @if (Model.Menu_GroupPermission.SystemDelete == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnDelete" tabindex="0" aria-controls="example2" type="button"><span>Xóa</span></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="addOrUpdateModal" aria-labelledby="addOrUpdateModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addOrUpdateModalLabel">@Html.Raw("Cập nhật")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formUpdate">
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">Mã</label>
+                        <div class="col-sm-9 controls">
+                            <input class="form-control" id="FormUpdate_Ma" type="text">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">Tên</label>
+                        <div class="col-sm-9 controls">
+                            <input class="form-control" id="FormUpdate_Ten" type="text">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">Nhóm bệnh</label>
+                        <div class="col-sm-9 controls">
+                            <input class="form-control" id="FormUpdate_NhomBenh" type="text">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">Mô tả</label>
+                        <div class="col-sm-9 controls">
+                            <input class="form-control" id="FormUpdate_MoTa" type="text">
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">@Html.Raw("Mãn tính")</label>
+                        <div class="col-sm-9 controls">
+                            <div class="vd_checkbox checkbox-success">
+                                <input type="checkbox" id="FormUpdate_ManTinh">
+                                <label for="FormUpdate_ManTinh"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">@Html.Raw("Thường gặp")</label>
+                        <div class="col-sm-9 controls">
+                            <div class="vd_checkbox checkbox-success">
+                                <input type="checkbox" id="FormUpdate_ThuongGap">
+                                <label for="FormUpdate_ThuongGap"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">@Html.Raw("Không bảo hiểm")</label>
+                        <div class="col-sm-9 controls">
+                            <div class="vd_checkbox checkbox-success">
+                                <input type="checkbox" id="FormUpdate_KhongBH">
+                                <label for="FormUpdate_KhongBH"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">@Html.Raw("Ngoài danh sách")</label>
+                        <div class="col-sm-9 controls">
+                            <div class="vd_checkbox checkbox-success">
+                                <input type="checkbox" id="FormUpdate_NgoaiDS">
+                                <label for="FormUpdate_NgoaiDS"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <label class="col-sm-3 col-form-label">@Html.Raw("Hiệu lực")</label>
+                        <div class="col-sm-9 controls">
+                            <div class="vd_checkbox checkbox-success">
+                                <input type="checkbox" id="FormUpdate_HieuLuc" checked>
+                                <label for="FormUpdate_HieuLuc"></label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn btn-success" id="btnThucHienLuu"><i class="lni lni-save"></i>@Html.Raw("Lưu")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="lni lni-ban"></i>@Html.Raw("Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")

@@ -1,0 +1,26 @@
+﻿<script>
+    function showNotificationAndAskModal(title, message) {
+        $("#notificationAndAskOperationModalLabel").text(title);
+        $("#notificationAndAskOperationModalContent").html(message);
+
+        $('#notificationAndAskOperationModal').modal('show');
+    }
+</script>
+
+<div class="modal fade" id="notificationAndAskOperationModal" tabindex="-1" aria-labelledby="notificationAndAskOperationModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notificationAndAskOperationModalLabel">@Html.Raw("Thông báo")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="notificationAndAskOperationModalContent">@Html.Raw("Bạn có chắc chắn là muốn xóa dữ liệu này?")</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" name="btnAddNew"><i class="lni lni-plus"></i>@Html.Raw("Thêm mới")</button>
+                <button type="button" class="btn btn-secondary" name="btnTroVeDanhSach"><i class="bx bx-arrow-back"></i>@Html.Raw("Trở về danh sách")</button>
+            </div>
+        </div>
+    </div>
+</div>

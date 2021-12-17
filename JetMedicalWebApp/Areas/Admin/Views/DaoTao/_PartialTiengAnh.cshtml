@@ -1,0 +1,112 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.NewsContentViewModels
+@using JetMedicalWebApp.Common
+
+<div class="panel widget light-widget">
+    <div class="panel-body" id="panelBody">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-9">
+                <form class="form-horizontal" action="#" id="formEN" role="form">
+                    <div class="form-group row">
+                        <input type="text" id="idEN" class="form-control hidden" value="@(Model.NewsContent != null ? Model.NewsContent.id : 0)">
+                        <input type="text" id="codeEN" class="form-control hidden" value="@(Model.NewsContent != null ? Model.NewsContent.code : "")">
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Keywords</div>
+                            <input type="text" id="keywords" class="form-control" placeholder="keywords" value="@(Model.NewsContent != null ? Model.NewsContent.keywords : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Descriptions</div>
+                            <input type="text" id="descriptions" class="form-control" placeholder="descriptions" value="@(Model.NewsContent != null ? Model.NewsContent.descriptions : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Tiêu đề</div>
+                            <input type="text" id="title" class="form-control" placeholder="tiêu đề" value="@(Model.NewsContent != null ? Model.NewsContent.title : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Tên</div>
+                            <input type="text" id="name" class="form-control" placeholder="tên" value="@(Model.NewsContent != null ? Model.NewsContent.name : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Loại tin</div>
+                            <select id="categoriId" name="categoriId" class="form-control select2">
+                                @if (Model.NewsCategory != null)
+                                {
+                                    <option value="@Model.NewsCategory.id" selected> @Html.Raw(Model.NewsCategory.name) </option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Mô tả ngắn</div>
+                            <textarea class="form-control" cols="20" id="shorttitle" name="shorttitle" placeholder="Mô tả ngắn" rows="6">@if (Model.NewsContent != null){<text>@Html.Raw(Model.NewsContent.shorttitle != null ? Model.NewsContent.shorttitle.Replace("&nbsp;", " ") : "")</text>}
+                        </textarea>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <div class="form-label">Position</div>
+                        <input type="number" id="position" class="form-control" placeholder="position" value="@(Model.NewsContent != null ? Model.NewsContent.position : 0)">
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <br />
+                        <div class="vd_checkbox  checkbox-success">
+                            <input type="checkbox" id="active" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.isactive ? "checked" : "" : "")>
+                            <label for="active"> Kích hoạt</label>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <br />
+                        <div class="vd_checkbox  checkbox-success">
+                            <input type="checkbox" id="ishot" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.ishot ? "checked" : "" : "")>
+                            <label for="ishot"> Tin hot</label>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                        <br />
+                        <div class="vd_checkbox  checkbox-success">
+                            <input type="checkbox" id="approved" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.approved ? "checked" : "" : "")>
+                            <label for="approved"> Phê duyệt</label>
+                        </div>
+                    </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                            <br />
+                            <div class="vd_checkbox  checkbox-success">
+                                <input type="checkbox" id="ActivePhone" class="form-control" @(Model.NewsContent != null ? Model.NewsContent.ActivePhone ? "checked" : "" : "")>
+                                <label for="ActivePhone"> Active Phone</label>
+                            </div>
+                        </div>
+                </div>
+
+
+            </form>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <div class="col-xs-12">
+                    <div class="form-img text-center mgbt-xs-15">
+                        <img id="imagePreview"
+                             @if (Model.NewsContent != null) { if (!string.IsNullOrEmpty(Model.NewsContent.avatar)) { <text>
+                             src="@Url.Content(Model.NewsContent.avatar)"
+                             </text>    } else { <text>
+                             src="@CommonConstants.FileNoImage"
+                             </text>    } } else { <text>
+                             src="@CommonConstants.FileNoImage"
+                             </text>    } alt="Image" width="300" height="300" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            <textarea rows="50" class="form-control m-input" id="description" placeholder="Chi tiết">
+                @if (Model.NewsContent != null)
+                { <text> @Html.Raw(Model.NewsContent.description != null ? Model.NewsContent.description.Replace("&nbsp;", " ") : "") </text>}
+            </textarea>
+        </div>
+    </div>
+</div>
+</div>

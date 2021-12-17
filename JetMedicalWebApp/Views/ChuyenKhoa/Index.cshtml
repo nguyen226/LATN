@@ -1,0 +1,56 @@
+@model JetMedicalWebApp.Models.BaseViewModel
+@using JetMedicalWebApp.Common
+
+@{
+    Layout = "~/Views/Shared/_ChuyenKhoaLayout.cshtml";
+}
+
+<section class="back_all" style="position: relative;">
+    <div>
+        <div class="container">
+
+            @if (Model.NewsCategories.Count() > 0)
+            {
+                foreach (var item in Model.NewsCategories.Where(m => m.parentId == 0))
+                {
+                    <div class="row" style="margin-top: 25px;">
+                        <div class="col-lg-12">
+                            <h3 class="title_center">
+                                @item.name
+                            </h3>
+                            @foreach (var u in Model.NewsCategories.Where(m => m.parentId == item.id))
+                            {
+                                <div class="xoamargin">
+                                    <div class="khung_dv chuyenkhoa">
+                                        @if (!string.IsNullOrEmpty(u.slug))
+                                        {
+                                            <a href='/chuyen-khoa/@u.slug.ToLower()_ck_@u.id/gioi-thieu'>
+                                                <div class="box_sl_dv">
+                                                    <img src="@(!string.IsNullOrEmpty(u.banner) ? u.banner : "/Content/Website/Assets/images/dv/1.png")"
+                                                         alt="@u.name">
+                                                    <p>@u.name</p>
+                                                </div>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a href='/chuyen-khoa/@Utilities.urlConvert(Utilities.VnConcert(u.name).ToLower())_ck_@u.id/gioi-thieu'>
+                                                <div class="box_sl_dv">
+                                                    <img src="@(!string.IsNullOrEmpty(u.banner) ? u.banner : "/Content/Website/Assets/images/dv/1.png")"
+                                                         alt="@u.name">
+                                                    <p>@u.name</p>
+                                                </div>
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>
+
+

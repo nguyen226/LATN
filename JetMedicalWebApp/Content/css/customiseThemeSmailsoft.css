@@ -1,0 +1,171 @@
+﻿
+/******* switcher-wrapper *******/
+.switcher-wrapper ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    background: 0 0;
+}
+
+.switcher-wrapper .metismenu {
+    background: 0 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 10px;
+    margin-top: 60px;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column
+}
+
+    .switcher-wrapper .metismenu li + li {
+        margin-top: 5px
+    }
+
+    .switcher-wrapper .metismenu li:first-child {
+        margin-top: 5px
+    }
+
+    .switcher-wrapper .metismenu li:last-child {
+        margin-bottom: 5px
+    }
+
+    .switcher-wrapper .metismenu > li {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        position: relative
+    }
+
+    .switcher-wrapper .metismenu a {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        padding: 8px 15px;
+        font-size: 15px;
+        color: #5f5f5f;
+        outline-width: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        letter-spacing: .5px;
+        border: 1px solid #ffffff00;
+        transition: all .3s ease-out
+    }
+
+        .switcher-wrapper .metismenu a .parent-icon {
+            font-size: 24px;
+            line-height: 1
+        }
+
+        .switcher-wrapper .metismenu a .menu-title {
+            margin-left: 10px
+        }
+
+    .switcher-wrapper .metismenu ul a {
+        padding: 6px 15px 6px 15px;
+        font-size: 15px;
+        border: 0
+    }
+
+        .switcher-wrapper .metismenu ul a i {
+            margin-right: 10px
+        }
+
+    .switcher-wrapper .metismenu ul {
+        border: 1px solid #ededed;
+        background: #fff
+    }
+
+        .switcher-wrapper .metismenu ul ul a {
+            padding: 8px 15px 8px 30px
+        }
+
+        .switcher-wrapper .metismenu ul ul ul a {
+            padding: 8px 15px 8px 45px
+        }
+
+    .switcher-wrapper .metismenu .mm-active > a, .switcher-wrapper .metismenu a:active, .switcher-wrapper .metismenu a:focus, .switcher-wrapper .metismenu a:hover {
+        color: #0d6efd;
+        text-decoration: none;
+        background: rgb(13 110 253 / .12)
+    }
+
+.menu-label {
+    padding: 20px 15px 5px 5px;
+    color: #b0afaf;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: .5px
+}
+
+.metismenu .has-arrow:after {
+    position: absolute;
+    content: "";
+    width: .5em;
+    height: .5em;
+    border-style: solid;
+    border-width: 1.2px 0 0 1.2px;
+    border-color: initial;
+    right: 15px;
+    transform: rotate(-45deg) translateY(-50%);
+    transform-origin: top;
+    top: 50%;
+    transition: all .3s ease-out
+}
+
+.phan-quyen-chuc-nang {
+    width: 500px;
+    right: -500px;
+}
+
+    .phan-quyen-chuc-nang .metismenu {
+        margin-top: 0px;
+    }
+
+    .phan-quyen-chuc-nang .tab-pane {
+        max-height: calc(100vh - 160px);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+
+
+
+
+.tagsinput {
+    padding: 0px;
+    min-height: 34px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+    .tagsinput .tag {
+        margin-bottom: 0px;
+    }
+
+    .tagsinput div input {
+        margin: 0px;
+    }
+
+
+.table-search .tagsinput {
+    border-width: 0px;
+}
+
+.ui-menu {
+    line-height: 25px;
+    color: #0d6efd;
+    background:white;
+}
+
+
+    .ui-menu .ui-menu-item:hover {
+        background: rgb(13 110 253 / .12);
+    }

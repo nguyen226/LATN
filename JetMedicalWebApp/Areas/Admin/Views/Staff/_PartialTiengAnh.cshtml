@@ -1,0 +1,85 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.StaffViewModels
+@using JetMedicalWebApp.Common
+
+<div class="panel widget light-widget">
+    <div class="panel-body" id="panelBody">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-xl-9">
+                <form class="form-horizontal" action="#" id="formEN" role="form">
+                    <div class="form-group row">
+
+                        <input type="text" id="id" class="form-control hidden" value="@(Model.Staff != null ? Model.Staff.id : 0)">
+                        <input type="text" id="code" class="form-control hidden" value="@(Model.Staff != null ? Model.Staff.code : "")">
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Full name</div>
+                            <input type="text" id="fullName" class="form-control" placeholder="full name" value="@(Model.Staff != null ? Model.Staff.fullname : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Brand Name</div>
+                            <input type="text" id="brandname" class="form-control" placeholder="brand name" value="@(Model.Staff != null ? Model.Staff.brandname : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Chức vụ</div>
+                            <input type="text" id="position" class="form-control" placeholder="Chức vụ" value="@(Model.Staff != null ? Model.Staff.position : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Thứ tự</div>
+                            <input type="number" id="order" class="form-control" placeholder="Thứ tự" value="@(Model.Staff != null ? Model.Staff.order : 0)">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Summary</div>
+                            <input type="text" id="summary" class="form-control" placeholder="summary" value="@(Model.Staff != null ? Model.Staff.summary : "")">
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                            <div class="form-label">Phòng ban</div>
+                            <select id="departmentIdVN" name="departmentIdVN" class="form-control select2">
+                                @if (Model.Staff != null)
+                                {
+                                    <option value="@Model.Staff.departmentid" selected> @Html.Raw(Model.Staff.departmentname) </option>
+}
+                            </select>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                            <br />
+                            <div class="vd_checkbox  checkbox-success">
+                                <input type="checkbox" id="active" class="form-control" @(Model.Staff != null ? Model.Staff.isactive ? "checked" : "" : "")>
+                                <label for="active"> Kích hoạt</label>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                            <br />
+                            <div class="vd_checkbox  checkbox-success">
+                                <input type="checkbox" id="Isexamination" class="form-control" @(Model.Staff != null ? Model.Staff.Isexamination ? "checked" : "" : "")>
+                                <label for="Isexamination"> Isexamination</label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                <div class="form-group">
+                    <div class="col-xs-12">
+                        <div class="form-img text-center mgbt-xs-15">
+                            <img id="imagePreview" src="@(Model.Staff != null ? !string.IsNullOrEmpty(Model.Staff.img) ? Url.Content(Model.Staff.img) : CommonConstants.FileNoImage : CommonConstants.FileNoImage)" alt="Image" width="300" height="300" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <textarea rows="50" class="form-control m-input" id="description" placeholder="Chi tiết">
+                    @if (Model.Staff != null)
+                    { <text> @Html.Raw(Model.Staff.description != null ? Model.Staff.description.Replace("&nbsp;", " ") : "")</text>}
+                </textarea>
+            </div>
+        </div>
+    </div>
+</div>

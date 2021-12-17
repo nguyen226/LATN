@@ -1,0 +1,751 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.UsersViewModels
+@{
+    ViewBag.Title = "Người dùng - bệnh nhân";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/content/bootstrap-datepicker-1-6-4/css/bootstrap-datepicker3.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/js/bootstrap-datepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/locales/bootstrap-datepicker.vi.min.js")"></script>
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/customisedatepicker.js")"></script>
+}
+
+<script>
+    var user = null;
+    var userInfo = null;
+    @if(Model.Users != null)
+    {
+        <text>
+    user = {
+        id: '@Model.Users.UserID'
+    };
+    </text>
+    }
+
+    @if(Model.UserInfo != null)
+    {
+        <text>
+    userInfo = {
+        id: '@Model.UserInfo.USER_INFO_ID'
+    };
+    </text>
+    }
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker(initialDatepickerOption());
+
+        if (user == null) {
+            $("#btnCapNhatUserInfo").prop("disabled", true);
+        }
+        var dropdownlistSelect2TinhOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2TinhOption.placeholder = "Chọn Tỉnh";
+        dropdownlistSelect2TinhOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Province", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'ProvinceID, ProvinceName, IsActive';
+                var condition = params.term ? ' ProvinceName.Contains(\\' + params.term + '\\) AND IsActive = True' : ' IsActive = True ';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'ProvinceName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.ProvinceID,
+                        text: item.ProvinceName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#tinh').select2(dropdownlistSelect2TinhOption);
+
+        var dropdownlistSelect2HuyenOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2HuyenOption.placeholder = "Chọn huyện";
+        dropdownlistSelect2HuyenOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "District", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'ProvinceID, DistrictID, DistrictName, IsActive';
+                var condition = ' IsActive = True AND ProvinceID.Contains(\\' + $('#tinh').val() + '\\)';
+                condition += params.term ? ' AND (DistrictName.Contains(\\' + params.term + '\\))' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'DistrictName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.DistrictID,
+                        text: item.DistrictName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#huyen').select2(dropdownlistSelect2HuyenOption);
+
+        var dropdownlistSelect2NhomMauOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2NhomMauOption.placeholder = "Chọn nhóm máu";
+        dropdownlistSelect2NhomMauOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "BloodType", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'BloodTypeID, BloodName';
+                var condition = params.term ? ' BloodName.Contains(\\' + params.term + '\\)' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'BloodName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.BloodTypeID,
+                        text: item.BloodName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#nhomMau').select2(dropdownlistSelect2NhomMauOption);
+
+        var dropdownlistSelect2GroupsOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2GroupsOption.placeholder = "Chọn nhóm người dùng";
+        dropdownlistSelect2GroupsOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Groups", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'GroupID, GroupName';
+                var condition = params.term ? ' GroupName.Contains(\\' + params.term + '\\)' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'GroupName asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.GroupID,
+                        text: item.GroupName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#nhomNguoiDung').select2(dropdownlistSelect2GroupsOption);
+
+        var dropdownlistSelect2CongTyOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CongTyOption.placeholder = "Chọn công ty";
+        dropdownlistSelect2CongTyOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Company", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'CompanyId, ComCode, ComName';
+                var condition = params.term ? ' ComCode.Contains(\\' + params.term.trim() + '\\) OR ComName.Contains(\\' + params.term.trim() + '\\)' : '';
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'ComCode asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.CompanyId,
+                        text: item.ComCode + " - " + item.ComName
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#congTy').select2(dropdownlistSelect2CongTyOption);
+
+
+        $('#btnTroLai').click(function () {
+            window.location.href = "@Url.Action("Index", "Users", new { area = "Admin" })";
+        });
+
+        $('#btnXoa').click(function () {
+            $('#confirmDeleteDataRowModal').modal('show');
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            var data = { ids: user != null ? user.id : "" };
+            var url = "@Url.Action("DeleteByIds", "Users", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    if (res == null) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                    }
+                    else if (res == "") {
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                        window.location.href = "@Url.Action("Index", "Users", new { area = "Admin" })";
+                    }
+                }
+            });
+        });
+
+        $("#btnCapNhatUser").click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdate()) {
+                var url = "@Url.Action("AddOrUpdate", "Users", new { area = "Admin" })";
+                var fields = [
+                    'FirstName',
+                    'LastName',
+                    'EmailID',
+                    'Phone',
+                    'Password',
+                    'GroupID',
+                    'Active',
+                    'IsMobile'
+                ];
+                var values = [
+                    $('#firstName').val(),
+                    $('#lastName').val(),
+                    $('#email').val(),
+                    $('#phone').val(),
+                    $('#password').val(),
+                    $('#nhomNguoiDung').val(),
+                    $('#active').is(':checked'),
+                    $('#activeMobile').is(':checked')
+                ];
+
+                var data = new FormData();
+
+                let filesUpload = $('#images').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    data.append("file", filesUpload[0]);
+                }
+
+                data.append("id", (user != null ? user.id : ''));
+                data.append("fields", JSON.stringify(fields));
+                data.append("values", JSON.stringify(values));
+
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        if (!isNaN(parseInt(res))) {
+                            window.location.href = "@Url.Action("Update", "Users", new { area = "Admin" })?UserId=" + res;
+                        }
+                        else {
+                            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                        }
+                    }
+                    else {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", 'Bạn không được phép cập nhật dữ liệu');
+                    }
+                });
+            }
+        });
+
+        $("#btnCapNhatUserInfo").click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdateUserInfo() && user != null) {
+                var url = "@Url.Action("AddOrUpdate", "UserInfo", new { area = "Admin" })";
+                var radios = document.getElementsByName('gender');
+                var sexValue = true;
+                for (var i = 0, length = radios.length; i < length; i++) {
+                    if (radios[i].checked) {
+                        // do whatever you want with the checked radio
+                        sexValue = radios[i].value
+                        break;
+                    }
+                }
+                var fields = [
+                    'UserID',
+                    'FirstName',
+                    'LastName',
+                    'MA_BN',
+                    'DateOfBirth',
+                    'CMND',
+                    'BHYT',
+                    'Sex',
+                    'Address',
+                    'Height',
+                    'Occupation',
+                    'weight',
+                    'BloodTypeID',
+                    'ProvinceID',
+                    'DistrictID',
+                    'Ma_Cong_Ty',
+                    'IsDefault'
+                ];
+                var values = [
+                    user.id,
+                    $('#firstNameUserInfo').val(),
+                    $('#lastNameUserInfo').val(),
+                    $('#maUserInfo').val(),
+                    $('#dateOfBirthUserInfo').val(),
+                    $('#cmndUserInfo').val(),
+                    $('#baoHiemYTeUserInfo').val(),
+                    sexValue,
+                    $('#diaChi').val(),
+                    $('#chieuCao').val(),
+                    $('#ngheNghiep').val(),
+                    $('#cangNang').val(),
+                    $('#nhomMau').val(),
+                    $('#tinh').val(),
+                    $('#huyen').val(),
+                    $('#congTy').val(),
+                    $('#hoSoMacDinh').is(':checked')
+                ];
+
+                var data = new FormData();
+
+                let filesUpload = $('#imagesUserInfo').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    data.append("file", filesUpload[0]);
+                }
+
+                data.append("id", (userInfo != null ? userInfo.id : ''));
+                data.append("fields", JSON.stringify(fields));
+                data.append("values", JSON.stringify(values));
+
+                sendDataFileToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        if (!isNaN(parseInt(res))) {
+                            window.location.href = "@Url.Action("Update", "Users", new { area = "Admin" })?UserId=" + user.id;
+                        }
+                        else {
+                            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", res);
+                        }
+                    }
+                    else {
+                        notification("top right", "info", "fadeIn animated bx bx-info-circle", "", 'Bạn không được phép cập nhật dữ liệu');
+                    }
+                });
+            }
+        });
+
+        $("a[name='btnTroVeDanhSach']").click(function (e) {
+            e.preventDefault();
+            window.location.href = '@Url.Action("NguoiDung", "Users", new { area = "Admin" })';
+        });
+
+        $('#imagesUserInfo').on('change', function () {
+            let filesUploads = $('#imagesUserInfo').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            readImageURL(this, $('#imagesPreviewUserInfo'));
+        });
+
+        $('#images').on('change', function () {
+            let filesUploads = $('#images').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            readImageURL(this, $('#imagesPreview'));
+        });
+    });
+
+    function checkFormUpdateUserInfo() {
+        var check = true;
+        var error = "";
+
+        if (isNullOrEmptySelect2($('#nhomMau').val())) {
+            error = "Chưa chọn nhóm máu.";
+            check = false;
+        }
+
+        if (isNullOrEmptySelect2($('#tinh').val())) {
+            error = "Chưa chọn tinh.";
+            check = false;
+        }
+
+        if (isNullOrEmptySelect2($('#huyen').val())) {
+            error = "Chưa chọn huyện.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#dateOfBirthUserInfo').val())) {
+            error = "Chưa nhập ngày sinh.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#firstNameUserInfo').val())) {
+            error = "Chưa nhập tên.";
+            check = false;
+        }
+        if (isNullOrEmpty($('#lastNameUserInfo').val())) {
+            error = "Chưa nhập họ.";
+            check = false;
+        }
+        if (isNullOrEmpty($('#maUserInfo').val())) {
+            error = "Chưa nhập mã bệnh nhân.";
+            check = false;
+        }
+
+        if (!check) {
+            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", error);
+        }
+
+        return check;
+    }
+
+    function checkFormUpdate() {
+        var check = true;
+        var error = "";
+
+        if (!isNullOrEmpty($('#password').val()) || !isNullOrEmpty($('#confrimPassword').val())) {
+            if ($('#password').val() != $('#confrimPassword').val()) {
+                error = "Mật khẩu xác nhận không đúng.";
+                check = false;
+            }
+        }
+
+        if (isNullOrEmpty($('#firstName').val())) {
+            error = "Chưa nhập tên.";
+            check = false;
+        }
+        if (isNullOrEmpty($('#lastName').val())) {
+            error = "Chưa nhập họ.";
+            check = false;
+        }
+        if (isNullOrEmpty($('#email').val())) {
+            error = "Chưa nhập email.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#password').val()) && user == null) {
+            error = "Chưa nhập mật khẩu.";
+            check = false;
+        }
+
+        if (!check) {
+            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", error);
+        }
+
+        return check;
+    }
+
+
+</script>
+
+@Html.Partial("_PartialContentHeader")
+
+<div class="card">
+    <div class="card-body">
+        <ul class="nav nav-tabs nav-primary" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-bs-toggle="tab" href="#primaryUser" role="tab" aria-selected="true">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon">
+                            <i class='bx bx-user font-18 me-1'></i>
+                        </div>
+                        <div class="tab-title">Thông tin user</div>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-bs-toggle="tab" href="#primaryprofile" role="tab" aria-selected="false">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon">
+                            <i class='bx bx-user-pin font-18 me-1'></i>
+                        </div>
+                        <div class="tab-title">Hồ sơ y tế</div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content py-3">
+            <div class="tab-pane fade show active" id="primaryUser" role="tabpanel">
+                <div class="d-flex">
+                    <div class="col-sm-3 mb-2">
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <img alt="example image" id="imagesPreview" src="@(Model.Users != null && !string.IsNullOrEmpty(Model.Users.Avartar) ?  Model.Users.Avartar : CommonConstants.FileNoImage)">
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-center mt-2">
+                                <label class="btn btn-primary" for="images"><i class="bx bx-cloud-upload mr-1"></i>Upload</label>
+                                <input id="images" type="file" name="files[]" class="form-control form-control-sm" hidden accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-9 mb-2">
+                        <div class="row d-flex">
+                            <div class="col-sm-3 mb-2">
+                                <label for="lastName" class="form-label">@Html.Raw("Họ")</label>
+                                <input class="form-control" id="lastName" name="lastName" placeholder="Họ" value="@(Model.Users != null ? Model.Users.LastName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="firstName" class="form-label">@Html.Raw("Tên")</label>
+                                <input class="form-control" id="firstName" name="firstName" placeholder="Tên" value="@(Model.Users != null ? Model.Users.FirstName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="email" class="form-label">@Html.Raw("Email")</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="@(Model.Users != null ? Model.Users.EmailID : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="phone" class="form-label">@Html.Raw("Số điện thoại")</label>
+                                <input class="form-control" id="phone" name="phone" placeholder="Số điện thoại" value="@(Model.Users != null ? Model.Users.Phone : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="nhomNguoiDung" class="form-label">@Html.Raw("Nhóm người dùng")</label>
+                                <select id="nhomNguoiDung" name="nhomNguoiDung" class="form-control select2">
+                                    @if (Model.Groups != null)
+                                    {
+                                        <option value="@Model.Groups.GroupID" selected>@Html.Raw(Model.Groups.GroupName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="password" class="form-label">@Html.Raw("Mật khẩu")</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" value="">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="confrimPassword" class="form-label">@Html.Raw("Xác nhận mật khẩu")</label>
+                                <input type="password" class="form-control" id="confrimPassword" name="confrimPassword" placeholder="Xác nhận mật khẩu" value="">
+                            </div>
+                            <div class="col-sm-3 mb-2 d-flex align-items-end pb-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="active" @(Model.Users != null ? Model.Users.Active ? "checked" : "" : "")>
+                                    <label class="form-check-label" for="active">@Html.Raw("Kích hoạt")</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2 d-flex align-items-end pb-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="activeMobile" @(Model.Users != null ? Model.Users.IsMobile ? "checked" : "" : "")>
+                                    <label class="form-check-label" for="activeMobile">@Html.Raw("Kích hoạt số điện thoại người dùng")</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2 d-flex justify-content-end">
+                                @if ((Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.AllowUpdate) || (Model.Users != null && Request.Cookies.Get(CommonConstants.CookieUserID) != null && Model.Users.UserID.ToString() == Request.Cookies.Get(CommonConstants.CookieUserID).Value.ToString()))
+                                {
+                                    <button class="btn buttons-excel buttons-html5 btn-primary ml-2" id="btnCapNhatUser" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-check"></i><span> Cập nhật user</span></button>
+                                }
+                                @if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.AllowDelete)
+                                {
+                                    <button class="btn buttons-excel buttons-html5 btn-danger ml-2" id="btnXoa" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-trash-alt"></i><span> Xoá</span></button>
+                                }
+
+                                <button class="btn buttons-excel buttons-html5 btn-secondary ml-2" id="btnTroLai" type="button"><i class="fadeIn animated bx bx-arrow-back"></i>@Html.Raw(" Trở lại danh sách")</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="primaryprofile" role="tabpanel">
+                <div class="d-flex">
+                    <div class="col-sm-3 mb-2">
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <img alt="example image" id="imagesPreviewUserInfo" src="@(Model.UserInfo != null && !string.IsNullOrEmpty(Model.UserInfo.Avartar) ?  Model.UserInfo.Avartar : CommonConstants.FileNoImage)">
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-center mt-2">
+                                <label class="btn btn-primary" for="imagesUserInfo"><i class="bx bx-cloud-upload mr-1"></i>Upload</label>
+                                <input id="imagesUserInfo" type="file" name="files[]" class="form-control form-control-sm" hidden accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-9 mb-2">
+                        <div class="row d-flex">
+                            <div class="col-sm-3 mb-2">
+                                <label for="maUserInfo" class="form-label">@Html.Raw("Mã BN")</label>
+                                <input class="form-control" id="maUserInfo" name="maUserInfo" placeholder="Mã BN" value="@(Model.UserInfo != null ? Model.UserInfo.MA_BN : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="lastNameUserInfo" class="form-label">@Html.Raw("Họ")</label>
+                                <input class="form-control" id="lastNameUserInfo" name="lastNameUserInfo" placeholder="Họ" value="@(Model.UserInfo != null ? Model.UserInfo.LastName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="firstNameUserInfo" class="form-label">@Html.Raw("Tên")</label>
+                                <input class="form-control" id="firstNameUserInfo" name="firstNameUserInfo" placeholder="Tên" value="@(Model.UserInfo != null ? Model.UserInfo.FirstName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="dateOfBirthUserInfo" class="form-label">@Html.Raw("Ngày sinh")</label>
+                                <input class="form-control datepicker" id="dateOfBirthUserInfo" name="dateOfBirthUserInfo" placeholder="Ngày sinh" value="@(Model.UserInfo != null ? Model.UserInfo.DateOfBirth : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="baoHiemYTeUserInfo" class="form-label">@Html.Raw("BHYT")</label>
+                                <input class="form-control" id="baoHiemYTeUserInfo" name="baoHiemYTeUserInfo" placeholder="BHYT" value="@(Model.UserInfo != null ? Model.UserInfo.BHYT : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="baoHiemYTeUserInfo" class="form-label">@Html.Raw("CMND")</label>
+                                <input class="form-control" id="baoHiemYTeUserInfo" name="baoHiemYTeUserInfo" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.BHYT : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="cmndUserInfo" class="form-label">@Html.Raw("CMND")</label>
+                                <input class="form-control" id="cmndUserInfo" name="cmndUserInfo" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.CMND : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="cmndUserInfo" class="form-label">@Html.Raw("CMND")</label>
+                                <input class="form-control" id="cmndUserInfo" name="cmndUserInfo" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.CMND : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="nhomMau" class="form-label">@Html.Raw("Nhóm máu")</label>
+                                <select id="nhomMau" name="nhomMau" class="form-control select2">
+                                    @if (Model.BloodType != null)
+                                    {
+                                        <option value="@Model.BloodType.BloodTypeID" selected>@Html.Raw(Model.BloodType.BloodName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end pb-1">
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" @(Model.UserInfo != null ? (Model.UserInfo.Sex == true ? "checked" : "") : "checked") value="True" id="gioiTinhNam" name="gender">
+                                    <label class="form-check-label" for="gioiTinhNam">Nam</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" @(Model.UserInfo != null ? (Model.UserInfo.Sex == false ? "checked" : "") : "") value="False" id="gioiTinhNu" name="gender">
+                                    <label class="form-check-label" for="gioiTinhNu">Nữ</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="tinh" class="form-label">@Html.Raw("Tỉnh")</label>
+                                <select id="tinh" name="tinh" class="form-control select2">
+                                    @if (Model.Province != null)
+                                    {
+                                        <option value="@Model.Province.ProvinceID" selected>@Html.Raw(Model.Province.ProvinceName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="huyen" class="form-label">@Html.Raw("Huyện/Xã")</label>
+                                <select id="huyen" name="huyen" class="form-control select2">
+                                    @if (Model.District != null)
+                                    {
+                                        <option value="@Model.District.DistrictID" selected>@Html.Raw(Model.District.DistrictName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="diaChi" class="form-label">@Html.Raw("Địa chỉ")</label>
+                                <input class="form-control" id="diaChi" name="diaChi" placeholder="Địa chỉ" value="@(Model.UserInfo != null ? Model.UserInfo.Address : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="chieuCao" class="form-label">@Html.Raw("Chiều cao(cm)")</label>
+                                <input type="number" class="form-control" id="chieuCao" name="chieuCao" placeholder="Chiều cao(cm)" value="@(Model.UserInfo != null ? Model.UserInfo.Height.ToString() : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="cangNang" class="form-label">@Html.Raw("Cân nặng(kg)")</label>
+                                <input type="number" class="form-control" id="cangNang" name="cangNang" placeholder="Cân nặng(kg)" value="@(Model.UserInfo != null ? Model.UserInfo.weight.ToString() : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="ngheNghiep" class="form-label">@Html.Raw("Nghề nghiệp")</label>
+                                <input class="form-control" id="ngheNghiep" name="ngheNghiep" placeholder="Nghề nghiệp" value="@(Model.UserInfo != null ? Model.UserInfo.Occupation : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="congTy" class="form-label">@Html.Raw("Công ty")</label>
+                                <select id="congTy" name="congTy" class="form-control select2">
+                                    @if (Model.Company != null)
+                                    {
+                                        <option value="@Model.Company.CompanyID" selected>@Html.Raw(Model.Company.ComCode + " - " + Model.Company.ComName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-3 mb-2 d-flex align-items-end pb-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="hoSoMacDinh" value="1" checked disabled>
+                                    <label class="form-check-label" for="hoSoMacDinh">@Html.Raw("Hồ sơ mặc định")</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2 d-flex justify-content-end">
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnCapNhatUserInfo" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-check"></i><span> Cập nhật user info</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

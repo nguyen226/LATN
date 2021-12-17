@@ -1,0 +1,195 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.AppSlideViewModels
+@{
+    ViewBag.Title = "Banner Mobile App";
+}
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoftDatalist.cshtml";
+}
+
+
+
+<script type="text/javascript">
+    var appSlide = null;
+
+    @if(Model.AppSlide != null)
+    {
+        <text>
+    appSlide = {
+        id: '@Model.AppSlide.Id'
+    };
+    </text>
+    }
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker(initialDatepickerOption());
+
+
+        $('[name="btnTroVeDanhSach"], #btnTroLai').click(function () {
+            window.location.href = "@Url.Action("Index", "AppSlide", new { area = "Admin" })";
+        });
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn tin tức";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsContent", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name';
+                var condition = '!string.IsNullOrEmpty(name)' + (params.term ? ' AND (name.Contains(\\' + params.term.trim() + '\\))' : '');
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+        $('#FormUpdate_NewID').select2(dropdownlistSelect2Option);
+
+
+
+
+        $('[name="btnTroVeDanhSach"]').click(function () {
+            window.location.href = "@Url.Action("Index", "AppSlide", new { area = "Admin" })";
+        });
+
+        $('[name="btnAddNew"]').click(function () {
+            window.location.href = "@Url.Action("Update", "AppSlide", new { area = "Admin" })";
+        });
+
+        $('#btnXoa').click(function () {
+            $('#confirmDeleteDataRowModal').modal('show');
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            var data = { ids: appSlide != null ? appSlide.id : "" };
+            var url = "@Url.Action("DeleteByIds", "AppSlide", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    if (res == null) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                    }
+                    else if (res == "") {
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                        window.location.href = "@Url.Action("Index", "AppSlide", new { area = "Admin" })";
+                    }
+                }
+            });
+        });
+
+        $('#btnLuu').click(function () {
+            if (checkFormUpdate()) {
+                var fields = [
+                    'NoCategory',
+                    'NoID',
+                    'Odx',
+                    'Active'
+                ];
+
+                var values = [
+                    $('#FormUpdate_NewCategory').val(),
+                    $('#FormUpdate_NewID').val(),
+                    $('#FormUpdate_Odx').val(),
+                    $('#FormUpdate_Active').is(':checked')
+                ];
+
+                var formData = new FormData();
+
+                let filesUpload = $('#FormUpdate_Images').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    formData.append("file", filesUpload[0]);
+                }
+
+                formData.append("id", (appSlide != null ? appSlide.id : ""));
+                formData.append("fields", JSON.stringify(fields));
+                formData.append("values", JSON.stringify(values));
+
+                var url = "@Url.Action("AddOrUpdate", "AppSlide", new { area = "Admin" })";
+
+                sendDataFileToURL(url, formData, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else
+                    {
+                        appSlide = { id: res };
+                        showNotificationAndAskModal('Thông báo', 'Cập nhật thành công.');
+                    }
+                });
+            };
+        });
+
+        $('#FormUpdate_Images').on('change', function () {
+            let filesUploads = $('#FormUpdate_Images').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            $('#FormUpdate_ImagesText').val(fileName);
+            readImageURL(this, $('#FormUpdate_ImagesPreview'));
+        });
+
+    });
+
+    function checkFormUpdate() {
+        let check = true;
+        let error = '';
+
+        if (isNullOrEmptySelect2($('#FormUpdate_NewCategory').val())) {
+            check = false;
+            error = 'Bạn chưa chọn category';
+        }
+
+        if (isNullOrEmptySelect2($('#FormUpdate_NewID').val())) {
+            check = false;
+            error = 'Bạn chưa chọn content Id';
+        }
+
+
+        if (isNullOrEmpty($('#FormUpdate_Odx').val())) {
+            check = false;
+            error = 'Bạn chưa nhập Odx';
+        }
+
+        if (!check) {
+            notification("top right", "error", "fadeIn animated bx bx-error", "", error);
+        }
+
+        return check;
+    }
+</script>
+

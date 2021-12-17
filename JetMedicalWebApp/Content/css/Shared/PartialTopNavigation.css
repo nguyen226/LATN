@@ -1,0 +1,23 @@
+﻿#linkHomePage{
+    color:white; 
+    font-size:2em;
+}
+
+@media (min-width: 993px) {
+    #ChonLoaiPhieuKeToan {
+        display: none;
+    }
+}
+
+#ChonLoaiPhieuKeToan{
+    height: auto !important;
+}
+
+#LoaiPhieuKeToan{
+    width :auto !important;
+}
+
+
+span#select2-LoaiPhieuKeToan-container {
+    width: 16em !important;
+}

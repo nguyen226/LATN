@@ -1,0 +1,78 @@
+﻿.nhom-phan-quyen-menu-control-sidebar, .nhom-phan-quyen-menu-control-sidebar-bg {
+    right: -520px !important;
+    width:520px !important;
+}
+
+#nhomMenu_GroupPermissionContent .ten-menu-cap1 {
+    cursor:pointer;
+}
+
+#nhomMenu_GroupPermissionContent .customize-phan-quyen-box-header {
+    padding: 10px 0px 10px 0px;
+}
+
+#nhomMenu_GroupPermissionContent .box-title-phan-quyen {
+    width:100%;
+}
+
+#nhomMenu_GroupPermissionContent .box-title-phan-quyen .title-menu-cap-2-container {
+    margin-bottom:10px;
+}
+
+#nhomMenu_GroupPermissionContent .checkbox-phan-quyen-container label {
+    margin-right:10px;
+}
+
+#nhomMenu_GroupPermissionContent .checkbox-phan-quyen-container.form-group {
+    margin-bottom: 0;
+    font-size:14px;
+}
+
+
+
+
+#nhomMenu_GroupPermissionContent{
+    overflow:auto;
+    max-height:calc(100vh - 200px);
+}
+
+.titleMenuCap1{
+    font-size:14px;
+}
+
+    .titleMenuCap2{
+    font-size:12px;
+}
+
+    .titleMenuCap3{
+    font-size:10px;
+}
+
+.fade-in-primary{
+    margin-right: 0px !important; 
+}
+
+#titleTenNhomGroupPermission{
+    color:cadetblue;
+}
+
+
+.m-quick-sidebar {
+    padding: 0 !important;
+}
+
+.m-quick-sidebar__content {
+    height:100vh;
+    padding: 20px 30px 30px 30px;
+}
+#headerSidebar{
+    background: #00c5dc !important;
+}
+.titleTenNhomGroupPermission{
+    padding: 10px 0;
+    color:white;
+}
+
+.m-quick-sidebar__close{
+    top: 3px !important;
+}

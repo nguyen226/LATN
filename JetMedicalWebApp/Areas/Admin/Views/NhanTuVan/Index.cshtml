@@ -1,0 +1,264 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.NhanTuVanViewModels
+@{
+    ViewBag.Title = "Nhận tư vấn";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "Id, HoVaTen,TrangThai, SoDienThoai,Email, TieuDe, NoiDung,CreateDate";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "NhanTuVan", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    var search = $('#quickSearch').val().trim();
+                    stringFilter += '(HoVaTen.Contains("' + search + '") OR SoDienThoai.Contains("' + search + '") OR Email.Contains("' + search + '") OR TieuDe.Contains("' + search + '"))';
+
+                }
+
+                return stringFilter;
+            }
+        };
+
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.order = [0, "DESC"];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [4,5],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [6],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            },
+            {
+                "targets": [8],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "Id", "name": "Id", "autoWidth": true, "title": "Id" },
+            { "data": "HoVaTen", "name": "FullName", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "SoDienThoai", "name": "RegisterDate", "autoWidth": true, "title": "Số điện thoại" },
+            { "data": "Email", "name": "DepartmentName", "autoWidth": true, "title": "Email" },
+            { "data": "TieuDe", "name": "Phone", "autoWidth": true, "title": "Tiêu đề" },
+            { "data": "CreateDate", "name": "CreateDate", "autoWidth": true, "title": "CreateDate" },
+            {
+                "data": "TrangThai", "name": "TrangThai", "title": "Trạng thái", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    switch (data) {
+                        case 1:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Mới</span>';
+                            break;
+                        case 2:
+                            content = '<span class="text-uppercase vd_bd-green  vd_green">Đã xử lý</span>';
+                            break;
+                    }
+                    return content;
+                }, width: "30px"
+            },
+            {
+                "data": "Status", "name": "Status", "title": "Action", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    content = '<div class="d-flex order-actions"><a  href="#!" class="btnView"><i class="bx bx-detail"></i></a><div>';
+                    return content;
+                }, width: "30px"
+            },
+            {
+                "data": "TrangThai", "name": "TrangThai", "title": "Action", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    if (suaHeThong == true) {
+                        switch (data) {
+                            case 2:
+                                content = '';
+                                break;
+
+                            default:
+                                content = '<div class="d-flex order-actions"><a data-original-title="edit" data-toggle="tooltip" data-placement="top" class="btnEdit" href="javascript:void(0)"> <i class="bx bxs-edit"></i> </a></div>';
+                                break;
+                        }
+                    }
+
+                    return content;
+                }, width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#dtTable tbody').on('click', 'tr td.menu-action > .order-actions > .btnView', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+            $('#FormUpdateNhanTuVan_HoVaTen').val(selectedDataRow.HoVaTen);
+            $('#FormUpdateNhanTuVan_SoDienThoai').val(selectedDataRow.SoDienThoai);
+            $('#FormUpdateNhanTuVan_Email').val(selectedDataRow.Email);
+            $('#FormUpdateNhanTuVan_TieuDe').val(selectedDataRow.TieuDe);
+            $('#FormUpdateNhanTuVan_NoiDung').val(selectedDataRow.NoiDung);
+            $('#modalUpdateRegisterService').modal('show');
+        });
+
+
+        $('#dtTable tbody').on('click', 'tr td.menu-action > .order-actions >a.btnEdit', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+            updateCellDatatable(selectedDataRow.Id);
+        });
+
+        $('#quickSearch').on('keyup', function (e) {
+            resetCheckboxAndDatatable();
+        });
+    });
+
+    function updateCellDatatable(id) {
+        var data = {
+            id :id,
+            fields : ['TrangThai'],
+            values : [2],
+        };
+
+        var url = "@Url.Action("AddOrUpdate", "NhanTuVan", new { area = "Admin" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+            }else{
+                resetCheckboxAndDatatable();
+            }
+        });
+    }
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        selectedDataRow = null;
+    }
+</script>
+
+@Html.Partial("_PartialContentHeader")
+
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter mr-2">
+                                <label>
+                                    Search:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearch" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-sm-12 col-md-6">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
+                            @if (Model.Menu_GroupPermission.SystemDelete == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnDelete" tabindex="0" aria-controls="example2" type="button"><span>Xóa</span></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@Html.Partial("_PatialRegisterService_UpdateModal")

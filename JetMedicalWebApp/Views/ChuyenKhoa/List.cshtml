@@ -1,0 +1,158 @@
+﻿@using JetMedicalWebApp.Entities.EntityDto
+@using JetMedicalWebApp.Common
+
+@model JetMedicalWebApp.Models.BaseViewModel
+
+@{
+    Layout = "~/Views/Shared/_ChuyenKhoaChiTietLayout.cshtml";
+    NewsContentDto content = Model.NewsContent;
+}
+
+<script>
+    var trangHienTai = '@Model.PageIndex';
+    var url = '@Model.Url';
+   
+    function reloadTrang(trang) {
+        window.location.href = url + "?pageIndex=" + trang;
+    }
+
+    function chuyenTrang(el) {
+        window.location.href = url + "?&pageIndex=" + $(el).data('trang');
+    }
+
+</script>
+
+
+<div class="content_gt_bv199">
+    <div class="xoamargin">
+
+        @if (Model.IsList)
+        {
+            if (Model.Staffs != null && Model.Staffs.Count > 0)
+            {
+                foreach (var item in Model.Staffs)
+                {
+
+                    @Html.Raw("<div class='khung_tin'>")
+                    @Html.Raw("<div class='khung_t_tinkham'><div class='img_effect'><a href='/chuyen-khoa/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_sf_" + item.id + "'>")
+                    @Html.Raw("<img class='staffimg' src='" + item.img + "' alt='" + item.fullname + "'> </a></div>")
+                    @Html.Raw("<div class='ct_tin center_dn'>")
+                    @Html.Raw("<h4 class='title_xanh'>")
+                    @Html.Raw("<a href='/chuyen-khoa/" + Utilities.urlConvert(Utilities.VnConcert(item.fullname).ToLower()) + "_sf_" + item.id + "'>")
+                    @Html.Raw(item.brandname + " " + item.fullname + "</a> </h4>")
+                    @Html.Raw("<div class='der_dn'>")
+                    @Html.Raw(item.position + " </div></div></div></div>")
+
+                }
+            }
+            else if (Model.NewsContents != null && Model.NewsContents.Count > 0)
+            {
+                foreach (NewsContentDto item in Model.NewsContents)
+                {
+                    @Html.Raw("<div class='khung_dv_con'>")
+                    @Html.Raw("<div class='khung_t_tinkham'>")
+                    @Html.Raw("<div class='img_effect'>")
+                    @Html.Raw("<a href='/chuyen-khoa/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_ct_" + item.id + "'>")
+
+                    if (item.avatar != "")
+                    {
+                        @Html.Raw("<img src='" + item.avatar + "' alt='" + item.name + "'>")
+                    }
+                    else
+                    {
+                        @Html.Raw("<img src='/Images/files/Logo_BenhVien199.png'  alt='" + item.name + "'>")
+                    }
+                    @Html.Raw("</a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("<div class='time_up'>")
+                    @Html.Raw("<h6>" + item.created_at.Substring(0, 2) + "</h6>")
+                    @Html.Raw("<p>" + item.created_at.Substring(3) + "</p>")
+
+                    @Html.Raw("</div>")
+                    @Html.Raw("<div class='ct_tin'>")
+                    @Html.Raw("<h4 class='title_dv'>")
+                    @Html.Raw("<a href='/chuyen-khoa/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_ct_" + item.id + "' class='title'>" + item.name + "</a>")
+
+                    @Html.Raw("</h4>")
+                    @Html.Raw("<div class='descript_dv'>")
+                    @Html.Raw("<p>" + item.shorttitle + "</p>")
+                    @Html.Raw(" </div>")
+                    @Html.Raw("<a href='/chuyen-khoa/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_ct_" + item.id + "' class='more_dv'>Xem thêm")
+
+
+                    @Html.Raw("<i class='fa fa-more-next'></i></a>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                    @Html.Raw("</div>")
+                }
+
+            }
+            else
+            {<text>Đang cập nhật nội dung</text>}
+    }
+    else
+    {
+        if (content != null)
+        {
+            @Html.Raw(content.description)
+        }
+        else
+        {<text>Đang cập nhật nội dung</text>}
+}
+
+    </div>
+</div>
+
+
+
+@if (Model.IsList && Model.TongSoTrang > 1)
+{
+    NewsCategoryDto newsCategory = (NewsCategoryDto)ViewData["categori"];
+    int pageStart = Model.PageIndex - 3 > 1 ? Model.PageIndex - 3 : 1;
+    int pageEnd = Model.PageIndex + 3 < Model.TongSoTrang ? Model.PageIndex + 3 : Model.TongSoTrang;
+    <div class="content_gt_bv199 pagination">
+        <ul class="page-number">
+            <li class="paginate_button @(Model.PageIndex == 1 || Model.PageIndex < 1 ? "d-none" : "")">
+                <a href="@(Model.PageIndex == 1 || Model.PageIndex < 1 ? "javascript:void(0);" : Model.Url + "?pageIndex=" + (Model.PageIndex - 1))">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+            </li>
+            @if (pageStart > 1)
+            {
+                <li><a href='javascript:void(0);' data-trang="1" onclick="chuyenTrang(this)">1</a></li>
+            }
+            @if (pageStart > 2)
+            {
+                <li class="active"><a href="#">...</a></li>
+            }
+            @for (int n = pageStart; n <= pageEnd; n++)
+            {
+                if (n == Model.PageIndex)
+                {
+                    <li class="active"><a id="@n" href="#">@n.ToString()</a></li>
+                }
+                else
+                {
+                    <li><a href='javascript:void(0);' data-trang="@n" onclick="chuyenTrang(this)">@n.ToString()</a></li>
+                }
+            }
+            @if (pageEnd < Model.TongSoTrang - 1)
+            {
+                <li><a href="#">...</a></li>
+            }
+            @if (pageEnd < Model.TongSoTrang)
+            {
+                <li><a href='javascript:void(0);' data-trang="@Model.TongSoTrang" onclick="chuyenTrang(this)">@Model.TongSoTrang</a></li>
+            }
+            <li class="paginate_button @(Model.PageIndex == Model.TongSoTrang || Model.PageIndex > Model.TongSoTrang ? "d-none" : "")">
+                <a href="javascript:void(0);"
+                   @if (Model.PageIndex == Model.TongSoTrang || Model.PageIndex < Model.TongSoTrang) { <text>
+                   data-trang="@(Model.PageIndex + 1)" onclick="chuyenTrang(this)"
+                   </text> }>
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+}
+

@@ -1,0 +1,59 @@
+﻿<script>
+    $(document).ready(function () {
+        CKEDITOR.replace('noteEN', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+
+        CKEDITOR.replace('footerEN', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+    });
+</script>
+
+<div class="panel widget light-widget">
+    <div class="panel-body" id="panelBody">
+        <div class="row">
+            <div class="form-group row">
+                <input type="text" id="idEN" class="form-control hidden" value="@(Model.ContactEN != null ? Model.ContactEN.id : 0)">
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 form-group">
+                    <div class="form-label">Địa chỉ</div>
+                    <input type="text" id="addressEN" class="form-control" placeholder="Địa chỉ" value="@(Model.ContactEN != null ? Model.ContactEN.address : "")">
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 form-group">
+                    <div class="form-label">Email</div>
+                    <input type="text" id="emailEN" class="form-control" placeholder="Email" value="@(Model.ContactEN != null ? Model.ContactEN.email : "")">
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                    <div class="form-label">Điện thoại</div>
+                    <input type="text" id="phoneEN" class="form-control" placeholder="Điện thoại" value="@(Model.ContactVN != null ? Model.ContactVN.phone : "")">
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                    <div class="form-label">Hotline</div>
+                    <input type="text" id="hotlineEN" class="form-control" placeholder="Hotline" value="@(Model.ContactEN != null ? Model.ContactEN.hotline : "")">
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 col-xl-4 form-group">
+                    <div class="form-label">Fax</div>
+                    <input type="text" id="faxEN" class="form-control" placeholder="Fax" value="@(Model.ContactEN != null ? Model.ContactEN.fax : "")">
+                </div>
+
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 form-group">
+                    <div class="form-label">Note</div>
+                    <textarea rows="50" class="form-control m-input" id="noteEN" placeholder="Nội dung">@Html.Raw(Model.ContactEN != null ? Model.ContactEN.note.Replace("&nbsp;", " ") : "")</textarea>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 form-group">
+                    <div class="form-label">Footer</div>
+                    <textarea rows="50" class="form-control m-input" id="footerEN" placeholder="Nội dung">@Html.Raw(Model.ContactEN != null ? Model.ContactEN.footer.Replace("&nbsp;", " ") : "")</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

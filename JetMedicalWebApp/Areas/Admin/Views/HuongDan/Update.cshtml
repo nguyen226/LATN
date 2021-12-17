@@ -1,0 +1,347 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.NewsContentViewModels
+@{
+    ViewBag.Title = "Hướng dẫn";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatetimepicker.css")" type="text/css">
+
+}
+
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/ckeditor/ckeditor.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/ckfinder/ckfinder.js")"></script>
+}
+
+<script>
+    var newsContent = null;
+    @if(Model.NewsContent != null)
+    {
+        <text>
+    newsContent = {
+        id: '@Model.NewsContent.id'
+    };
+    </text>
+    }else if(Model.NewsContentVN != null)
+    {
+        <text>
+            newsContent = {
+                id: '@Model.NewsContentVN.id'
+            };
+        </text>
+    }
+
+    $(document).ready(function () {
+       
+        CKEDITOR.replace('descriptionVN', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+
+        CKEDITOR.replace('description', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+
+        var dropdownlistSelect2CategoriIdOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CategoriIdOption.placeholder = "Chọn loại tin";
+        dropdownlistSelect2CategoriIdOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsCategory", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name, typeId';
+                var condition = 'typeId =@CommonConstants.CategoryHuongDanEN';
+                condition += params.term ? ' AND name.Contains(\\' + params.term + '\\) ' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'id asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#categoriId').select2(dropdownlistSelect2CategoriIdOption);
+
+        var dropdownlistSelect2CategoriIdVNOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2CategoriIdVNOption.placeholder = "Chọn loại tin";
+        dropdownlistSelect2CategoriIdVNOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsCategory", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name, typeId';
+                var condition = 'typeId =@CommonConstants.CategoryHuongDanVN';
+                condition += params.term ? ' AND name.Contains(\\' + params.term + '\\) ' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'id asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#categoriIdVN').select2(dropdownlistSelect2CategoriIdVNOption);
+
+
+        $('#btnTroLai').click(function () {
+            window.location.href = "@Url.Action("Index", "HuongDan", new { area = "Admin" })";
+        });
+
+        $('#btnXoa').click(function () {
+            $('#confirmDeleteDataRowModal').modal('show');
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            var data = { ids: newsContent != null ? newsContent.id : "" };
+            var url = "@Url.Action("DeleteByIds", "NewsContent", new { area = "Admin" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                }
+                else {
+                    if (res == null) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                    }
+                    else if (res == "") {
+                        $('#confirmDeleteDataRowModal').modal('hide');
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                        window.location.href = "@Url.Action("Index", "HuongDan", new { area = "Admin" })";
+                    }
+                }
+            });
+        });
+
+        $("#btnCapNhat").click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdate()) {
+                var url = "@Url.Action("AddOrUpdate", "NewsContent", new { area = "Admin" })";
+
+                var valuesVN = {
+                    id: $('#idVN').val(),
+                    code: $('#codeVN').val(),
+                    name: $('#nameVN').val(),
+                    categoriId: $('#categoriIdVN').val(),
+                    shorttitle: $('#shorttitleVN').val(),
+                    description: CKEDITOR.instances.descriptionVN.getData(),
+                    languageId: '@CommonConstants.TiengViet'
+                };
+
+                var valuesEN = {
+                    id: $('#idEN').val(),
+                    code: $('#codeEN').val(),
+                    name: $('#name').val(),
+                    categoriId: $('#categoriId').val(),
+                    shorttitle: $('#shorttitle').val(),
+                    description: CKEDITOR.instances.description.getData(),
+                    languageId: '@CommonConstants.TiengAnh'
+                };
+
+                var data = {
+                    listItem: [valuesVN, valuesEN]
+                };
+
+                var url = "@Url.Action("AddOrUpdate", "NewsContent", new { area = "Admin" })";
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Lưu thành công.");
+                        $('#formEN')[0].reset();
+                        $('#formVN')[0].reset();
+                        $('#imagePreviewVN').attr('src', '');
+                        $('#imagePreview').attr('src', '');
+                        showNotificationAndAskModal('Thông báo', 'Cập nhật thành công.');
+
+                    }
+                });
+            }
+        });
+
+
+        $("button[name='btnTroVeDanhSach']").click(function (e) {
+            e.preventDefault();
+            window.location.href = '@Url.Action("Index", "HuongDan", new { area = "Admin" })';
+        });
+    });
+
+    function checkFormUpdate() {
+        var check = true;
+        var error = "";
+
+        if (isNullOrEmptySelect2($('#categoriId').val()) && isNullOrEmptySelect2($('#categoriIdVN').val())) {
+            error = "Chưa chọn loại tin.";
+            check = false;
+        }
+
+        if (!check) {
+            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", error);
+        }
+
+        return check;
+    }
+
+</script>
+
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel widget light-widget">
+                    <div class="panel-body">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab1" data-toggle="tab" class="text-uppercase">@Html.Raw("Tiếng Việt")</a></li>
+                            <li><a href="#tab2" data-toggle="tab" class="text-uppercase">@Html.Raw("Tiếng Anh")</a></li>
+                        </ul>
+                        <br />
+                        <div class="tab-content mgbt-xs-20">
+                            <div class="tab-pane active" id="tab1">
+                                <div class="panel widget light-widget">
+                                    <div class="panel-body" id="panelBody">
+                                        <div class="row">
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                <form class="form-horizontal" action="#" id="formVN" role="form">
+                                                    <div class="form-group row">
+
+                                                        <input type="text" id="idVN" class="form-control hidden" value="@(Model.NewsContentVN != null ? Model.NewsContentVN.id : 0)">
+                                                        <input type="text" id="codeVN" class="form-control hidden" value="@(Model.NewsContentVN != null ? Model.NewsContentVN.code : "")">
+
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                            <div class="form-label">Tên</div>
+                                                            <input type="text" id="nameVN" class="form-control" placeholder="tên" value="@(Model.NewsContentVN != null ? Model.NewsContentVN.name : "")">
+                                                        </div>
+
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                            <div class="form-label">Loại tin</div>
+                                                            <select id="categoriIdVN" name="categoriIdVN" class="form-control select2">
+                                                                @if (Model.NewsCategoryVN != null)
+                                                                {
+                                                                    <option value="@Model.NewsCategoryVN.id" selected> @Html.Raw(Model.NewsCategoryVN.name) </option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                            <div class="form-label">Mô tả ngắn</div>
+                                                            <textarea class="form-control" cols="20" id="shorttitleVN" name="shorttitleVN" placeholder="Mô tả ngắn" rows="6">@if (Model.NewsContentVN != null){<text>@Html.Raw(Model.NewsContentVN.shorttitle != null ? Model.NewsContentVN.shorttitle.Replace("&nbsp;", " ") : "")</text>}</textarea>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                <textarea rows="50" class="form-control m-input" id="descriptionVN" placeholder="Chi tiết">
+                                                    @if (Model.NewsContentVN != null && !string.IsNullOrEmpty(Model.NewsContentVN.description))
+                                                    {
+                                                        @Html.Raw(Model.NewsContentVN.description != null ? Model.NewsContentVN.description.Replace("&nbsp;", " ") : "")
+                                                    }
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab2">
+                                @Html.Partial("_PartialTiengAnh")
+                            </div>
+                        </div>
+
+
+                        <div class="row text-right">
+                            <div class="col-xs-12 text-right">
+                                <button class="btn vd_btn vd_bg-grey" id="btnTroLai" type="button">@Html.Raw("Trở lại danh sách")</button>
+                                @if ((Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.AllowUpdate))
+                                {
+                                    <button class="btn vd_btn vd_bg-green" id="btnCapNhat"><span class="menu-icon"><i class="fa fa-fw fa-check"></i></span> Cập nhật</button>
+                                }
+                                @if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.AllowDelete && (Model.NewsContentVN != null || Model.NewsContent != null))
+                                {
+                                    <button class="btn vd_btn vd_bg-red" id="btnXoa" type="button">@Html.Raw("Xóa")</button>
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- col-sm-12 -->
+
+
+
+                </div>
+                <!-- row -->
+            </div>
+        </div>
+        <!-- Panel Widget -->
+    </div>
+    <!-- col-sm-12-->
+</div>
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")

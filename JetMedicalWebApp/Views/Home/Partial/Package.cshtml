@@ -1,0 +1,56 @@
+@using JetMedicalWebApp.Entities.EntityDto
+@model JetMedicalWebApp.Models.BaseViewModel
+@using JetMedicalWebApp.Common
+
+<div id="page_2">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="title_right">
+                    @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? " DỊCH VỤ" : " SERVICES")
+                    
+                </h3>
+                
+                <div class="box_khambenh">
+                    <div class="xoamargin">
+                        <div class="slide_goikham">
+                            @{
+                                if (Model.NewsCategories != null)
+                                {
+                                    if (Model.NewsCategories.Count() > 0)
+                                    {
+                                        int count = 0;
+                                        foreach (var item in Model.NewsCategories.OrderByDescending(x => x.odx))
+                                        {
+                                            count++;
+                                            if (count > 12)
+                                            {
+                                                break;
+                                            }
+
+                                            <div class="khung_tinkham">
+                                                <div class="khung_t_tinkham">
+                                                    <div class="img_effect">
+                                                        <a href="/@{@item.slug}_p_@{@item.id}">
+                                                            <img src='@item.banner' alt="@item.name" class="img_project" />
+                                                        </a>
+                                                    </div>
+                                                    <div class="text_tinkham">
+                                                        <h4 class="title_xanh"><a href="/@{@item.slug}_p_@{@item.id}">@item.name</a></h4>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        }
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

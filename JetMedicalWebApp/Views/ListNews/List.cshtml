@@ -1,0 +1,26 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section banner{
+<section class="banner-about">
+    <div class="container">
+        <h1 class="title">@Html.Raw(ViewBag.TitleHeader)</h1>
+    </div>
+</section>
+}
+<section>
+    <div class="container">
+        <div class="row box-list">
+            <h2 class='title-sm'>@Html.Raw(ViewBag.Title)</h2>
+            <div class="col-big">
+                
+            </div>
+            <div class="col-sm">
+                @*<h3 class="title-box">Bài viết mới nhất</h3>
+                <div class="box-news-other">
+                </div>*@
+            </div>
+        </div>
+    </div>
+</section>

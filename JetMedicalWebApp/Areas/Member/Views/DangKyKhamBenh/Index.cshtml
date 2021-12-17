@@ -1,0 +1,240 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.RegisterServiceViewModels
+@{
+    Layout = "~/Areas/Member/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Đăng ký dịch vụ";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var selectedId = null;
+    let userId ='@Model.UsersID';
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        $('.select2-local').select2();
+
+        let selectedFields = "RegisterID, UserID, MA_LK, FullName, StrRegisterDate, DepartmentName, Phone, Email, TenBacSi, GoiKham, RegisterNote, Status";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "DangKyKhamBenh", new { area = "Member" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(FullName LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Phone LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Email LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+
+                stringFilter += "UserID = " + userId;
+
+                return stringFilter;
+            }
+        };
+
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.order = [0, "DESC"];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [9,8,10],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "RegisterID", "name": "RegisterID", "autoWidth": true, "title": "Register ID" },
+            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "Mã lượt khám" },
+            { "data": "FullName", "name": "FullName", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "StrRegisterDate", "name": "StrRegisterDate", "autoWidth": true, "title": "Ngày giờ khám" },
+            { "data": "DepartmentName", "name": "DepartmentName", "autoWidth": true, "title": "Phòng khám" },
+            { "data": "GoiKham", "name": "GoiKham", "autoWidth": true, "title": "Gói dịch vụ" },
+            { "data": "TenBacSi", "name": "TenBacSi", "autoWidth": true, "title": "Bác sĩ" },
+            { "data": "RegisterNote", "name": "RegisterNote", "autoWidth": true, "title": "Ghi chú" },
+            {
+                "data": "Status", "name": "Status", "title": "Trạng thái", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    switch (data) {
+                        case @CommonConstants.RegisterService_DangKy:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Đăng ký</span>';
+                            break;
+                        case @CommonConstants.RegisterService_TiepNhan:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Tiếp nhận</span>';
+                            break;
+                        case @CommonConstants.RegisterService_Kham:
+                            content = '<span class="text-uppercase vd_bd-yellow vd_yellow">Khám</span>';
+                            break;
+                        case @CommonConstants.RegisterService_KetThuc:
+                            content = '<span class="text-uppercase vd_bd-green vd_green">Đã kết thúc</span>';
+                            break;
+                    }
+                    return content;
+                }, width: "30px"
+            },
+            {
+                "data": "Status", "name": "Status", "title": "Action", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    switch (data) {
+                        case @CommonConstants.RegisterService_DangKy:
+                            content ='<a href="@Url.Action("Update", "DangKyKhamBenh", new { area = "Member" })?id=' + row.RegisterID + '" class="btn menu-icon vd_bg-yellow" href="#!"> <i class="fa fa-pencil"></i> </a>';
+                            break;
+
+                        default:
+                            content = '';
+                            break;
+                    }
+                    return content;
+                }, width: "30px"
+            },
+            {
+                "data": "Status", "name": "Status", "title": "Action", "mRender": function (data, type, row, meta) {
+                    let content='';
+                    switch (data) {
+                        case @CommonConstants.RegisterService_DangKy:
+                            content ='<a class="btn menu-icon vd_bg-red" onclick=deleteDataRow(' + row.RegisterID + ')> <i class="fa fa-trash-o"></i> </a>';
+                            break;
+
+                        default:
+                            content = '';
+                            break;
+                    }
+                    return content ;
+                }, "name": "btnDelete", width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        //$('#dtTable tbody').on('click', 'tr td > .btnDelete', function () {
+        //    selectedDataRow = table.row($(this).parents('tr')).data();
+        //    deleteDataRow(selectedDataRow.RegisterID)
+        //});
+
+
+        $('#btnAdd').click(function () {
+            window.location.href = '@Url.Action("Update", "DangKyKhamBenh", new { area = "Member" })';
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            var data = { id: selectedId };
+            var url = "@Url.Action("DeleteById", "DangKyKhamBenh", new { area = "Member" })";
+
+            sendDataToURL(url, data, true, null)
+            .then(function (res) {
+                if (res) {
+                    notification("topright", "error", "fa fa-exclamation-triangle vd_yellow", "", res);
+                }
+                else {
+                    $('#confirmDeleteDataRowModal').modal('hide');
+                    notification("topright", "success", "fa fa-check-circle vd_green", "", "Xóa thành công");
+                    resetCheckboxAndDatatable();
+                    selectedId = null;
+                }
+            });
+        });
+
+    });
+
+    
+    function deleteDataRow(id) {
+        selectedId = id;
+        $('#confirmDeleteDataRowModal').modal();
+    }
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        selectedDataRow = null;
+    }
+</script>
+
+
+
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
+                <div class="panel widget light-widget">
+                    <div class="panel-heading no-title">
+                        <div class="vd_menu-search table-search input-group input-border">
+                            <input type="text" id="quickSearch"  class="form-control" placeholder="Tìm kiếm" onchange="resetCheckboxAndDatatable()">
+                            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                        </div>
+                        <div class="vd_panel-menu">
+                            <div id="btnRefreshData" class="menu entypo-icon largerFont" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới"> <i class="icon-cycle"></i> </div>
+                            <div id="btnAdd" class="menu entypo-icon largerFont vd_green" data-placement="bottom" data-toggle="tooltip" data-original-title="Thêm"> <i class="icon-plus3"></i> </div>
+                        </div>
+                    </div>
+                    <div class="panel-body" id="panelBody">
+                        <div class="row">
+                            <table id="dtTable" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("PartialConfirmDeleteModal")

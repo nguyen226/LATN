@@ -1,0 +1,107 @@
+@using JetMedicalWebApp.Entities.EntityDto
+@model JetMedicalWebApp.Models.BaseViewModel
+@using JetMedicalWebApp.Common
+
+<div id="page_video">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="title_center">
+                      @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "VIDEO HOẠT ĐỘNG" : "VIDEOS")
+                </h3>
+                <div class="box_tintuc">
+                    <div class="xoamargin">
+                        @if (Model.Videos != null)
+                        {
+                            if (Model.Videos.Count() > 0)
+                            {
+                                int ivideo = 0;
+                                foreach (var item in Model.Videos)
+                                {
+                                    ivideo++;
+                                    if (ivideo > 3)
+                                    {
+                                        break;
+                                    }
+                                    <div class="khung_video">
+                                        <div class="khung_t_tinkham">
+                                            <div class="img_effect">
+                                                <a href="#" data-toggle="modal" data-target="#myModalVideo" data-url="@(!string.IsNullOrEmpty(item.url) ? item.url.Replace("watch?v=", "embed/").Replace("&start_radio=1", "").Replace("&", "?") : "")" id="myModalVideo" onclick="openVideo(this)" class="img_video">
+                                                    <img src="@item.avatar" alt="@item.title">
+                                                </a>
+                                            </div>
+                                            <div class="ct_tin">
+                                                <h4 class="title_xanh">@Html.Raw(item.title)</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="page_5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 class="title_center">
+                    @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "ĐÁNH GIÁ TỪ KHÁCH HÀNG" : "REVIEW FROM CUSTOMERS")
+                  
+                </h3>
+                <div class="slider_danhgia">
+                    @{
+                        if (Model.Feedbacks != null)
+                        {
+                            if (Model.Feedbacks.Count() > 0)
+                            {
+                                foreach (feedbackDto item in Model.Feedbacks)
+                                {
+                                    @Html.Raw("<div class='box_danhgia'>")
+                                    @Html.Raw(" <div class='box_avatar'>")
+                                    @Html.Raw("<img src='" + item.avatar + "' alt='Đánh giá của " + item.fullname + "'>")
+                                    @Html.Raw("</div>")
+                                    @Html.Raw(" <h4 class='title_bl'>" + item.fullname + "</h4>")
+                                    @Html.Raw("<div class='ct_danhgia'>")
+                                    @Html.Raw("“" + item.content + "”")
+                                    @Html.Raw("</div></div>")
+                                }
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div id="page_6">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="khung_ud">
+                    <div class="box_nd_ungdung">
+                        <h3 class="title_right">
+                            KHAI BÁO Y TẾ TRỰC TUYẾN
+                        </h3>
+                        <p class="descript_title">
+                            Với các bước khai báo y tế trực tuyến đơn giản, bạn và gia đình có thể hoàn toàn yên tâm thăm khám & chăm sóc sức khỏe tại Bệnh viện 199 trong mùa dịch này.
+
+                            Bạn có thể thực hiện khai báo y tế online trước tại nhà (trong vòng TỐI ĐA 08 TIẾNG trước khi đến khám chữa bệnh) hoặc khai báo ngay tại Bệnh viện 199.
+                        </p>
+                        <div class="app_bv">
+                            <a class="dktv" target="_blank"  alt="Khai báo y tế trực tuyến" href="http://kbyt.benhvien199.vn ">KHAI BÁO Y TẾ</a>
+
+                        </div>
+                    </div>
+                    <div class="box_img_ud">
+                        <img src="images/ungdungmobile.png" alt="Khai báo y tế trực tuyến">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*@

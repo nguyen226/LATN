@@ -1,0 +1,119 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.LeftNavigationViewModel
+
+
+<div class="sidebar-header">
+    <div>
+        <a href="/"><img class="logo-icon" alt="Snail Soft" src="~/Content/snailsoft/assets/images/logo.png"></a>
+
+    </div>
+    <div>
+        <h4 class="logo-text">BV199</h4>
+    </div>
+    <div class="toggle-icon ms-auto">
+        <i class='bx bx-arrow-to-left'></i>
+    </div>
+</div>
+<!--navigation-->
+<ul class="metismenu" id="menu">
+    @foreach (var menuCap1 in Model.Menus.Where(m => string.IsNullOrEmpty(m.MaMenuCapTren)).OrderBy(m => m.No))
+    {
+        if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).FirstOrDefault() != null)
+        {
+            <li>
+                <a href="javascript:;" class="has-arrow">
+                    <div class="parent-icon">
+                        <i class='bx bx-@menuCap1.Icon'></i>
+                    </div>
+                    <div class="menu-title">@menuCap1.Name</div>
+                </a>
+
+                <ul>
+                    @foreach (var menuCap2 in Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).OrderBy(m => m.No))
+                    {
+                        if (Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap2.Code.Trim().ToLower())).FirstOrDefault() != null)
+                        {
+                            <li>
+                                <a href="javascript:void(0);" data-action="click-trigger">
+                                    @if (!string.IsNullOrEmpty(menuCap2.Icon))
+                                    {
+                                        <span class="menu-icon"><i class="@menuCap2.Icon"></i></span>
+                                    }
+                                    <span class="menu-text">@menuCap2.Name</span>
+                                    <span class="menu-badge"><span class="badge vd_bg-black-30"><i class="fa fa-angle-down"></i></span></span>
+                                </a>
+                                <div class="child-menu" data-action="click-target">
+                                    <ul>
+                                        @foreach (var menuCap3 in Model.Menus.Where(m => !string.IsNullOrEmpty(m.MaMenuCapTren) && m.MaMenuCapTren.Trim().ToLower().Equals(menuCap1.Code.Trim().ToLower())).OrderBy(m => m.No))
+                                        {
+                                            <li>
+                                                <a href="@(!string.IsNullOrEmpty(menuCap3.ControllerName) ? Url.Content("/"+menuCap3.ControllerName+"/" +menuCap3.ActionName) + (!string.IsNullOrEmpty(menuCap3.Parameters) ? "?" + menuCap3.Parameters : "") : "javascript:void(0);")">
+                                                    @if (!string.IsNullOrEmpty(menuCap3.Icon))
+                                                    {
+                                                        <span class="menu-icon"><i class="@menuCap3.Icon"></i></span>
+                                                    }
+                                                    <span class="menu-text">@menuCap3.Name</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </li>
+                        }
+                        else
+                        {
+
+                            <li>
+                                <a href="@(!string.IsNullOrEmpty(menuCap2.ControllerName) ? Url.Content("/"+menuCap2.ControllerName+"/" +menuCap2.ActionName) + (!string.IsNullOrEmpty(menuCap2.Parameters) ? "?" + menuCap2.Parameters : "") : "javascript:void(0);")">
+                                    @if (!string.IsNullOrEmpty(menuCap2.Icon))
+                                    {
+                                        <i class="bx bx-@menuCap2.Icon"></i>
+                                    }
+                                    else
+                                    {
+                                        <div class="parent-icon">
+                                            <i class="bx bx-right-arrow-alt"></i>
+                                        </div>
+                                    }
+
+                                    <div class="menu-title">@menuCap2.Name</div>
+
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+
+            </li>
+        }
+        else
+        {
+
+            <li>
+                <a href="@(!string.IsNullOrEmpty(menuCap1.ControllerName) ? Url.Content("/"+menuCap1.ControllerName+"/" +menuCap1.ActionName) + (!string.IsNullOrEmpty(menuCap1.Parameters) ? "?" + menuCap1.Parameters : "") : "javascript:void(0);")">
+                    <div class="parent-icon">
+                        <i class="bx bx-@menuCap1.Icon"></i>
+                    </div>
+                    <div class="menu-title">@menuCap1.Name</div>
+                </a>
+            </li>
+        }
+    }
+    <li class="menu-label">Hỗ trợ</li>
+    <li>
+        <a href="http://bv199.info" target="_blank">
+            <div class="parent-icon">
+                <i class="bx bx-folder"></i>
+            </div>
+            <div class="menu-title">Tài liệu hướng dẫn</div>
+        </a>
+    </li>
+    <li>
+        <a href="http://bv199.info" target="_blank">
+            <div class="parent-icon">
+                <i class="bx bx-support"></i>
+            </div>
+            <div class="menu-title">Hỗ trợ trực tuyến</div>
+        </a>
+    </li>
+</ul>
+<!--end navigation-->

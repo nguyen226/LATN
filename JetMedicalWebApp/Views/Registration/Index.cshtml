@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "Index";
+    if(ViewBag.Success == "Success")
+    {
+
+    }
+    else
+    {
+
+    }
+}
+    <script>
+    $.ajax({
+    type: 'GET',
+    url: "/signedservice/dangkylichhen",
+    dataType: 'json',
+    success: function (response) {
+         alert('3567373');
+    }
+    });
+
+
+    </script>

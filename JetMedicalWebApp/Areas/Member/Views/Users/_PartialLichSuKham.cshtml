@@ -1,0 +1,426 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.UsersViewModels
+<script type="text/javascript" charset="utf-8">
+
+    var user = null;
+    var userInfo = null;
+    @if(Model.Users != null)
+    {
+        <text>
+    user = {
+        id: '@Model.Users.UserID'
+    };
+        </text>
+    }
+
+    @if(Model.UserInfo != null)
+    {
+        <text>
+    userInfo = {
+        id: '@Model.UserInfo.USER_INFO_ID'
+    };
+        </text>
+    }
+
+
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        $('.select2-local').select2();
+        $('.datepicker').datepicker(initialDatepickerOption());
+
+        let selectedFields = "UserID, MA_BN, MA_LK, HO_TEN, STRNGAY_VAO, NGAY_VAO, STRNGAY_RA, NGAY_RA, STRNGAY_TAI_KHAM, NGAY_TAI_KHAM, MA_BENH, TEN_BENH, CreatedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "XML1", new { area = "Member" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearchMaLK').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(MA_LK LIKE N'%" + $('#quickSearchMaLK').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchMaBenh').val())) {
+                    var strTemp = $('#quickSearchMaBenh').val().split(';');
+
+                    var tempStringFilter = '';
+                    $.each(strTemp, function (i, item) {
+                        if (!isNullOrEmpty(tempStringFilter)) {
+                            tempStringFilter += ' OR ';
+                        }
+                        tempStringFilter += "MA_BENH LIKE N'" + item + "'";
+                    });
+
+                    if (!isNullOrEmpty(tempStringFilter)) {
+                        if (!isNullOrEmpty(stringFilter)) {
+                            stringFilter += ' AND ';
+                        }
+
+                        stringFilter += "(" + tempStringFilter + ")";
+                    }
+                }
+
+                if (!isNullOrEmpty($('#quickSearchTenBenh').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(TEN_BENH LIKE N'%" + $('#quickSearchTenBenh').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchMaBenhKem').val())) {
+                    var strTemp = $('#quickSearchMaBenhKem').val().split(';');
+
+                    var tempStringFilter = '';
+                    $.each(strTemp, function (i, item) {
+                        if (!isNullOrEmpty(tempStringFilter)) {
+                            tempStringFilter += ' OR ';
+                        }
+                        tempStringFilter += "MA_BENHKHAC LIKE N'" + item + "'";
+                    });
+
+                    if (!isNullOrEmpty(tempStringFilter)) {
+                        if (!isNullOrEmpty(stringFilter)) {
+                            stringFilter += ' AND ';
+                        }
+
+                        stringFilter += "(" + tempStringFilter + ")";
+                    }
+                }
+
+
+                if (!isNullOrEmptySelect2($('#ketQuaDieuTri').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(KET_QUA_DTRI = '" + $('#ketQuaDieuTri').val() + "')";
+                }
+
+                if (!isNullOrEmptySelect2($('#khoaDieuTri').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(MA_KHOA = '" + $('#khoaDieuTri').val() + "')";
+                }
+
+                if (!isNullOrEmpty($('#quickSearchNgayVao').val())) {
+                    var tempNgay = $('#quickSearchNgayVao').val().split('/');
+
+                    if (tempNgay.length == 3) {
+                        if (!isNullOrEmpty(stringFilter)) {
+                            stringFilter += ' AND ';
+                        }
+
+                        stringFilter += "(NGAY_VAO >= '" + tempNgay[2] + '-' + tempNgay[1] + '-' + tempNgay[0] + "')";
+                    }
+                }
+
+                if (!isNullOrEmpty($('#quickSearchNgayRa').val())) {
+                    var tempNgay = $('#quickSearchNgayRa').val().split('/');
+
+                    if (tempNgay.length == 3) {
+                        if (!isNullOrEmpty(stringFilter)) {
+                            stringFilter += ' AND ';
+                        }
+
+                        stringFilter += "(NGAY_RA <= '" + tempNgay[2] + '-' + tempNgay[1] + '-' + tempNgay[0] + " 23:59:59')";
+                    }
+                }
+
+                if (!isNullOrEmpty($('#quickSearchNgayTaiKham').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    stringFilter += "(STRNGAY_TAI_KHAM LIKE N'%" + $('#quickSearchNgayTaiKham').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty(stringFilter)) {
+                    stringFilter += ' AND ';
+                }
+                stringFilter += 'UserID =' + user.id;
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.order = [[0, "DESC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [8],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "MA_BN", "name": "MA_BN", "autoWidth": true, "title": "Mã bệnh nhân" },
+            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "Mã LK" },
+            { "data": "HO_TEN", "name": "HO_TEN", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "STRNGAY_VAO", "name": "STRNGAY_VAO", "autoWidth": true, "title": "Ngày khám" },
+            { "data": "STRNGAY_RA", "name": "STRNGAY_RA", "autoWidth": true, "title": "Ngày kết thúc" },
+            { "data": "STRNGAY_TAI_KHAM", "name": "STRNGAY_TAI_KHAM", "autoWidth": true, "title": "Ngày tái khám" },
+            { "data": "MA_BENH", "name": "MA_BENH", "autoWidth": true, "title": "Mã bệnh" },
+            { "data": "TEN_BENH", "name": "TEN_BENH", "autoWidth": true, "title": "Tên bệnh" },
+            {
+                "data": "MA_LK", "mRender": function (data, type, row, meta) {
+                    return '<a class="btn menu-icon vd_bg-green" onclick=xemChiTiet(this) href="#!" data-malk=' + row.MA_LK + ' data-mabn=' + row.MA_BN + '> <i class="fa fa-user-md"></i> </a>';
+                }, "title": "Chi tiết"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#quickSearchMaLK, #quickSearchTenBenh, #quickSearchNgayVao, #quickSearchNgayRa, #quickSearchNgayTaiKham').keyup(function (e) {
+            e.preventDefault();
+            resetCheckboxAndDatatable();
+        });
+
+
+        $('#ketQuaDieuTri, #khoaDieuTri').change(function (e) {
+            e.preventDefault();
+            resetCheckboxAndDatatable();
+        });
+
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn khoa";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Khoa", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'Id, Code, Name';
+                var condition = params.term ? ' (Code.Contains(\\' + params.term.trim() + '\\) OR Name.Contains(\\' + params.term.trim() + '\\))' : '';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'Code asc, Name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.Code,
+                        text: item.Name
+                    }
+                });
+                data.unshift({
+                    id: "-1",
+                    text: "không chọn"
+                })
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#khoaDieuTri').select2(dropdownlistSelect2Option);
+
+        $('#quickSearchMaBenh').tagsInput({
+            placeholder: 'Chọn mã bệnh',
+            unique: true,
+            clearText: true,
+            delimiter: ';',
+            errorMessage: 'Mã bệnh này đã tồn tại.',
+            errorTitle: 'Lỗi',
+            autocomplete: {
+                source: function (request, response) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Filter", "ICD10", new { area = "Member" })',
+                        dataType: 'json',
+                        contentType: "application/json",
+                        delay: 250,
+                        data: JSON.stringify({
+                            selectedFields: 'Id, Ma, Ten',
+                            stringFilter: request.term ? ' (Ma.Contains(\\' + request.term.trim() + '\\) OR Ten.Contains(\\' + request.term.trim() + '\\))' : '',
+                            sortCondition: 'Ma asc',
+                            top: 10,
+                        }),
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item.Ma,
+                                    label: item.Ma + ' - ' + item.Ten
+                                };
+                            }));
+                        }
+                    })
+                }
+            },
+            onChange: function () {
+                resetCheckboxAndDatatable();
+            }
+        });
+
+        $('#quickSearchMaBenhKem').tagsInput({
+            placeholder: 'Chọn mã bệnh kèm',
+            unique: true,
+            clearText: true,
+            delimiter: ';',
+            errorMessage: 'Mã bệnh kèm này đã tồn tại.',
+            errorTitle: 'Lỗi',
+            autocomplete: {
+                source: function (request, response) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("Filter", "ICD10", new { area = "Member" })',
+                        dataType: 'json',
+                        contentType: "application/json",
+                        delay: 250,
+                        data: JSON.stringify({
+                            selectedFields: 'Id, Ma, Ten',
+                            stringFilter: request.term ? ' (Ma.Contains(\\' + request.term.trim() + '\\) OR Ten.Contains(\\' + request.term.trim() + '\\))' : '',
+                            sortCondition: 'Ma asc',
+                            top: 10,
+                        }),
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item.Ma,
+                                    label: item.Ma + ' - ' + item.Ten
+                                };
+                            }));
+                        }
+                    })
+                }
+            },
+            onChange: function () {
+                resetCheckboxAndDatatable();
+            }
+        });
+
+    });
+
+    function resetCheckboxAndDatatable() {
+        if (typeof table != 'undefined') {
+            table.draw();
+        }
+    }
+
+
+    function xemChiTiet(data) {
+        var malk =$(data).data("malk");
+        var mabn =$(data).data("mabn");
+        viewUrl('@Url.Action("XemChiTiet", "XML1", new { area = "Member" })?maLK=' + malk + '&maBN=' + mabn);
+    }
+
+</script>
+
+<div class="panel widget light-widget">
+    <div class="panel-body">
+        <div class="row d-flex">
+            <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                    <input type="text" id="quickSearchMaLK"  class="form-control" placeholder="Mã lượt khám" onchange="resetCheckboxAndDatatable()">
+                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                    <input type="text" id="quickSearchNgayVao" class="vd_menu-search-text no-bd datepicker" placeholder="Ngày khám" onchange="resetCheckboxAndDatatable()">
+                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                    <input type="text" id="quickSearchNgayRa" class="vd_menu-search-text no-bd datepicker" placeholder="Ngày kết thúc" onchange="resetCheckboxAndDatatable()">
+                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                    <input type="text" id="quickSearchNgayTaiKham" class="vd_menu-search-text no-bd datepicker" placeholder="Ngày tái khám" onchange="resetCheckboxAndDatatable()">
+                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                <select id="ketQuaDieuTri" name="ketQuaDieuTri" class="form-control select2-local" style="height:30px;">
+                    <option value="-1" selected>@Html.Raw("Không chọn")</option>
+                    @foreach (var item in CommonConstants.GetListKetQuaDieuTri())
+                    {
+                        <option value="@item.Id">@Html.Raw(item.Name)</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-sm-12 col-md-4 col-lg-2 form-group">
+                <select id="khoaDieuTri" name="khoaDieuTri" class="form-control select2"></select>
+            </div>
+
+            <div class="col-sm-12 col-md-12 col-lg-6 form-group">
+                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                    <input type="text" id="quickSearchMaBenh" class="vd_menu-search-text no-bd tags" placeholder="Mã bệnh" onchange="resetCheckboxAndDatatable()">
+                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-12 col-lg-6 form-group">
+                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                    <input type="text" id="quickSearchMaBenhKem" class="vd_menu-search-text no-bd tags" placeholder="Mã bệnh kèm" onchange="resetCheckboxAndDatatable()">
+                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-md-4 col-lg-4 form-group">
+                <div class="vd_menu-search table-search input-group input-border" style="width:auto !important;">
+                    <input type="text" id="quickSearchTenBenh"  class="form-control" placeholder="Tên bệnh" onchange="resetCheckboxAndDatatable()">
+                    <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
+                </div>
+            </div>
+
+        
+
+        
+        </div>
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-12">
+
+        <div class="panel widget light-widget">
+            <div class="panel-body">
+                <div class="row">
+                    <table id="dtTable" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,318 @@
+﻿@using JetMedicalWebApp.Common
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function () {
+
+        $('#Name_VN').on('keyup', function () {
+            var slug = toSlug($(this).val());
+            $('#slug_VN').val(slug);
+        });
+
+        $('#Name_EN').on('keyup', function () {
+            var slug = toSlug($(this).val());
+            $('#slug_EN').val(slug);
+        });
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsType", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name, languageId';
+                var condition = 'languageId=@CommonConstants.TiengViet' + (params.term ? ' AND name.Contains(\\' + params.term + '\\)' : '');
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#TypeId_VN').select2(dropdownlistSelect2Option);
+
+        dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Loại tin";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsType", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name, languageId';
+                var condition = 'languageId=@CommonConstants.TiengAnh' + (params.term ? ' AND name.Contains(\\' + params.term + '\\)' : '');
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                data.unshift({
+                    id: 0,
+                    text: ""
+                })
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#TypeId_EN').select2(dropdownlistSelect2Option);
+
+        dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("FilterParent", "NewsCategory")',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, name, parent_ids';
+                var condition = (params.term ? " AND (name LIKE N'%" + params.term + "%')" : "");
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    top: 20
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    var space = '';
+
+                    if (!isNullOrEmpty(item.parent_ids)) {
+                        space = hienThiPhanBacV2(item.parent_ids.split(',').length);
+                    }
+                    return {
+                        id: item.id,
+                        text: space + item.name
+                    }
+                });
+
+                data.unshift({
+                    id: 0,
+                    text: ""
+                })
+
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        dropdownlistSelect2Option.escapeMarkup = function (markup) {
+            return markup;
+        }
+
+        $('#CategoryParentId_VN').select2(dropdownlistSelect2Option);
+
+        $('#btnExecuteAddNewDataRowNewsCategory').click(function (e) {
+            e.preventDefault();
+            if (checkFormUpdate()) {
+
+                var values = {
+                    id: $('#Id_VN').val(),
+                    title: $('#Title_VN').val(),
+                    keywords: $('#Keywords_VN').val(),
+                    descriptions: $('#Descriptions_VN').val(),
+                    name: $('#Name_VN').val(),
+                    slug: $('#slug_VN').val(),
+                    odx: $('#odx_VN').val(),
+                    description: $('#Description_VN').val(),
+                    typeId: $('#TypeId_VN').val(),
+                    parentId: $('#CategoryParentId_VN').val(),
+                    isHome: $('#IsHome_VN').is(':checked'),
+                    ActivePhone: $('#ActivePhone_VN').is(':checked'),
+                    isactive: $('#isactive_VN').is(':checked'),
+                    banner: $('#Banner_VN').val(),
+                    code: $('#code').val(),
+                    languageId: $('#selectLanguageId').val()
+                };
+                var data = {
+                    listItem: [values]
+                };
+
+                var url = "@Url.Action("AddOrUpdate", "NewsCategory", new { area = "Admin" })";
+
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        Lobibox.notify('warning', {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            icon: 'bx bx-error',
+                            msg: res
+                        });
+                    }
+                    else {
+                        Lobibox.notify('success', {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: true,
+                            position: 'top right',
+                            icon: 'bx bx-check-circle',
+                            msg: 'Thêm mới/cập nhật thành công.'
+                        });
+                        $('#formVN')[0].reset();
+                        $('#modalUpdateNewsCategory').modal('hide');
+                        resetCheckboxAndDatatable()
+                    }
+                });
+
+            }
+
+        });
+    });
+
+    function checkFormUpdate() {
+        var check = true;
+        var error = "";
+
+        if (isNullOrEmptySelect2($('#TypeId_VN').val()) && isNullOrEmptySelect2($('#TypeId_VN').val())) {
+            error = "Chưa chọn loại tin.";
+            check = false;
+        }
+
+
+        if (!check) {
+            notification("top right", "info", "fadeIn animated bx bx-info-circle", "", error);
+        }
+
+        return check;
+    }
+    function browserImage(that) {
+        var inputElm = $('#' + $(that).data('colname'));
+        var imageElm = $('#' + $(that).data('previewimage'));
+
+        var finder = new CKFinder();
+        finder.selectActionFunction = function (url) {
+            inputElm.val(url);
+            imageElm.attr('src', url);
+        };
+        finder.popup();
+    }
+</script>
+
+<div class="modal fade" id="modalUpdateNewsCategory" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header vd_bg-blue vd_white">
+                <h5 class="modal-title">@Html.Raw("Cập nhật")</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-body">
+                    <form id="formVN" class="row g-3" action="#" role="form">
+                        <div hidden>
+                            <div class="form-label">Id</div>
+                            <input type="number" value="0" id="Id_VN" class="form-control">
+                            <input type="text" id="code" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="inputFirstName" class="form-label">Ngôn ngữ</label>
+                            <select class="form-select" id="selectLanguageId">
+                                @foreach (var item in CommonConstants.GetDanhSachNgonNgu())
+                                {
+                                    <option value="@item.Id">@Html.Raw(item.Name)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="inputLastName" class="form-label">Loại tin</label>
+                            <select id="TypeId_VN" class="form-control select2"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="inputEmail" class="form-label">Danh mục cha</label>
+                            <select id="CategoryParentId_VN" class="form-control select2"></select>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="Name_VN" class="form-label">Tên danh mục</label>
+                            <input type="text" id="Name_VN" class="form-control" placeholder="Tên danh mục">
+                        </div>
+                        <div class="col-md-5">
+                            <label for="slug_VN" class="form-label">Alias</label>
+                            <input type="text" id="slug_VN" class="form-control" placeholder="Alias">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="odx_VN" class="form-label">ODX</label>
+                            <input type="number" id="odx_VN" class="form-control" placeholder="Odx">
+                        </div>
+                        <div class="col-8">
+                            <label for="inputAddress" class="form-label">Mô tả ngắn</label>
+                            <textarea class="form-control" cols="20" id="Description_VN" name="Description_VN" placeholder="Mô tả ngắn" rows="5"></textarea>
+                        </div>
+                        <div class="col-4">
+                            <label for="inputAddress" class="form-label">Hình ảnh</label>
+                            <div data-colname="Banner_VN" data-previewimage="imgBanner_VN" onclick="browserImage(this)" style="min-height: 100px; border:#808080 1px solid">
+                                <input id="Banner_VN" name="Banner_VN" type="hidden" value="">
+                                <img id="imgBanner_VN" src="@CommonConstants.FileNoImage" height="130" style="width: 100%; max-height:130px;" onclick="browserImage(this)">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="Title_VN" class="form-label">SEO Title</label>
+                            <input type="text" id="Title_VN" class="form-control">
+                        </div>
+                        <div class="col-md-12">
+                            <label for="Keywords_VN" class="form-label">SEO Keywords</label>
+                            <input class="form-control" id="Keywords_VN" name="Keywords_VN" placeholder="Tags" data-role="tagsinput" value="">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="Descriptions_VN" class="form-label">SEO Descriptions</label>
+                            <input type="text" id="Descriptions_VN" class="form-control" placeholder="Descriptions">
+                        </div>
+                        <div class="col-md-4" hidden>
+                            <label for="ActivePhone_VN" class="form-label">PHONE</label>
+                            <input class="form-check-input" type="checkbox" value="" id="ActivePhone_VN">
+                            
+                        </div>
+                        <div class="col-md-6">
+                            <label for="IsHome_VN" class="form-label">TRANG CHỦ</label>
+                            <input class="form-check-input" type="checkbox" value="" id="IsHome_VN">
+                           
+                        </div>
+                        <div class="col-md-6">
+                            <label for="isactive_VN" class="form-label">KÍCH HOẠT</label>
+                            <input class="form-check-input" type="checkbox" value="" id="isactive_VN">
+                 
+                        </div>
+                    </form>
+                   
+                </div>
+            </div>
+            <div class="modal-footer background-login">
+                <button type="button" class="btn btn-primary" id="btnExecuteAddNewDataRowNewsCategory">@Html.Raw(" Lưu")</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Html.Raw(" Đóng")</button>
+            </div>
+        </div>
+    </div>
+</div>

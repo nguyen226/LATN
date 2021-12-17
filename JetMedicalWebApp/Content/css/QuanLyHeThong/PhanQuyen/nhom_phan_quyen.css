@@ -1,0 +1,18 @@
+﻿#titleTenNhomGroupPermission {
+    margin-top:10px;
+    font-weight: bold;
+}
+
+.control-sidebar.control-sidebar-open, .control-sidebar.control-sidebar-open+.control-sidebar-bg {
+    right: 0 !important;
+}
+
+
+
+.menu-cap-1-box {
+    margin-top:5px;
+}
+
+#m_quick_sidebar{
+    overflow:hidden;
+}

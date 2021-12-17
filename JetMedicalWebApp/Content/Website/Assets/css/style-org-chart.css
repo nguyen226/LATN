@@ -1,0 +1,319 @@
+.content_orgchart {
+    font-family: Verdana;
+    font-size: 14px;
+    position: relative;
+}
+
+    .content_orgchart * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+.org-chart {
+    display: block;
+    clear: both;
+    margin-bottom: 30px;
+    position: relative;
+    /**
+  * For IE 6/7 only
+  * Include this rule to trigger hasLayout and contain floats.
+  */
+    /* Box colors */
+    /* 1 column */
+    /* 2 column */
+    /* 3 column */
+    /* DEPARTMENTS COLUMNs */
+}
+
+    .org-chart.cf:before, .org-chart.cf:after {
+        content: " ";
+        /* 1 */
+        display: table;
+        /* 2 */
+    }
+
+    .org-chart.cf:after {
+        clear: both;
+    }
+
+    .org-chart.cf {
+        *zoom: 1;
+    }
+
+    .org-chart ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+.hinhanhkhoaphong {
+}
+
+.tenkhoakhong {
+}
+
+.lanhdao a {
+}
+
+.org-chart ul li {
+    position: relative;
+}
+
+    .org-chart ul li span {
+        display: block;
+        border: 2px solid orange;
+        text-align: center;
+        overflow: hidden;
+        text-decoration: none;
+        color: black;
+        font-size: 12px;
+        box-shadow: 4px 4px 9px -4px rgba(0, 0, 0, 0.8);
+        -webkit-transition: all linear .1s;
+        -moz-transition: all linear .1s;
+        transition: all linear .1s;
+        background: #92D4A8;
+        padding: 4px;
+        line-height: 1.5em;
+    }
+
+.org-chart .lvl-b {
+    background: #00b0ae;
+    color: #ffffff;
+}
+.org-chart .lvl-b:hover {
+   cursor:pointer;
+   background:#ff6a00;
+}
+.org-chart .department li span:hover {
+    cursor: pointer;
+    background: #ff6a00;
+}
+.org-chart .board {
+    width: 70%;
+    margin: 0 auto;
+    display: block;
+    position: relative;
+}
+
+    .org-chart .board:before {
+        content: "";
+        display: block;
+        position: absolute;
+        height: 310px;
+        width: 0px;
+        border-left: 2px solid orange;
+        margin-left: 49%;
+        top: 25px;
+    }
+
+.org-chart ul.columnOne {
+    height: 90px;
+   
+    width: 100%;
+    display: block;
+    clear: both;
+}
+
+    .org-chart ul.columnOne li {
+        width: 60%;
+    margin: 0px auto;
+    top: 0px
+    }
+
+.org-chart ul.columnTwo {
+    
+    width: 100%;
+    display: block;
+    height: 90px;
+    clear: both;
+}
+
+    .org-chart ul.columnTwo li:first-child {
+        width: 40%;
+        float: left;
+    }
+
+    .org-chart ul.columnTwo li {
+        width: 40%;
+        float: right;
+    }
+
+    .org-chart ul.columnTwo:before {
+        content: "";
+        display: block;
+        position: relative;
+        width: 80%;
+        height: 10px;
+        border-top: 2px solid orange;
+        margin: 0 auto;
+        top: 40px;
+    }
+
+.org-chart ul.columnThree {
+    position: relative;
+    width: 100%;
+    display: block;
+    clear: both;
+}
+
+    .org-chart ul.columnThree li:first-child {
+        width: 30%;
+        float: left;
+        margin-left: 0;
+    }
+
+    .org-chart ul.columnThree li {
+        width: 30%;
+        margin-left: 5%;
+        float: left;
+    }
+
+        .org-chart ul.columnThree li:last-child {
+            width: 30%;
+            float: right;
+            margin-left: 0;
+        }
+
+    .org-chart ul.columnThree:before {
+        content: "";
+        display: block;
+        position: relative;
+        width: 80%;
+        height: 10px;
+        border-top: 2px solid orange;
+        margin: 0 auto;
+        top: 40px;
+    }
+
+.org-chart .departments {
+    width: 100%;
+    display: block;
+    clear: both;
+}
+
+    .org-chart .departments:before {
+        content: "";
+        display: block;
+        width: 85%;
+        height: 22px;
+        border-top: 2px solid orange;
+        border-left: 2px solid orange;
+        border-right: 2px solid orange;
+        margin: 0 auto;
+        top: 0px;
+    }
+
+.org-chart .department {
+    border-left: 2px solid orange;
+    width: 32.3%;
+    float: left;
+    margin: 0px 4px;
+}
+
+    .org-chart .department:after {
+        /*content: "";
+  position: absolute;
+  display: block;
+  width: 10px;
+  height: 22px;
+  border-left: 2px solid orange;
+  left: 50%;
+  top: -22px;*/
+    }
+
+    .org-chart .department:first-child:after {
+        display: none;
+    }
+
+    .org-chart .department:last-child:after {
+        display: none;
+    }
+
+    .org-chart .department.central {
+        background: #F5EEC9;
+    }
+
+        .org-chart .department.central:after {
+            display: none;
+        }
+
+    .org-chart .department span {
+        border-left: 1px solid orange;
+    }
+
+    .org-chart .department li {
+        padding-left: 25px;
+        border-bottom: 2px solid orange;
+        height: 80px;
+    }
+
+        .org-chart .department li span {
+            background: #f4f4f4;
+            top: 38px;
+            position: absolute;
+            z-index: 1;
+            width: 95%;
+            height: 60px;
+            right: 0px;
+            line-height: 14px;
+            border: 3px solid orange;
+        }
+
+            .s-1r strong {
+                margin-top: 15px;
+                display: block;
+            }
+.s-2r strong {
+    margin-top: 5px;
+    display: block;
+}
+
+    .org-chart .department .sections  {
+        margin-top: -20px;
+    }
+
+/* MEDIA QUERIES */
+
+@media all and (max-width: 767px) {
+    .org-chart .board {
+        margin: 0px;
+        width: 100%;
+    }
+    .org-chart ul.columnOne li {
+        width: 80% !important;
+        margin: 0px auto;
+        top: 0px;
+    }
+    .org-chart .departments:before {
+        border: none;
+    }
+
+    .org-chart .department {
+        float: none;
+        width: 100%;
+        margin-left: 0;
+        
+        margin-bottom: 40px;
+    }
+
+        .org-chart .department:before {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 15px;
+            height: 60px;
+            border-left: 2px solid orange;
+            z-index: 1;
+            top: -45px;
+            left: 0%;
+            margin-left: -2px;
+        }
+
+        .org-chart .department:after {
+            display: none;
+        }
+
+        .org-chart .department:first-child:before {
+            display: none;
+        }

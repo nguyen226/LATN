@@ -1,0 +1,19 @@
+﻿@model JetMedicalWebApp.Models.BaseViewModel
+@{
+    Layout = "~/Views/Shared/_AboutLayout.cshtml";
+}
+@{
+    if (Model != null)
+    {
+        if (Model.NewsContents != null)
+        {
+            foreach (var item in Model.NewsContents)
+            {
+                @Html.Raw("<div class='title_content'><h4>" + item.fullname + "</h4></div>")
+                @Html.Raw(" <div class='content_gt_bv199'><div class='ct_full_gt'>" + HttpUtility.HtmlDecode(item.description.Replace("&nbsp;", " ")) + "</div></div>")
+            }
+        }
+    }
+}
+
+

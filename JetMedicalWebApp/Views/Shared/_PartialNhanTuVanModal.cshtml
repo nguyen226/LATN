@@ -1,0 +1,151 @@
+﻿@using JetMedicalWebApp.Common
+<script>
+    $(document).ready(function () {
+        $('#btnDangKyTuVan').click(function () {
+            if (checkFormNhanTuVan()) {
+                var url = "@Url.Action("AddOrUpdate", "NhanTuVan", new { area = "Member" })";
+
+                var fields = [
+                    'HoVaTen',
+                    'SoDienThoai',
+                    'Email',
+                    'TieuDe',
+                    'NoiDung'
+                ];
+                var values = [
+                    $('input[name="formDangKyNhanTuVan_HoTen"]').val(),
+                    $('input[name="formDangKyNhanTuVan_DienThoai"]').val(),
+                    $('input[name="formDangKyNhanTuVan_Email"]').val(),
+                    $('input[name="formDangKyNhanTuVan_TieuDe"]').val(),
+                    $('textarea[name="formDangKyNhanTuVan_NoiDung"]').val()
+                ];
+
+                var data = {
+                    id: null,
+                    fields: fields,
+                    values: values
+                };
+
+                sendDataToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        showAlertErrorDatLichKham(res);
+                    }
+                    else {
+                        $('.formDangKyNhanTuVanThanhCong').fadeIn().show();
+                        $('.formDangKyNhanTuVan').fadeOut().hide();
+                    }
+                });
+            }
+        })
+    });
+
+    function resetFormDangKyNhanTuVan() {
+        hideAlertErrorRegister();
+        $('#formDangKyNhanTuVan')[0].reset();
+    }
+
+    function hideAlertErrorDangKyNhanTuVan() {
+        $('#formErrorDangKyNhanTuVan').fadeOut().hide();
+        $('#formDangKyNhanTuVanLabel').text('');
+    }
+
+    function showAlertErrorDangKyNhanTuVan(msg) {
+        $('#formErrorDangKyNhanTuVan').fadeIn().show()
+        $('#formDangKyNhanTuVanLabel').text(msg);
+    }
+
+    function checkFormNhanTuVan() {
+        hideAlertErrorDangKyNhanTuVan();
+
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmpty($('input[name="formDangKyNhanTuVan_HoTen"]').val())) {
+            check = false;
+            error = 'Bạn chưa nhập họ và tên';
+        }
+
+        if (isNullOrEmpty($('input[name="formDangKyNhanTuVan_DienThoai"]').val()) || isNullOrEmpty($('input[name="formDangKyNhanTuVan_Email"]').val())) {
+            check = false;
+            error = 'Bạn chưa nhập số điện thoại hoặc email';
+        }
+
+        if (!isNullOrEmpty($('input[name="formDangKyNhanTuVan_Email"]').val())) {
+            if (!validateEmail($('input[name="formDangKyNhanTuVan_Email"]').val())) {
+                check = false;
+                error = 'Email sai định dạng';
+            }
+        }
+
+        if (isNullOrEmpty($('input[name="formDangKyNhanTuVan_TieuDe"]').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tiêu đề';
+        }
+
+        if (isNullOrEmpty($('textarea[name="formDangKyNhanTuVan_NoiDung"]').val())) {
+            check = false;
+            error = 'Bạn chưa nhập nội dung';
+        }
+
+        if (!check) {
+            showAlertErrorDangKyNhanTuVan(error);
+        }
+
+        return check;
+    }
+</script>
+
+<div class="modal fade" id="nhanTuVanModal" role="dialog">
+    <div class="modal-dialog modalsp">
+        <div class="modal-content">
+            <button type="button" class="btn-close-modal" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+            <div class="khung_register shopping">
+                <div class="formDangKyNhanTuVan">
+                    <form id="formDangKyNhanTuVan" class="frm form-group">
+                        <div class="text-center">
+                            <img src="/Content/Website/Assets/images/logo.svg">
+                        </div>
+                        <h2>ĐĂNG KÝ NHẬN TƯ VẤN</h2>
+                        <p class="der_lh">Vui lòng để lại thông tin, chúng tôi sẽ liên hệ đến bạn sớm nhất.</p>
+                        <div class="alert d-none" id="formErrorDangKyNhanTuVan">
+                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                            <strong>Lỗi!</strong> <span id="formDangKyNhanTuVanLabel"></span>.
+                        </div>
+                        <div class="row">
+                            <div class="box_group_from inputfrom col-md-6">
+                                <input type="text" name="formDangKyNhanTuVan_HoTen" placeholder="Họ và tên..." required>
+                            </div>
+                            <div class="box_group_from inputfrom col-md-6">
+                                <input type="text" name="formDangKyNhanTuVan_DienThoai" placeholder="Số điện thoại..." required>
+                            </div>
+                            <div class="box_group_from inputfrom col-md-6">
+                                <input type="email" name="formDangKyNhanTuVan_Email" placeholder="Email..." required>
+                            </div>
+                            <div class="box_group_from inputfrom col-md-6">
+                                <input type="text" name="formDangKyNhanTuVan_TieuDe" placeholder="Tiêu đề..." required>
+                            </div>
+                        </div>
+                        <div class="box_group_from inputfrom">
+                            <textarea name="formDangKyNhanTuVan_NoiDung" placeholder="Nội dung yêu cầu..." cols="60" rows="3" required></textarea>
+                        </div>
+                    </form>
+                    <div class="form-group">
+                        <button id="btnDangKyTuVan" class="send_mail btn regs"><i class="fa fa-dk"></i> GỬI THÔNG TIN</button>
+                    </div>
+                </div>
+                <div class="formDangKyNhanTuVanThanhCong d-none frm form-group">
+                    <div class="text-center">
+                        <img src="/Content/Website/Assets/images/logo.svg">
+                    </div>
+                    <h2>ĐĂNG KÝ THÀNH CÔNG</h2>
+                    <p>Bộ phận CSKH sẽ phản hồi bạn trong thời gian sớm nhất</p>
+
+                    <div class="form-group">
+                        <button type="button" data-dismiss="modal" aria-hidden="true" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐÓNG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

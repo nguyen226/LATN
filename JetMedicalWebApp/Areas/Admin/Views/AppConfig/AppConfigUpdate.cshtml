@@ -1,0 +1,459 @@
+﻿@model JetMedicalWebApp.Areas.Admin.Models.AppConfigViewModels
+@{
+    ViewBag.Title = "Cấu hình hệ thống";
+}
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+<link href="~/Content/snailsoft/assets/plugins/input-tags/css/tagsinput.css" rel="stylesheet" />
+<script src="~/Content/snailsoft/assets/plugins/input-tags/js/tagsinput.js"></script>
+
+<script type="text/javascript" src="@Url.Content("~/Content/ckeditor/ckeditor.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Content/ckfinder/ckfinder.js")"></script>
+
+<script type="text/javascript">
+    var appConfig = null;
+
+    @if(Model.AppConfig != null)
+    {
+        <text>
+    appConfig = {
+        id: '@Model.AppConfig.ID'
+    };
+    </text>
+    }
+
+    $(document).ready(function () {
+        CKEDITOR.replace('FormUpdate_Introduce', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+        CKEDITOR.replace('FormUpdate_Privacy', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+        CKEDITOR.replace('FormUpdate_TermsOfUse', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+        CKEDITOR.replace('FormUpdate_Support', {
+            customConfig: '/Content/ckeditor/config.js',
+            extraPlugins: 'embed,embedbase,widget',
+            embed_provider: '//ckeditor.iframe.ly/api/oembed?url={url}&callback={callback}',
+        });
+        $('#btnLuu').click(function () {
+            if (checkFormUpdate()) {
+                var fields = [
+                    'CompanyName',
+                    'Active',
+                    'Introduce',
+                    'Privacy',
+                    'TermsOfUse',
+                    'Support',
+                    'Hotline',
+                    'Facebook',
+                    'Zalo',
+                    'Website',
+                    'PhoneAuthentication',
+                    'SmsAccount',
+                    'SmsPass',
+                    'SmsLink',
+                    'MailAccount',
+                    'MailPass',
+                    'MailHost',
+                    'MailPort',
+                    'MailSSL',
+                    'Title',
+                    'Description',
+                    'Keywords'
+                ];
+
+                var values = [
+                    $('#FormUpdate_CompanyName').val(),
+                    $('#FormUpdate_Active').is(':checked'),
+                    CKEDITOR.instances.FormUpdate_Introduce.getData(),
+                    CKEDITOR.instances.FormUpdate_Privacy.getData(),
+                    CKEDITOR.instances.FormUpdate_TermsOfUse.getData(),
+                    CKEDITOR.instances.FormUpdate_Support.getData(),
+                  /*  $('#FormUpdate_Introduce').val(),*/
+                    //$('#FormUpdate_Privacy').val(),
+                    //$('#FormUpdate_TermsOfUse').val(),
+                    //$('#FormUpdate_Support').val(),
+
+                    $('#FormUpdate_Hotline').val(),
+                    $('#FormUpdate_Facebook').val(),
+                    $('#FormUpdate_Zalo').val(),
+                    $('#FormUpdate_Website').val(),
+                    $('#FormUpdate_PhoneAuthentication').is(':checked'),
+                    $('#FormUpdate_SmsAccount').val(),
+                    $('#FormUpdate_SmsPass').val(),
+                    $('#FormUpdate_SmsLink').val(),
+                    $('#FormUpdate_MailAccount').val(),
+                    $('#FormUpdate_MailPass').val(),
+                    $('#FormUpdate_MailHost').val(),
+                    $('#FormUpdate_MailPort').val(),
+                    $('#FormUpdate_MailSSL').is(':checked'),
+                    $('#Title').val(),
+                    $('#Description').val(),
+                    $('#Keywords').val()
+                ];
+
+                var formData = new FormData();
+
+
+                let filesUpload = $('#FormUpdate_Fileupload').prop('files');
+
+                if (filesUpload != null && filesUpload.length > 0) {
+                    formData.append("file", filesUpload[0]);
+                }
+
+                formData.append("id", (appConfig != null ? appConfig.id : ""));
+                formData.append("fields", JSON.stringify(fields));
+                formData.append("values", JSON.stringify(values));
+
+                var url = "@Url.Action("AddOrUpdate", "AppConfig", new { area = "Admin" })";
+
+                sendDataFileToURL(url, formData, true, null)
+                .then(function (res) {
+                    if (res) {
+                        Lobibox.notify('warning', {
+                            pauseDelayOnHover: true,
+                            continueDelayOnInactiveTab: false,
+                            position: 'top right',
+                            icon: 'bx bx-error',
+                            msg: res
+                        });
+
+                    }
+                    else {
+                        Lobibox.notify('success', {
+                                pauseDelayOnHover: true,
+                                continueDelayOnInactiveTab: true,
+                                position: 'top right',
+                                icon: 'bx bx-check-circle',
+                                msg: 'Thêm mới/cập nhật thành công.'
+                            });
+
+                    }
+                });
+            };
+        });
+
+        $('#FormUpdate_Fileupload').on('change', function () {
+            let filesUploads = $('#FormUpdate_Fileupload').prop('files');
+            let fileName = '';
+
+            if (filesUploads != null && filesUploads.length > 0) {
+                $.each(filesUploads, function (index, file) {
+                    if (!isNullOrEmpty(fileName)) {
+                        fileName += '; ';
+                    }
+                    fileName += file.name;
+                });
+            }
+
+            $('#FormUpdate_FileuploadText').val(fileName);
+        });
+    });
+
+    function checkFormUpdate() {
+        let check = true;
+        let error = '';
+        if (isNullOrEmpty($('#FormUpdate_CompanyName').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tên công ty';
+        }
+
+        if (!check) {
+
+            Lobibox.notify('warning', {
+                pauseDelayOnHover: true,
+                continueDelayOnInactiveTab: false,
+                position: 'top right',
+                icon: 'bx bx-error',
+                msg: error
+            });
+
+        }
+
+        return check;
+    }
+</script>
+
+
+
+
+<div class="page-content">
+    <form id="formUpdate">
+        <!--breadcrumb-->
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            @*<div class="breadcrumb-title pe-3">QUẢN TRỊ WEBSITE</div>*@
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item">
+                            <a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">CẤU HÌNH WEB</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="ms-auto">
+
+                <div class="btn-group">
+                    <button type="button" id="btnLuu" name="btnLuu" class="btn btn-primary px-3"><i class="fadeIn animated bx bx-save"></i>LƯU CẤU HÌNH</button>
+                </div>
+            </div>
+        </div>
+        <!--end breadcrumb-->
+        <div class="card">
+            <div class="card-body">
+                <ul class="nav nav-tabs nav-primary" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#primaryhome" role="tab" aria-selected="true">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-home font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">Home</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#contact" role="tab" aria-selected="false">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-user-pin font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">Liên hệ</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#Email" role="tab" aria-selected="false">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-mail-send font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">Email</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#Sms" role="tab" aria-selected="false">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-message-square-detail font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">Sms</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#Seo" role="tab" aria-selected="false">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-search-alt font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">SEO</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#Chinhsachriengtu" role="tab" aria-selected="false">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-comment-error font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">Chính sách riêng tư</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#Dieukhoansudung" role="tab" aria-selected="false">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-comment-error font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">Điều khoản sử dụng</div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" data-bs-toggle="tab" href="#Hotro" role="tab" aria-selected="false">
+                            <div class="d-flex align-items-center">
+                                <div class="tab-icon">
+                                    <i class='bx bx-comment-error font-18 me-1'></i>
+                                </div>
+                                <div class="tab-title">Hỗ trợ</div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content py-3">
+                    <div class="tab-pane fade show active" id="primaryhome" role="tabpanel">
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_CompanyName">@Html.Raw("Tên công ty (*)")</label>
+                            <input id="FormUpdate_CompanyName" name="FormUpdate_CompanyName" class="form-control" placeholder="Tên công ty" value="@(Model.AppConfig != null ? Model.AppConfig.CompanyName : "")">
+                        </div>
+                        <div class="mb-2">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="FormUpdate_Active" @(Model.AppConfig != null ? Model.AppConfig.Active ? "checked" : "" : "")>
+                                <label class="form-check-label" for="FormUpdate_Active">@Html.Raw("Kích hoạt")</label>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="row">
+                                <div class="col-xl-8">
+                                    <label class="form-label" for="formFileSm">@Html.Raw("Logo Website")</label>
+                                    <input id="FormUpdate_Fileupload" class="form-control form-control-sm" type="file" name="files[]">
+                                   
+                                </div>
+                                <div class="col-xl-4">
+                                    <img alt="Logo" class="p-1" width="110" src="@(Model.AppConfig != null ? Model.AppConfig.Logo : "")">
+                                </div>
+                            </div>
+                           
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_Introduce">@Html.Raw("Giới thiệu")</label>
+                            <textarea style="height:350px" name="FormUpdate_Introduce" id="FormUpdate_Introduce" data-rel="ckeditor" rows="10">@(Model.AppConfig != null ? Model.AppConfig.Introduce : "")</textarea>
+                        </div>
+
+
+
+
+
+
+                    </div>
+                    <div class="tab-pane fade" id="contact" role="tabpanel">
+
+                        <div class="mb-2">
+                            <label class="form-label">@Html.Raw("Hotline")</label>
+                            <input id="FormUpdate_Hotline" name="FormUpdate_Hotline" class="form-control" placeholder="Hotline" value="@(Model.AppConfig != null ? Model.AppConfig.Hotline : "")">
+                        </div>
+
+
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_Facebook">@Html.Raw("Facebook")</label>
+                            <input id="FormUpdate_Facebook" name="FormUpdate_Facebook" class="form-control" placeholder="Hotline" value="@(Model.AppConfig != null ? Model.AppConfig.Facebook : "")">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_Zalo">@Html.Raw("Zalo")</label>
+                            <input id="FormUpdate_Zalo" name="FormUpdate_Zalo" class="form-control" placeholder="Hotline" value="@(Model.AppConfig != null ? Model.AppConfig.Zalo : "")">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_Website">@Html.Raw("Website")</label>
+                            <input id="FormUpdate_Website" name="FormUpdate_Website" class="form-control" placeholder="Hotline" value="@(Model.AppConfig != null ? Model.AppConfig.Website : "")">
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Email" role="tabpanel">
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_MailAccount">@Html.Raw("Tài khoản")</label>
+                            <input id="FormUpdate_MailAccount" name="FormUpdate_MailAccount" class="form-control" placeholder="Tài khoản" value="@(Model.AppConfig != null ? Model.AppConfig.MailAccount : "")">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_MailPass">@Html.Raw("Mật khẩu")</label>
+                            <input type="password" id="FormUpdate_MailPass" name="FormUpdate_MailPass" class="form-control" placeholder="Mật khẩu" value="@(Model.AppConfig != null ? Model.AppConfig.MailPass : "")">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_MailHost">@Html.Raw("Host")</label>
+                            <input id="FormUpdate_MailHost" name="FormUpdate_MailHost" class="form-control" placeholder="Host" value="@(Model.AppConfig != null ? Model.AppConfig.MailHost : "")">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_MailPort">@Html.Raw("Port")</label>
+                            <input id="FormUpdate_MailPort" name="FormUpdate_MailPort" class="form-control" placeholder="Port" value="@(Model.AppConfig != null ? Model.AppConfig.MailPort : "")">
+                        </div>
+                        <div class="mb-2">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="FormUpdate_MailSSL" @(Model.AppConfig != null ? Model.AppConfig.MailSSL ? "checked" : "" : "")>
+                                <label class="form-check-label" for="FormUpdate_MailSSL">@Html.Raw("Có sử dụng SSL")</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Sms" role="tabpanel">
+                        <div class="mb-2">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="FormUpdate_PhoneAuthentication" @(Model.AppConfig != null ? Model.AppConfig.PhoneAuthentication ? "checked" : "" : "")>
+                                <label class="form-check-label" for="FormUpdate_PhoneAuthentication">@Html.Raw("Xác thực đăng nhập qua SMS")</label>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_SmsAccount">@Html.Raw("Tài khoản")</label>
+                            <input id="FormUpdate_SmsAccount" name="FormUpdate_SmsAccount" class="form-control" placeholder="Tài khoản" value="@(Model.AppConfig != null ? Model.AppConfig.SmsAccount : "")">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_SmsPass">@Html.Raw("Mật khẩu")</label>
+                            <input id="FormUpdate_SmsPass" name="FormUpdate_SmsPass" class="form-control" placeholder="Mật khẩu" value="@(Model.AppConfig != null ? Model.AppConfig.SmsPass : "")">
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label" for="FormUpdate_SmsLink">@Html.Raw("SMS link")</label>
+                            <input id="FormUpdate_SmsLink" name="FormUpdate_SmsLink" class="form-control" placeholder="SMS link" value="@(Model.AppConfig != null ? Model.AppConfig.SmsLink : "")">
+                        </div>
+
+                    </div>
+                    <div class="tab-pane fade" id="Seo" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <label class="form-label">Tiêu đề</label>
+                                    <input type="text" name="Title" id="Title" class="form-control" value="@(Model.AppConfig != null ? Model.AppConfig.Title : "")">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Mô tả</label>
+                                    <input type="text" class="form-control" name="Description" id="Description" value="@(Model.AppConfig != null ? Model.AppConfig.Description : "")">
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label">Từ khóa</label>
+                                    <input type="text" name="Keywords" id="Keywords" class="form-control" data-role="tagsinput" value="@(Model.AppConfig != null ? Model.AppConfig.Keywords : "")">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Chinhsachriengtu" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <label class="form-label" for="FormUpdate_Privacy">@Html.Raw("Privacy")</label>
+                                    <textarea style="height:350px" name="FormUpdate_Privacy" id="FormUpdate_Privacy" data-rel="ckeditor" rows="10">@(Model.AppConfig != null ? Model.AppConfig.Privacy : "")</textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Dieukhoansudung" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <label class="form-label" for="FormUpdate_TermsOfUse">@Html.Raw("Điều khoản sử dụng")</label>
+                                    <textarea style="height:350px" name="FormUpdate_TermsOfUse" id="FormUpdate_TermsOfUse" data-rel="ckeditor" rows="10">@(Model.AppConfig != null ? Model.AppConfig.TermsOfUse : "")</textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="Hotro" role="tabpanel">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <label class="form-label" for="FormUpdate_Support">@Html.Raw("Hỗ trợ")</label>
+                                    <textarea style="height:350px" name="FormUpdate_Support" id="FormUpdate_Support" data-rel="ckeditor" rows="10">@(Model.AppConfig != null ? Model.AppConfig.Support : "")</textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+

@@ -1,0 +1,160 @@
+@model JetMedicalWebApp.Areas.Admin.Models.KSKTTBenhNhanViewModels
+
+@{
+    ViewBag.Title = "KetQuaKSK";
+    Layout = "~/Views/Shared/_KetQuaKSKLayout.cshtml";
+}
+<script>
+    
+</script>
+<div class="heading clearfix">
+    <div class="logo" style="width: 200px; display: block; margin-left: auto; margin-right: auto">
+        <h2 class="mgbt-xs-5"><img src="~/Content/theme/img/ico/logo-bv199.png" alt="logo"></h2>
+    </div>
+    <br />
+    <h3 class="text-center vd_grey" style="font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight:700">PHIẾU KẾT LUẬN TƯ VẤN KSK ĐỊNH KỲ</h3>
+</div>
+<div class="panel widget">
+    <div class="panel-body">
+        <div class="form-group">
+            <div class="col-md-12">
+                <label class="col-xs-6 col-md-3 control-label">Họ và tên:</label> <div class="col-xs-6 col-md-3 controls"> @Model.TTBN.HO_TEN </div>
+            </div>
+            <div class="col-md-12">
+                <label class="col-xs-3 control-label">Ngày sinh:</label> <div style="padding-left:5px" class="col-xs-3 controls" > @Model.TTBN.NGAY_SINH.Substring(0,11) </div>
+                <label class="col-xs-3 control-label">Giới tính:</label> <div class="col-xs-3 controls"> @(Model.TTBN.GIOI_TINH == 1 ? "Nam" : "Nữ")</div>
+            </div>
+            <div class="col-md-12">
+                <h4>I. SỨC KHỎE THỂ LỰC</h4>
+            </div>
+            <div class="col-md-12">
+                <label class="col-xs-3 control-label">Chiều cao (cm):</label> <div class="col-xs-3 controls"> @Model.TTBN.CHIEU_CAO </div>
+                <label class="col-xs-3 control-label">Cân nặng (kg):</label> <div class="col-xs-3 controls"> @Model.TTBN.CAN_NANG </div>
+            </div>
+            <div class="col-md-12">
+                <label class="col-xs-3 control-label">Nhịp tim (lần/phút):</label> <div class="col-xs-3 controls"> @Model.TTBN.MACH </div>
+                <label class="col-xs-3 control-label">Huyết áp (mmHg):</label> <div class="col-xs-3 controls"> @Model.TTBN.HUYET_AP </div>
+            </div>
+            <div class="col-md-12">
+                <label class="col-xs-3 control-label">BMI:</label> <div class="col-xs-3 controls" id="bmi"> </div>
+            </div>
+            <div class="col-md-12">
+                <h4>II. KẾT QUẢ CĐHA – TDCN</h4>
+            </div>
+            <div class="col-md-12">
+                <table border="1" width="100%" style="margin-bottom:5px">
+                    <tr>
+                        <td>STT</td>
+                        <td style="text-align:center">Tên dịch vụ</td>
+                        <td>Kết quả</td>
+                        <td>Tư vấn </td>
+                    </tr>
+                    @for (int i = 1; i <= Model.CDHAs.Count(); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@Model.CDHAs[i - 1].TEN_CDHA</td>
+                            <td>@Model.CDHAs[i - 1].KET_QUA</td>
+                            <td> </td>
+                        </tr>
+                    }
+
+                </table>
+            </div>            
+            <div class="col-md-12">
+                <h4>III. KẾT QUẢ XÉT NGHIỆM</h4>
+            </div>
+            <div class="col-md-12">
+                <h5>1. Công thức máu:</h5>
+            </div>
+            <div class="col-md-12">
+                <table border="1" width="100%" style="margin-bottom:5px">
+                    <tr>
+                        <td>STT</td>
+                        <td style="text-align:center">Tên xét nghiệm</td>
+                        <td>Kết quả</td>
+                        <td>Tư vấn </td>
+                    </tr>
+                    @for (int i = 1; i <= Model.XNCTMs.Count(); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@Model.XNCTMs[i - 1].TEN_XNCTM</td>
+                            <td>@Model.XNCTMs[i - 1].KQ_XNCTM</td>
+                            <td> </td>
+                        </tr>
+                    }
+
+                </table>
+            </div>
+            <div class="col-md-12">
+                <h5>2. XN nước tiểu: Bình thường</h5>
+            </div>
+
+            <div class="col-md-12">
+                <table border="1" width="100%" style="margin-bottom:5px">
+                    <tr>
+                        <td>STT</td>
+                        <td style="text-align:center">Tên xét nghiệm</td>
+                        <td>Kết quả</td>
+                        <td>Tư vấn </td>
+                    </tr>
+                    @for (int i = 1; i <= Model.XNNTs.Count(); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@Model.XNNTs[i - 1].TEN_XNNT</td>
+                            <td>@Model.XNNTs[i - 1].KQ_XNTT</td>
+                            <td> </td>
+                        </tr>
+                    }
+
+                </table>
+            </div>
+
+            <div class="col-md-12">
+                <h5>3. Các XN khác:</h5>
+            </div>
+            <div class="col-md-12">
+                <table border="1" width="100%" style="margin-bottom: 20px">
+                    <tr>
+                        <td>STT</td>
+                        <td style="text-align:center">Tên xét nghiệm</td>
+                        <td>Kết quả</td>
+                        <td>Tư vấn </td>
+                    </tr>
+                    @for (int i = 1; i <= Model.XNKs.Count(); i++)
+                    {
+                        <tr>
+                            <td>@i</td>
+                            <td>@Model.XNKs[i - 1].TEN_XNK</td>
+                            <td>@Model.XNKs[i - 1].KQ_XNK</td>
+                            <td> </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+
+            <div class="col-md-12">
+                <table border="1" width="100%">
+                    <tr>
+                        <td style="width:50%">KẾT LUẬN</td>
+                        <td style="text-align:center">TƯ VẤN SỨC KHỎE</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left; padding-left:5px" rowspan="3">
+                            1. Phân loại sức khỏe:  @Model.TTBN.PHAN_LOAI
+                            <br /> @Model.TTBN.KET_LUAN
+                            2. Các bệnh, tật (nếu có):
+                            <br />
+                            @Model.TTBN.KHAM_LAM_SANG
+                        </td>
+                        <td rowspan="3">
+                            @Model.TTBN.TU_VAN
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

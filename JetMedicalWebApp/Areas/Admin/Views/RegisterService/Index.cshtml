@@ -1,0 +1,243 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.RegisterServiceViewModels
+@{
+    ViewBag.Title = "Đăng ký dịch vụ";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        $('.select2-local').select2();
+
+        let selectedFields = "RegisterID, MA_LK, FullName,DepartmentName, RegisterDate, StrRegisterDate, Phone, Email,TenBacSi, GoiKham, RegisterNote, Status";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "RegisterService", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(FullName LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Phone LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Email LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                }
+
+                if (!isNullOrEmpty($('#FilterTheoNamBieuDo').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(YEAR(RegisterDate) = " + $('#FilterTheoNamBieuDo').val() + ")";
+                }
+
+                return stringFilter;
+            }
+        };
+
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.order = [0,"DESC"];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "className": "text-uppercase",
+                "orderable": false
+            },
+            {
+                "targets": [3],
+                className: 'dt-body-right text-uppercase',
+                "searchable": false
+            },
+            {
+                "targets": [11],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (Model.Menu_GroupPermission != null && !Model.Menu_GroupPermission.AllowUpdate)
+                {
+                    <text>
+                visible: false
+                </text>
+                }
+            }
+        ];
+
+        datatableOption.columns = [
+            { "data": "RegisterID", "name": "RegisterID", "autoWidth": true, "title": "Id" },
+            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "Mã lượt khám" },
+            { "data": "FullName", "name": "FullName", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "StrRegisterDate", "name": "StrRegisterDate", "autoWidth": true, "title": "Ngày giờ khám" },
+            { "data": "DepartmentName", "name": "DepartmentName", "autoWidth": true, "title": "Tên phòng khám" },
+            { "data": "Phone", "name": "Phone", "autoWidth": true, "title": "Số điện thoại" },
+            { "data": "Email", "name": "Email", "autoWidth": true, "title": "Email" },
+            { "data": "GoiKham", "name": "GoiKham", "autoWidth": true, "title": "Gói dịch vụ" },
+            { "data": "TenBacSi", "name": "TenBacSi", "autoWidth": true, "title": "Bác sĩ" },
+            { "data": "RegisterNote", "name": "RegisterNote", "autoWidth": true, "title": "Ghi chú" },
+            {
+                "data": "Status", "name": "Status", "title": "Trạng thái", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    switch (data) {
+                        case @CommonConstants.RegisterService_DangKy:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Đăng ký</span>';
+                            break;
+                        case @CommonConstants.RegisterService_TiepNhan:
+                            content = '<span class="text-uppercase vd_bd-twitter vd_twitter">Tiếp nhận</span>';
+                            break;
+                        case @CommonConstants.RegisterService_Kham:
+                            content = '<span class="text-uppercase vd_bd-yellow vd_yellow">Khám</span>';
+                            break;
+                        case @CommonConstants.RegisterService_KetThuc:
+                            content = '<span class="text-uppercase vd_bd-green vd_green">Đã kết thúc</span>';
+                            break;
+                    }
+                    return content;
+                }, width: "30px"
+            },
+            {
+                "data": "Status", "name": "Status", "title": "Action", "mRender": function (data, type, row, meta) {
+                    var content = '';
+                    if (suaHeThong == true) {
+                        switch (data) {
+                            case @CommonConstants.RegisterService_KetThuc:
+                                content = '';
+                                break;
+
+                            default:
+                                content = '<div class="d-flex order-actions"><a data-original-title="edit" data-toggle="tooltip" data-placement="top" class="btnEdit" href="javascript:void(0)"> <i class="bx bxs-edit"></i> </a></div>';
+                                break;
+                        }
+                    }
+
+                    return content;
+                }, width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        $('#dtTable tbody').on('click', 'tr td.menu-action > .order-actions >a.btnEdit', function () {
+            selectedDataRow = table.row($(this).parents('tr')).data();
+            $('#FormUpdateRegisterService_MA_LK').val(selectedDataRow.MA_LK);
+            $('#FormUpdateRegisterService_Status').val(selectedDataRow.Status).trigger('change');
+            $('#modalUpdateNhanTuVan').modal('show');
+        });
+
+        $('#FilterTheoNamBieuDo').change(function () {
+            resetCheckboxAndDatatable();
+        });
+    });
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        selectedDataRow = null;
+    }
+</script>
+
+@Html.Partial("_PartialContentHeader")
+
+
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter mr-2">
+                                <label>
+                                    Search:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearch" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+                            <select id="FilterTheoNamBieuDo" class="form-select select2-local ml-2 mr-2">
+                                @for (int i = DateTime.Now.Year; i >= Model.NamBatDauSuDungPhamMem; i--)
+                                {
+                                    <option value="@i" @(i == DateTime.Now.Year ? "selected" : "")>@i</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-sm-12 col-md-6">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
+                            @if (Model.Menu_GroupPermission.SystemDelete == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnDelete" tabindex="0" aria-controls="example2" type="button"><span>Xóa</span></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_PatialRegisterService_UpdateModal")

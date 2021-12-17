@@ -1,0 +1,135 @@
+@using JetMedicalWebApp.Entities.EntityDto
+@model JetMedicalWebApp.Models.BaseViewModel
+@using JetMedicalWebApp.Common
+
+<script>
+    $(document).ready(function () {
+        $('a[name="btnDatLichKhamTheoPhongBan"]').on('click', function () {
+            @if (Model.MemberId > 0)
+              {
+                  <text>
+            resetFormDatLichKhamTheoPhongBan();
+            $('#datLichKhamTheoPhongBanModal').modal();
+            $('.timepicker').timepicker({
+                showMeridian: false,
+                scrollbar: true,
+            });
+
+            </text>
+              }
+              else
+              {
+                  <text>
+            loginForm();
+            </text>
+              }
+        })
+
+        $('a[name="btnDangKyNhanTuVan"]').on('click', function () {
+            hideAlertErrorDangKyNhanTuVan();
+            resetFormDangKyNhanTuVan();
+
+            $('.formDangKyNhanTuVan').fadeIn().show();
+            $('.formDangKyNhanTuVanThanhCong').fadeOut().hide();
+
+            $('#nhanTuVanModal').modal();
+        })
+    });
+</script>
+<script>
+    $(document).ready(function () {
+       
+        $('a[name="dangkyxetnghiemcovid"]').on('click', function () {
+            hideAlertErrorDangKyNhanTuVan();
+            resetFormDangKyNhanTuVan();
+
+            $('.dangkyxetnghiemcovid').fadeIn().show();
+            
+            $('#dangkyxetnghiemcovid').modal();
+        })
+    });
+</script>
+<div id="banner">
+    <div id="slider_desktop">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                @if (Model.Banners != null)
+                {
+                    if (Model.Banners.Count() > 0)
+                    {
+                       
+                        foreach (var item in Model.Banners)
+                        {
+                            <div class="swiper-slide">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="inslider">
+                                                @{
+                                                    if (item.text != "")
+                                                    {
+                                                        <div class="title_sliderhome">
+                                                            <h1>@Html.Raw(item.title)</h1>
+                                                            <h4>@Html.Raw(item.text)</h4>
+                                                        </div>
+                                                        <div class="button_dk">
+                                                            @*<a href="javascript:void(0)" name="btnDatLichKhamTheoPhongBan" class="more_blue click_view">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "ĐẶT LỊCH KHÁM" : "Appointment")</a>*@
+                                                            <a href="javascript:void(0)"  class="more_blue click_view" name="btnDangKyNhanTuVan"><i class="fas fa-calendar-check"></i>  @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "ĐẶT LỊCH KHÁM" : "Appointment")</a>
+                                                           
+                                                        </div>
+                                                    }
+                                                }
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <img src="@item.url" alt="">
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <!-- Add Pagination -->
+            <div class="swiper-pagination swiper-pagination-white"></div>
+            <!-- Add Arrows -->
+        </div>
+    </div>
+
+    <div id="slider_mobile">
+        <div class="button_dk">
+            <div class="button_dk_popup">
+                <a href="javascript:void(0)" class="more_blue click_view" name="dangkyxetnghiemcovid">ĐẶT LỊCH XÉT NGHIỆM COVID</a>
+                @*<a href="javascript:void(0)" name="btnDatLichKhamTheoPhongBan" class="more_blue click_view">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "ĐẶT LỊCH KHÁM" : "Appointment")</a>*@
+            </div>
+            <div class="button_dk_lh">
+                <a href="javascript:void(0)" class="dktv" name="btnDangKyNhanTuVan">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "Nhận tư vấn" : "Questioning")</a>
+            </div>
+        </div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <img src="~/Content/Website/Assets/images/slider_home/slider_mb01.png" alt="Bệnh viện 199 - BCA">
+                </div>
+                <div class="swiper-slide">
+                    <img src="~/Content/Website/Assets/images/slider_home/slider_mb02.png" alt="Bệnh viện 199 - BCA">
+                </div>
+            </div>
+            <!-- Add Pagination -->
+            <div class="swiper-pagination swiper-pagination-white"></div>
+            <!-- Add Arrows -->
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="dangkyxetnghiemcovid">
+    <div class="modal-dialog modal-fix-width-470 modalsp">
+        <div class="modal-content">
+            <button type="button" class="btn-close-modal" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i></button>
+            <div class="khung_register">
+                <iframe frameborder="0" height="700" src="https://docs.google.com/forms/d/e/1FAIpQLScVB87Kz_4nGB6Z_5qltoaaq7CcW7yBCw8VLfhixMBRLZ8GwA/viewform?embedded=true" width="100%"></iframe>
+            </div>
+
+            </div>
+        </div>
+</div>

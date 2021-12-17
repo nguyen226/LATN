@@ -1,0 +1,382 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.BannerViewModels
+@{
+    ViewBag.Title = "Banner";
+    Layout = "~/Areas/Admin/Views/Shared/_SnailSoft.cshtml";
+}
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/Responsive-2.2.2/css/responsive.bootstrap.min.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+}
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/jquery.dataTables.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/DataTables/DataTables-1.10.18/js/dataTables.bootstrap4.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/ckfinder/ckfinder.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseDatatable.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+}
+
+<script type="text/javascript" charset="utf-8">
+    var selectedDataRow = null;
+    var table;
+    var dataListId = [];
+    let userId ='@Model.UsersID';
+    let suaHeThong=@if (Model.Menu_GroupPermission.SystemEdit == true) { <text>true</text>} else { <text>false</text>};
+    let suaCaNhan=@if (Model.Menu_GroupPermission.PersonalEdit == true) { <text>true</text>} else { <text>false</text>};
+    let xemHeThong=@if (Model.Menu_GroupPermission.SystemView == true) { <text>true</text>} else { <text>false</text>};
+    let xemCaNhan=@if (Model.Menu_GroupPermission.PersonalView == true) { <text>true</text>} else { <text>false</text>};
+    let xoaHeThong=@if (Model.Menu_GroupPermission.SystemDelete == true) { <text>true</text>} else { <text>false</text>};
+    let xoaCaNhan=@if (Model.Menu_GroupPermission.PersonalDelete == true) { <text>true</text>} else { <text>false</text>};
+
+    $(document).ready(function () {
+
+
+        let resizeObserver = new ResizeObserver(() => {
+            if (typeof (table) !== 'undefined') {
+                table.columns.adjust();
+            }
+        });
+        resizeObserver.observe($('#vdContentContainer')[0]);
+
+        let selectedFields = "id,title,code,text,url,isactive,position,languageId, CreatedUserID";
+
+        var datatableOption = initialDatatableOption();
+        datatableOption.ajax.url = '@Url.Action("GetList", "Banner", new { area = "Admin" })';
+        datatableOption.ajax.data = {
+            selectedFields: function () {
+                return selectedFields;
+            },
+            stringFilter: function () {
+                let stringFilter = '';
+
+                if (!isNullOrEmpty($('#quickSearch').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+
+                    var search = $('#quickSearch').val().trim();
+                    stringFilter += "title.Contains(\"" + search + "\") OR text.Contains(\"" + search + "\")";
+                }
+
+                if (xemHeThong == false && (xemCaNhan == true)) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += 'CreatedUserID =' + userId;
+                }
+
+
+                return stringFilter;
+            }
+        };
+
+        datatableOption.drawCallback = function (settings) {
+            table.columns.adjust();
+        };
+
+        datatableOption.initComplete = function () {
+            this.api().columns().every(function (index) {
+                var headerName = $(this.header()).text();
+                var column = this;
+                if (index == 0) {
+                    $(column.header()).html('<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkbox-select-all">\
+                                <label for="checkbox-select-all"></label>\
+                            </div></div>');
+                }
+
+                table.columns.adjust();
+            });
+
+            $('#checkbox-select-all').off('change').on('change', function () {
+                $('#dtTable tbody input:checkbox[name="checkboxSelected"]').prop('checked', this.checked);
+            });
+        };
+
+        datatableOption.order = [[2, "ASC"]];
+        datatableOption.columnDefs = [
+            {
+                "targets": "_all",
+                "orderable": false
+            },
+            {
+                "targets": [0],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [5],
+                className: 'dt-body-center'
+            },
+            {
+                "targets": [6],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowUpdate)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            },
+            {
+                "targets": [7],
+                className: 'dt-body-center menu-action',
+                "orderable": false,
+                "searchable": false,
+                @if (!Model.Menu_GroupPermission.AllowDelete)
+                    {
+                        <text>
+                visible: false
+                </text>
+                    }
+            }
+        ];
+
+        datatableOption.columns = [
+            {
+                "width": "20px", "data": "id", "name": "id", "autoWidth": true,
+                "render": function (data, type, full, meta) {
+                    return '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                <input type="checkbox" id="checkboxSelected_' + full.id + '" name="checkboxSelected">\
+                                <label for="checkboxSelected_' + full.id + '"></label>\
+                            </div></div>';
+                }
+            },
+            {
+                "data": "url", "name": "url", width: "150px", "title": "Ảnh",
+                "render": function (data, type, full, meta) {
+                    let content = '';
+                    if (!isNullOrEmpty(data)) {
+                        content = '<img src="'+data+'" height="50" style=" object-fit: contain;" />'
+                    }
+
+                    return content;
+                }
+            },
+            { "data": "title", "name": "title", "autoWidth": true, "title": "Tiêu đề" },
+            { "data": "text", "name": "text", "autoWidth": true, "title": "Text" },
+            { "data": "position", "name": "position", "autoWidth": true, "title": "Thứ tự" },
+            {
+                "data": "isactive", "name": "isactive", width: "30px", "title": "Kích hoạt",
+                "render": function (data, type, full, meta) {
+                    let content = '<div class="controls"><div class="vd_checkbox checkbox-success">\
+                                    <input type="checkbox" id="checkboxActive_' + full.id + '" value="" ' + (data == true ? 'checked' : '') + (suaHeThong == true || (suaCaNhan == true && full.CreatedUserID == userId) ? ' onclick="updateCellDatatable(this)"' : ' disabled' ) + ' data-id="' + full.id + '"' + (data == true ? ' checked ' : '') + ' data-field="isactive" data-value="' + !data + '">\
+                                    <label for="checkboxActive_' + full.id + '"></label>\
+                                  </div></div>';
+
+                    return content;
+                }
+            },
+            {
+                "data": "id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(suaHeThong == true || (suaCaNhan == true && row.CreatedUserID == userId)){
+                        html ='<div class="d-flex order-actions"><a data-original-title="edit" data-toggle="tooltip" data-placement="top" onclick=editRow(this) data-code='+row.code+' data-code="' + row.code + '"  href="#!"> <i class="bx bxs-edit"></i> </a></div>';
+                    }
+                    return html ;
+                }, "name": "btnEdit", width: "30px"
+            },
+            {
+                "data": "id", "mRender": function (data, type, row, meta) {
+                    let html='';
+                    if(xoaHeThong == true ||  (xoaCaNhan == true && row.CreatedUserID == userId)){
+                        html ='<div class="d-flex order-actions"><a data-original-title="delete" data-toggle="tooltip" data-placement="top"  onclick=deleteDataRow(' + row.id + ')> <i class="bx bxs-trash"></i> </a></div>';
+                    }
+                    return html ;
+                }, "name": "btnDelete", width: "30px"
+            }
+        ]
+
+        table = $('#dtTable').DataTable(datatableOption);
+
+        $('#dtTable tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+
+            selectedDataRow = table.row($(this)).data();
+        });
+
+        $("#btnRefreshData").click(function () {
+            table.draw();
+        });
+
+        $('#btnAdd').click(function () {
+            $('#form')[0].reset();
+            $('#imgAvatar').attr('src', '@CommonConstants.FileNoImage');
+
+            $('#modalUpdateBanner').modal('show');
+        });
+
+        $('#btnDelete').click(function () {
+            dataListId = [];
+            dataListId = $(table.$('input:checkbox[name="checkboxSelected"]').map(function () {
+                return $(this).prop("checked") ? table.rows($(this).closest('tr')).data()[0].id : null;
+            })).toArray();
+
+            if (dataListId.length > 0) {
+                $('#confirmDeleteDataRowModal').modal('show');
+            } else {
+                notification("top right", "info", "fadeIn animated bx bx-info-circle", "", "Bạn chưa chọn dòng nào để xóa.");
+            }
+        });
+
+        $('#btnExecuteDeleted').click(function (e) {
+            e.preventDefault();
+
+            if (dataListId.length > 0) {
+                var data = { ids: dataListId };
+                var url = "@Url.Action("DeleteByIds", "Banner", new { area = "Admin" })";
+
+                sendDataToURL(url, data, true, null)
+                .then(function (res) {
+                    if (res) {
+                        notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+                    }
+                    else {
+                        if (res == null) {
+                            notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+                        }
+                        else if (res == "") {
+                            $('#confirmDeleteDataRowModal').modal('hide');
+                            notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Xóa thành công");
+                            resetCheckboxAndDatatable();
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    function deleteDataRow(id) {
+        dataListId = [id];
+        $('#confirmDeleteDataRowModal').modal('show');
+    }
+
+    function editRow(data) {
+        var data = {
+            selectedFields: "id,title,code,text,url,isactive,position,languageId",
+            stringFilter: 'code.Contains("' + $(data).data('code') + '")',
+            sortCondition: 'id asc',
+            top: 10,
+        };
+
+        var url = "@Url.Action("Filter", "Banner", new { area = "Admin" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                res.forEach(function (item, index) {
+                     $('#Id').val(item.id);
+                        $('#Title').val(item.title);
+                        $('#Text').val(item.text);
+                        $('#Position').val(item.position);
+                        $('#Isactive').prop('checked', item.isactive);
+                        $('#imgAvatar').attr('src', item.url);
+                        $('#Avatar').val(item.url);
+                });
+                $('#modalUpdateBanner').modal('show');
+            }else{
+                notification("top right", "error", "fadeIn animated bx bx-error", "", "Bạn không được phép thực hiện thao tác này");
+            }
+        });
+    }
+
+    function resetCheckboxAndDatatable() {
+        table.draw();
+        $('#checkbox-select-all').prop('checked', false);
+        dataListId = [];
+        selectedDataRow = null;
+    }
+
+    function updateCellDatatable(that) {
+        var data = {
+            id : $(that).data("id"),
+            fields : [$(that).data("field")],
+            values : [$(that).data("value")],
+        };
+
+        var url = "@Url.Action("AddOrUpdateList", "Banner", new { area = "Admin" })";
+
+        sendDataToURL(url, data, false, null)
+        .then(function (res) {
+            if (res) {
+                notification("top right", "error", "fadeIn animated bx bx-error", "", res);
+            }
+        });
+    }
+</script>
+
+
+@Html.Partial("_PartialContentHeader")
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter">
+                                <label>
+                                    Search:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearch" onchange="resetCheckboxAndDatatable()">
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
+
+                            @if (Model.Menu_GroupPermission.SystemEdit == true || Model.Menu_GroupPermission.PersonalEdit == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnAdd" tabindex="0" aria-controls="example2" type="button"><span>Thêm mới</span></button>
+                            }
+
+                            @if (Model.Menu_GroupPermission.SystemDelete == true)
+                            {
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnDelete" tabindex="0" aria-controls="example2" type="button"><span>Xóa</span></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@Html.Partial("PartialConfirmDeleteModal")
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PatialAddOrUpdateModal")

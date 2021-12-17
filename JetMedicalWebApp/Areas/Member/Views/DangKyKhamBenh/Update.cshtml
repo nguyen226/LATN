@@ -1,0 +1,368 @@
+﻿@using JetMedicalWebApp.Common
+@model JetMedicalWebApp.Areas.Admin.Models.RegisterServiceViewModels
+@{
+    Layout = "~/Areas/Member/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Đăng ký khám bệnh";
+}
+
+
+@section Vendors_CSS{
+    <link rel="stylesheet" href="@Url.Content("~/content/bootstrap-datepicker-1-6-4/css/bootstrap-datepicker3.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
+    <link href="@Url.Content("~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css")" rel="stylesheet" type="text/css">
+}
+
+@section Vendors_Scripts{
+    <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/js/bootstrap-datepicker.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/locales/bootstrap-datepicker.vi.min.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js")"></script>
+}
+
+@section HeaderScript{
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/main.css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseDatatable.css")" type="text/css">
+    <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
+
+}
+
+@section FooterScript{
+    <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/content/js/customisedatepicker.js")"></script>
+}
+
+<script>
+    var dangKyKhamBenh = null;
+    @if(Model.RegisterService != null)
+    {
+        <text>
+    dangKyKhamBenh = {
+        id: '@Model.RegisterService.RegisterID'
+    };
+    </text>
+    }
+
+    $(document).ready(function () {
+        $('.datepicker').datepicker(initialDatepickerOption());
+        //$('#timepicker-default').timepicker({
+        //    showMeridian: false
+        //});
+
+        var dropdownlistSelect2StaffOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2StaffOption.placeholder = "Chọn bác sĩ";
+        dropdownlistSelect2StaffOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Staff", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, fullname, isactive, Isexamination';
+                var condition = params.term ? ' ProvinceName.Contains(\\' + params.term + '\\) AND IsActive = True AND Isexamination = TRUE' : ' IsActive = True AND Isexamination = TRUE';
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'fullname asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.fullname
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#bacSi').select2(dropdownlistSelect2StaffOption);
+
+        var dropdownlistSelect2GoiKhamOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2GoiKhamOption.placeholder = "Chọn gói khám";
+        dropdownlistSelect2GoiKhamOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "NewsContent", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = "id, name";
+                var condition = 'TypeId IN (@CommonConstants.CategoryGoiKhamVN) AND languageId IN (@CommonConstants.TiengViet) AND isactive = 1';
+                if(params.term){
+                    condition += "AND (name LIKE N'%" + params.term + "%')";
+                }
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#goiKham').select2(dropdownlistSelect2GoiKhamOption);
+
+
+        var dropdownlistSelect2PhongKhamOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2PhongKhamOption.placeholder = "Chọn phòng khám";
+        dropdownlistSelect2PhongKhamOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Department", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = "id, name";
+                var condition = '';
+                if (params.term) {
+                    condition += "(name LIKE N'%" + params.term + "%')";
+                }
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#phongKham').select2(dropdownlistSelect2PhongKhamOption);
+
+
+        $("#btnDangKyKham").click(function (e) {
+            e.preventDefault();
+
+            if (checkFormUpdate()) {
+                var url = "@Url.Action("AddOrUpdate", "DangKyKhamBenh", new { area = "Member" })";
+
+                var fields = [
+                    'DepartmentId',
+                    'PackageId',
+                    'StaffId',
+                    'RegisterDate',
+                    'RegisterNote',
+                    'Status'
+                ];
+                var values = [
+                    $('#phongKham').val(),
+                    $('#goiKham').val(),
+                    $('#bacSi').val(),
+                    $('#ngayKham').val() + " " + $('#timepicker-default').val(),
+                    $('#RegisterNote').val(),
+                    $('#Status').val()
+                ];
+
+                var data = {
+                    id: dangKyKhamBenh != null ? dangKyKhamBenh.id : null,
+                    fields: fields,
+                    values: values
+                };
+
+                sendDataToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", res);
+                    }
+                    else {
+                        window.location.href = "@Url.Action("Index", "DangKyKhamBenh", new { area = "Member" })";
+                    }
+                });
+            }
+        });
+
+        $("a[name='btnTroVeDanhSach']").click(function (e) {
+            e.preventDefault();
+            window.location.href = '@Url.Action("Index", "DangKyKhamBenh", new { area = "Member" })';
+        });
+
+    });
+
+    function checkFormUpdate() {
+        var check = true;
+        var error = "";
+
+        if (isNullOrEmptySelect2($('#bacSi').val())) {
+            error = "Chưa chọn bác sĩ.";
+            check = false;
+        }
+
+        if (isNullOrEmptySelect2($('#goiKham').val())) {
+            error = "Chưa chọn gói khám.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#ngayKham').val())) {
+            error = "Chưa chọn ngày khám.";
+            check = false;
+        }
+
+        if (isNullOrEmpty($('#timepicker-default').val())) {
+            error = "Chưa nhập thời gian khám.";
+            check = false;
+        }
+
+        if (!check) {
+            notification("topright", "notify", "fa fa-exclamation-triangle vd_yellow", "", error);
+        }
+
+        return check;
+    }
+
+
+</script>
+
+
+<div class="vd_content clearfix">
+    @Html.Partial("_PartialContentHeader")
+
+    <div class="vd_content-section clearfix">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel widget light-widget">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="mgbt-xs-15">Thông tin đăng ký</h3>
+                                <form class="form-horizontal" action="#" role="form">
+                                    <div class="form-group row">
+                                        <div class="col-md-12">
+                                            <label class="control-label  col-sm-2">Gói khám <span class="vd_red">*</span></label>
+                                            <div id="first-name-input-wrapper" class="controls col-sm-6">
+                                                <select id="goiKham" name="goiKham" class="form-control select2">
+                                                    @if (Model.RegisterService != null && Model.RegisterService.PackageId > 0)
+                                                    {
+                                                        <option value="@Model.RegisterService.PackageId" selected>@Html.Raw(Model.Package != null ? Model.Package.name : string.Empty)</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-12">
+                                            <label class="control-label  col-sm-2">Phòng khám <span class="vd_red">*</span></label>
+                                            <div id="first-name-input-wrapper" class="controls col-sm-6">
+                                                <select id="phongKham" name="phongKham" class="form-control select2">
+                                                    @if (Model.RegisterService != null && Model.RegisterService.DepartmentId > 0)
+                                                    {
+                                                        <option value="@Model.RegisterService.DepartmentId" selected>@Html.Raw(Model.Department != null ? Model.Department.name : string.Empty)</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-12">
+                                            <label class="control-label  col-sm-2">Bác sĩ <span class="vd_red">*</span></label>
+                                            <div id="first-name-input-wrapper" class="controls col-sm-6">
+                                                <select id="bacSi" name="bacSi" class="form-control select2">
+                                                    @if (Model.RegisterService != null && Model.RegisterService.StaffId > 0)
+                                                    {
+                                                        <option value="@Model.RegisterService.StaffId" selected>@Html.Raw(Model.Staff != null ? Model.Staff.fullname : string.Empty)</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+
+                                        <div class="col-md-12">
+                                            <label class="control-label  col-sm-2">Ngày khám <span class="vd_red">*</span></label>
+                                            <div id="first-name-input-wrapper" class="controls col-sm-6">
+                                                <input type="text" class="datepicker" name="ngayKham" id="ngayKham" value="@(Model.RegisterService != null ? Model.RegisterService.NgayKham : DateTime.Now.ToString("dd/MM/yyyy"))">
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-12">
+                                            <label class="control-label  col-sm-2">Thời gian khám <span class="vd_red">*</span></label>
+                                            <div id="first-name-input-wrapper" class="controls col-sm-6">
+                                                <div class="input-group bootstrap-timepicker">
+                                                    @*<input type="text" style="border-radius: 4px; height:34px;" id="timepicker-default" value="@(Model.RegisterService != null ? Model.RegisterService.ThoiGianKham : DateTime.Now.ToString("HH:mm"))">*@
+                                                    <input type="text" style="border-radius: 4px; height:34px;" id="timepicker-default" readonly onclick="openTimepicker(this)" required autocomplete="off" value="@(Model.RegisterService != null ? Model.RegisterService.ThoiGianKham : string.Empty)">
+                                                    <span class="input-group-addon" id="timepicker-default-span"><i class="fa fa-clock-o"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="col-md-12">
+                                            <label class="control-label  col-sm-2">Trạng thái đăng ký <span class="vd_red">*</span></label>
+                                            <div id="first-name-input-wrapper" class="controls col-sm-6">
+                                                <input type="number" disabled id="Status" class="form-control" value="@(Model.RegisterService != null ? Model.RegisterService.Status : 1)">
+                                                <span class="vd_red">1: Đăng ký, 2: Đã tiếp nhận thông tin, 3: Khám , 4: Hoàn thành</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <label class="control-label  col-sm-2">Ghi chú <span class="vd_red">*</span></label>
+                                            <div id="first-name-input-wrapper" class="controls col-sm-6">
+                                                <input type="text" id="RegisterNote" class="form-control" value="@(Model.RegisterService != null ? Model.RegisterService.RegisterNote : "")">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-2"></div>
+                                        <div class="col-md-6">
+                                            @if (Model.RegisterService == null || (Model.RegisterService != null && Model.RegisterService.Status == 1))
+                                            {
+                                                <button class="btn vd_btn vd_bg-green" id="btnDangKyKham"><span class="menu-icon"><i class="fa fa-fw fa-check"></i></span> Đăng ký</button>
+                                            }
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- col-sm-12 -->
+                </div>
+                <!-- row -->
+            </div>
+        </div>
+        <!-- Panel Widget -->
+    </div>
+    <!-- col-sm-12-->
+</div>
+
+@Html.Partial("_PartialNotificationModal")
+@Html.Partial("_PartialNotificationAndAskOperationModal")
+@Html.Partial("_PartialChonThoiGianKhamBenh")
