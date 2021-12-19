@@ -54,14 +54,14 @@
                     <p><i class="fas fa-envelope-open-text"></i> Vanthu.bvtwqn@gmail.com <span><i class="fas fa-phone-volume"></i> HOTLINE: <span class="hotline">0967 951  313</span></span> </p>
                 </div>
                 <div class="menu_topleft">
-                    <div class="col-lg-7">
+                    <div class="col-lg-12">
                         @if (Model.MemberId > 0)
                         {
                             <div class="popup">
                                 <a href="javascript:void(0)" data-url="@Url.Action("Update", "Users", new { area = "Member", userId= (Model.MemberId > 0 ? Model.MemberId : -1)})" class="mr-2 button-regis" id="btnThongTinCaNhan">
                                     Xin Chào: @Html.Raw(Model.MemberName)
                                 </a>
-                                <a href="javascript:void(0)" data-url="/dang-xuat" class="button-regis" id="btnDangXuat">
+                                <a href="/Home/Login" class="button-regis" id="btnDangXuat">
                                     Thoát
                                 </a>
                             </div>
@@ -78,26 +78,6 @@
 
                         }
                     </div>
-                    <div class="col-lg-3">
-                        <form action="/Search" method="GET" class="timkiem" id="desktop">
-                            <input name="txtSearch" placeholder="Tìm kiếm...">
-                            <button type="submit"><img src="~/Content/bvtwqn/images/search.svg"></button>
-                        </form>
-                    </div>
-                    <div class="col-lg-2">
-                        <div class="ngon_ngu">
-                            <a href="javascript:void(0)" onclick="reloadNgonNgu('@CommonConstants.TiengViet')">
-                                <img src="~/Content/Website/Assets/images/vi.svg" alt="">
-                            </a>
-                            <a href="javascript:void(0)" onclick="reloadNgonNgu('@CommonConstants.TiengAnh')">
-                                <img src="~/Content/Website/Assets/images/en.svg" alt="">
-                            </a>
-                        </div>
-                    </div>
-
-
-
-
                 </div>
 
             </div>

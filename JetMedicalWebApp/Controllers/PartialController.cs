@@ -21,7 +21,6 @@ namespace JetMedicalWebApp.Controllers
             Dictionary<string, string> filters = null, inData = null, outData = null, requestParameters = null;
             Dictionary<string, Dictionary<string, string>> parameters = null;
             Dictionary<string, string> inputParam = new Dictionary<string, string>();
-            model.Tags = internalService.GetListDataThongKeTagsFromViewExposeDto();
 
             int languageId = Utilities.GetLanguage();
 

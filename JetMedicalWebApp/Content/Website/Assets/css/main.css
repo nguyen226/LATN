@@ -2221,19 +2221,19 @@ span.dichvu_money {
 }
 
 .box_group_from, .box_group_from_radio {
-    padding: 10px 0;
+    padding: 5px 0;
 }
 
-.box_group_from label {
-    color: #ffffff;
-    font-family: Roboto Bold;
-    margin-bottom: 10px;
-}
+    .box_group_from label {
+        color: #0088cc;
+        font-family: Roboto Bold;
+        margin-bottom: 10px;
+    }
 
 .box_group_from input {
     border: 1px solid rgba(151, 151, 151, 0.2);
     border-radius: 4px;
-    padding: 10px;
+    padding: 5px;
     width: 100%;
 }
 
@@ -2278,6 +2278,11 @@ span.dichvu_money {
     background-position-x: 10px;
 }
 
+
+.input-lich {
+    background: url(../images/lich.svg) no-repeat right white;
+    background-position-x: 10px;
+}
 .input-sdt {
     background: url(../images/sdt_kham.svg) no-repeat right white;
     background-position-x: 10px;
@@ -2303,7 +2308,7 @@ span.dichvu_money {
     background-position-x: 10px;
 }
 
-.input-lock, .input-checkin, .input-email, .input-time, .input-sdt, .input-hoten {
+.input-lock, .input-checkin, .input-email, .input-time, .input-sdt, .input-hoten, .input-lich {
     padding-left: 40px !important;
 }
 

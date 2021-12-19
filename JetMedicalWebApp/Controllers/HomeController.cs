@@ -16,206 +16,27 @@ namespace JetMedicalWebApp.Controllers
     {
         public ActionResult Index()
         {
+            HttpCookie currentUserCookie = Request.Cookies[Common.CommonConstants.CookieMemberID];
+            if (currentUserCookie == null)
+            {
+                return Redirect("/Home/Login");
+            }
+
             ViewBag.MennuSelected = "Home";
             BaseViewModel model = new BaseViewModel();
             ResourceService resourceService = new ResourceService();
-            StaffService staffService = new StaffService();
-            VideoService videoService = new VideoService();
             InternalService internalService = new InternalService();
           
             model.IDicResource = resourceService.GetView();
-            model.Tags = internalService.GetListDataThongKeTagsFromViewExposeDto();
             Dictionary<string, string> filters = null, inData = null, outData = null, requestParameters = null;
             Dictionary<string, Dictionary<string, string>> parameters = null;
             Dictionary<string, string> inputParam = new Dictionary<string, string>();
             
             model.LanguageId = Utilities.GetLanguage();
 
-            string selectedFields = "id, brandname, [order], img, fullname,position, languageId";
-            inputParam.Add(CommonConstants.StrSortedColumnNames, "[order] asc");
-            inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-            inputParam.Add(CommonConstants.StrStringFilter, "languageId = " + model.LanguageId.ToString());
-
-            parameters = internalService.SetThamSoChoDatatable_GetList(0, 12, inputParam);
-
-            inData = parameters[CommonConstants.StrInData];
-            filters = parameters[CommonConstants.StrFilters];
-            requestParameters = parameters[CommonConstants.StrRequestParamters];
-
-            model.Staffs = staffService.GetListDataFromViewExposeDto(filters, inData, out outData);
-
-
-            //newType staff
-            //NewsTypeService newsTypeService = new NewsTypeService();
-            //inputParam = new Dictionary<string, string>();
-
-            //inputParam.Add(CommonConstants.StrSortedColumnNames, "orderBy ASC");
-            //selectedFields = "id, code, name, show, isMennu, isactive, languageId, languageCode, orderBy";
-            //inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-            //inputParam.Add(CommonConstants.StrStringFilter, "languageId = " + model.LanguageId.ToString() + " AND code.Equals(\"" +CommonConstants.NewsType_STAFF+ "\")");
-
-            //parameters = internalService.SetThamSoChoDatatable_GetList(0, 1, inputParam);
-
-            //inData = parameters[CommonConstants.StrInData];
-            //filters = parameters[CommonConstants.StrFilters];
-            //requestParameters = parameters[CommonConstants.StrRequestParamters];
-
-            //var newType = newsTypeService.GetListExposeDto(filters, inData, out outData).FirstOrDefault();
-            //ViewBag.DoiNguChuyenGia = newType != null ? newType.name : (model.LanguageId == CommonConstants.TiengViet ? "Đội ngũ chuyên gia" : "Expert team");
-
-
-            //inputParam[CommonConstants.StrStringFilter] = "languageId = " + model.LanguageId.ToString() + " AND code.Equals(\"" + CommonConstants.NewsType_FEEDBACK + "\")";
-
-            //parameters = internalService.SetThamSoChoDatatable_GetList(0, 1, inputParam);
-
-            //inData = parameters[CommonConstants.StrInData];
-            //filters = parameters[CommonConstants.StrFilters];
-            //requestParameters = parameters[CommonConstants.StrRequestParamters];
-
-            //newType = newsTypeService.GetListExposeDto(filters, inData, out outData).FirstOrDefault();
-            //ViewBag.Feedback = newType != null ? newType.name : (model.LanguageId == CommonConstants.TiengViet ? "Đánh giá từ Khách hàng" : "Review from Customers");
-
-
-            // feddback
-
-            //FeedbackService feedbackService = new FeedbackService();
-            //inputParam = new Dictionary<string, string>();
-
-            //selectedFields = "id, avatar, fullname,content, languageId";
-            //inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-            //inputParam.Add(CommonConstants.StrStringFilter, "languageId = " + model.LanguageId.ToString());
-            //parameters = internalService.SetThamSoChoDatatable_GetList(0, 15, inputParam);
-            //inData = parameters[CommonConstants.StrInData];
-            //filters = parameters[CommonConstants.StrFilters];
-            //requestParameters = parameters[CommonConstants.StrRequestParamters];
-
-            //model.Feedbacks = feedbackService.GetListExposeDto(filters, inData, out outData);
-
-
-            // package
-            NewsContentService newsContentService = new NewsContentService();
-            //model.NewsCategories = new List<NewsCategoryDto>();
-            //NewsCategoryService newsCategoryService = new NewsCategoryService();
-            //inputParam = new Dictionary<string, string>();
-
-            //selectedFields = "id, slug, banner, name ";
-            //inputParam.Add(CommonConstants.StrSortedColumnNames, "CONVERT(Datetime,created_at,103) desc");
-            //inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-            //inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = " + model.LanguageId.ToString() + " AND isHome= 1 ");
-
-            //parameters = internalService.SetThamSoChoDatatable_GetList(0, 15, inputParam);
-            //inData = parameters[CommonConstants.StrInData];
-            //filters = parameters[CommonConstants.StrFilters];
-            //requestParameters = parameters[CommonConstants.StrRequestParamters];
-
-            //model.NewsCategories = newsCategoryService.GetListDataFromStoreExposeDto(filters, inData, out outData);
-            NewsCategoryService newsCategoryService = new NewsCategoryService();
-            model.NewsCategories = new List<NewsCategoryDto>();
-            inputParam = new Dictionary<string, string>();
-            selectedFields = "id, name, typeId, banner, slug, languageId, isactive, isHome";
-            inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-            inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = " + model.LanguageId.ToString() + " AND isHome= 1 AND typeId = 1046");
-            parameters = internalService.SetThamSoChoDatatable_GetList(0, 999, inputParam);
-            inData = parameters[CommonConstants.StrInData];
-            filters = parameters[CommonConstants.StrFilters];
-            requestParameters = parameters[CommonConstants.StrRequestParamters];
-            model.NewsCategories = newsCategoryService.GetListDataFromStoreExposeDto(filters, inData, out outData);
-            ViewData["cateList"] = model.NewsCategories;
-
-
-            //Thông báo
-            inputParam = new Dictionary<string, string>();
-
-            selectedFields = "id, title, keywords,descriptions, avatar,slug, url, categoriId,TypeCode,  name, categoriName, isactive, created_by, shorttitle,description,created_at,languageId ";
-            inputParam.Add(CommonConstants.StrSortedColumnNames, "CONVERT(Datetime,created_at,103) desc");
-            inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-            //2058 tin Benh vien
-            if (model.LanguageId == 1)
-            {
-                inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = 1 AND categoriId = 3082");
-            }
-            else
-            {
-                inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = 2 AND categoriId = 3082");
-            }
-            parameters = internalService.SetThamSoChoDatatable_GetList(0, 10, inputParam);
-            inData = parameters[CommonConstants.StrInData];
-            filters = parameters[CommonConstants.StrFilters];
-            requestParameters = parameters[CommonConstants.StrRequestParamters];
-            model.News = newsContentService.GetListDataFromViewExposeDto(filters, inData, out outData);
-
-            // News trong nuoc 3080
-
-            inputParam = new Dictionary<string, string>();
-
-            selectedFields = "id, title, keywords,descriptions, avatar, slug,url, categoriId, name, isactive,TypeCode,  categoriName, created_by, shorttitle,description,created_at,languageId ";
-            inputParam.Add(CommonConstants.StrSortedColumnNames, "CONVERT(Datetime,created_at,103) desc");
-            inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-
-            if (model.LanguageId == 1)
-            {
-                inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = 1 AND categoriId = 3080");
-            }
-            else
-            {
-                inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = 2 AND categoriId = 3080");
-            }
-
-            parameters = internalService.SetThamSoChoDatatable_GetList(0, 10, inputParam);
-            inData = parameters[CommonConstants.StrInData];
-            filters = parameters[CommonConstants.StrFilters];
-            requestParameters = parameters[CommonConstants.StrRequestParamters];
-            model.NewsTrongNuoc = newsContentService.GetListDataFromViewExposeDto(filters, inData, out outData);
-
-
-            // Tin đoàn thể 3081
-
-            inputParam = new Dictionary<string, string>();
-
-            selectedFields = "id, title, keywords,descriptions, avatar, slug, isactive,url, categoriId, name,TypeCode,  categoriName, created_by, shorttitle,description,created_at,languageId ";
-            inputParam.Add(CommonConstants.StrSortedColumnNames, "CONVERT(Datetime,created_at,103) desc");
-            inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-
-            if(model.LanguageId == 1)
-            {
-                inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = 1 AND categoriId = 3081");
-            }   
-            else
-            {
-                inputParam.Add(CommonConstants.StrStringFilter, "isactive = 1 AND languageId = 2 AND categoriId = 3081");
-            }    
-           
-
-            parameters = internalService.SetThamSoChoDatatable_GetList(0, 10, inputParam);
-            inData = parameters[CommonConstants.StrInData];
-            filters = parameters[CommonConstants.StrFilters];
-            requestParameters = parameters[CommonConstants.StrRequestParamters];
-            model.NewsQuocTe = newsContentService.GetListDataFromViewExposeDto(filters, inData, out outData);
-
-
-            // Video hoạt động
-            //inputParam = new Dictionary<string, string>();
-
-            //selectedFields = "id, title, keywords, descriptions, avatar, url, name, languageId, position";
-
-            //inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
-            //inputParam.Add(CommonConstants.StrSortedColumnNames, "position ASC");
-            //inputParam.Add(CommonConstants.StrStringFilter, "languageId = " + model.LanguageId.ToString());
-
-            //parameters = internalService.SetThamSoChoDatatable_GetList(0, 3, inputParam);
-
-            //inData = parameters[CommonConstants.StrInData];
-            //filters = parameters[CommonConstants.StrFilters];
-            //requestParameters = parameters[CommonConstants.StrRequestParamters];
-
-            //model.Videos = videoService.GetListExposeDto(filters, inData, out outData);
-
-
-
-
             // banner
             inputParam = new Dictionary<string, string>();
-            selectedFields = "id, title, text, url, isactive, languageId, position";
+            string selectedFields = "id, title, text, url, isactive, languageId, position";
             inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
             inputParam.Add(CommonConstants.StrSortedColumnNames, "position ASC");
             inputParam.Add(CommonConstants.StrStringFilter, "isactive = TRUE AND languageId = " + model.LanguageId.ToString());
@@ -257,6 +78,16 @@ namespace JetMedicalWebApp.Controllers
                 ViewBag.seoDescription = app.Description;
             }
             return View(model);
+        }
+
+        public ActionResult Login()
+        {
+            return View();
+        }
+
+        public ActionResult Register()
+        {
+            return View();
         }
 
         public JsonResult Language(int id)
@@ -416,7 +247,7 @@ namespace JetMedicalWebApp.Controllers
         {
             if (string.IsNullOrEmpty(returnUrl))
             {
-                returnUrl = "/";
+                returnUrl = "Home/Login";
             }
             HttpCookie currentUserCookie = Request.Cookies[Common.CommonConstants.CookieMemberID];
             if (currentUserCookie != null)

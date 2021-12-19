@@ -9,8 +9,298 @@
         @Html.Partial("Partial/Banner")
     </div>
 }
-@Html.Partial("Partial/News")
-@Html.Partial("Partial/Package")
+
+<script>
+    $(document).ready(function () {
+        hideAlertErrorDatLichKhamTheoPhongBan();
+
+        var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn chuyên khoa";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Department", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = "id, name, languageId, isActive";
+                var condition = 'isActive == true';
+                if(params.term) {
+                    condition += "AND (name LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                }
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 25,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#formDatLichKhamTheoPhongBan_PhongBan').select2(dropdownlistSelect2Option);
+
+        var dropdownlistSelect2StaffOption = initialDropdownlistSelect2Option();
+        dropdownlistSelect2StaffOption.placeholder = "Chọn bác sĩ";
+        dropdownlistSelect2StaffOption.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Staff", new { area = "Member" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = 'id, fullname, isactive, Isexamination, departmentid';
+                var condition = 'IsActive == True AND Isexamination == TRUE';
+
+                if (!isNullOrEmpty(condition) && !isNullOrEmptySelect2($('#formDatLichKhamTheoPhongBan_PhongBan').val())) {
+                    condition += ' AND departmentid == ' + $('#formDatLichKhamTheoPhongBan_PhongBan').val();
+                }
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'fullname asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.fullname
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#formDatLichKhamTheoPhongBan_BacSi').select2(dropdownlistSelect2StaffOption);
+
+        $('#btnDatLichKhamTheoPhongBan').click(function () {
+            if (checkFormDangKyLichKham()) {
+                var url = "@Url.Action("AddOrUpdate", "DangKyKhamBenh", new { area = "Member" })";
+
+                var fields = [
+                    'DepartmentId',
+                    'StaffId',
+                    'RegisterDate'
+                ];
+                var values = [
+                    $('#formDatLichKhamTheoPhongBan_PhongBan').val(),
+                    $('#formDatLichKhamTheoPhongBan_BacSi').val(),
+                    $('#formDatLichKhamTheoPhongBan_NgayKham').val() + " " + $('#formDatLichKhamTheoPhongBan_ThoiGianKham').val()
+                ];
+
+                var data = {
+                    id: null,
+                    fields: fields,
+                    values: values
+                };
+
+                sendDataToURL(url, data, true)
+                .then(function (res) {
+                    if (res) {
+                        showAlertErrorDatLichKhamTheoPhongBan(res);
+                    }
+                    else {
+                        $('.formDatLichKhamTheoPhongBanThanhCong').fadeIn().show();
+                        $('.formDatLichKhamTheoPhongBan').fadeOut().hide();
+                    }
+                });
+            }
+        })
+
+        $('#formDatLichKhamTheoPhongBan_PhongBan').change(function () {
+            if (!isNullOrEmptySelect2($('#formDatLichKhamTheoPhongBan_PhongBan').val())) {
+                var url = "@Url.Action("Filter", "Staff", new { area = "Member" })";
+
+                var data = {
+                    selectedFields: 'id, fullname, departmentid, isactive',
+                    stringFilter: 'isactive == true AND departmentid == ' + $('#formDatLichKhamTheoPhongBan_PhongBan').val(),
+                    sortCondition: 'fullname asc',
+                    top: 1,
+                };
+
+                sendDataToURL(url, data, false)
+                    .then(function (res) {
+                        var data = res[0];
+                        if (data != null) {
+                            $('#formDatLichKhamTheoPhongBan_BacSi').append('<option value="' + data.id + '" selected>' + data.fullname + '</option>')
+                        }
+                        else {
+                            $('#formDatLichKhamTheoPhongBan_BacSi').val('').trigger('change');
+                        }
+                    });
+            }
+        })
+
+        $('#formDatLichKhamTheoPhongBan_BacSi').change(function () {
+            if (!isNullOrEmptySelect2($('#formDatLichKhamTheoPhongBan_BacSi').val())) {
+                var url = "@Url.Action("FilterByView", "Staff", new { area = "Member" })";
+
+                var data = {
+                    selectedFields: 'id, fullname, departmentid, departmentname, isactive',
+                    stringFilter: 'id = ' + $('#formDatLichKhamTheoPhongBan_BacSi').val(),
+                    sortCondition: 'fullname asc',
+                    top: 1,
+                };
+
+                sendDataToURL(url, data, false)
+                    .then(function (res) {
+                        var data = res[0];
+                        if (data != null) {
+                            $('#formDatLichKhamTheoPhongBan_PhongBan').append('<option value="' + data.departmentid + '" selected>' + data.departmentname + '</option>')
+                        }
+                        else {
+                            $('#formDatLichKhamTheoPhongBan_PhongBan').val('').trigger('change');
+                        }
+                    });
+            }
+        })
+    });
+
+    function resetFormDatLichKhamTheoPhongBan() {
+        hideAlertErrorDatLichKhamTheoPhongBan();
+        $('.formDatLichKhamTheoPhongBan').fadeIn().show();
+        $('.formDatLichKhamTheoPhongBanThanhCong').fadeOut().hide();
+
+        $('#formDatLichKhamTheoPhongBan')[0].reset();
+        $('#formDatLichKhamTheoPhongBan_PhongBan').val('').trigger('change');
+        $('#formDatLichKhamTheoPhongBan_BacSi').val('').trigger('change');
+    }
+
+    function hideAlertErrorDatLichKhamTheoPhongBan() {
+        $('#formErrorDangKyKhamBenh').fadeOut().hide();
+        $('#formDangKyKhamBenhLabel').text('');
+    }
+
+    function showAlertErrorDatLichKhamTheoPhongBan(msg) {
+        $('#formErrorDangKyKhamBenh').fadeIn().show();
+        $('#formDangKyKhamBenhLabel').text(msg);
+    }
+
+    function checkFormDangKyLichKham() {
+        hideAlertErrorDatLichKhamTheoPhongBan();
+
+        var check = true;
+        var error = '';
+
+        if (isNullOrEmptySelect2($('#formDatLichKhamTheoPhongBan_PhongBan').val())) {
+            check = false;
+            error = 'Bạn chưa chọn gói khám';
+        }
+
+        if (isNullOrEmpty($('#formDatLichKhamTheoPhongBan_NgayKham').val())) {
+            check = false;
+            error = 'Bạn chưa nhập ngày khám';
+        }
+
+        if (isNullOrEmpty($('#formDatLichKhamTheoPhongBan_ThoiGianKham').val())) {
+            check = false;
+            error = 'Bạn chưa nhập thời giam khám';
+        }
+
+        if (!check) {
+            showAlertErrorDatLichKhamTheoPhongBan(error);
+        }
+
+        return check;
+    }
+</script>
+
+
+
+<div id="page_4">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h3 style="text-align:center; position: relative; margin: 0; font-size: 30px; line-height: 35px; color: #0088cc; font-family: Roboto Bold; text-transform: uppercase;">
+                    ĐẶT LỊCH KHÁM
+                </h3>
+                <div class="group-tabs">
+                    <div class="formDatLichKhamTheoPhongBan">
+                        <form id="formDatLichKhamTheoPhongBan" class="frm form-group">
+                            <div class="alert d-none" id="formErrorDangKyKhamBenh">
+                                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                                <strong>Lỗi!</strong> <span id="formDangKyKhamBenhLabel"></span>.
+                            </div>
+
+                            <div class="box_group_from">
+                                <label class="control-label">Họ và tên</label>
+                                <input type="text" class="input-hoten" name="formDatLichKhamTheoPhongBan_HoVaTen" id="formDatLichKhamTheoPhongBan_HoVaTen" placeholder="Họ và tên" required="">
+                            </div>
+
+                            <div class="box_group_from">
+                                <label class="control-label">Số điện thoại</label>
+                                    <input type="text" class="input-sdt" name="formDatLichKhamTheoPhongBan_SoDienThoai" id="formDatLichKhamTheoPhongBan_SoDienThoai" placeholder="Số điện thoại" required="">
+                            </div>
+
+
+                            <div class="box_group_from">
+                                <label class="control-label">Email</label>
+                                    <input type="text" class="input-email" name="formDatLichKhamTheoPhongBan_Email" id="formDatLichKhamTheoPhongBan_Email" placeholder="Email" required="">
+                            </div>
+
+
+                            <div class="box_group_from">
+                                <label class="control-label">Ngày sinh</label>
+                                <input type="text" class="input-checkin datepicker" name="formDatLichKhamTheoPhongBan_NgaySinh" id="formDatLichKhamTheoPhongBan_NgaySinh" placeholder="Ngày Sinh" required autocomplete="off">
+                            </div>
+
+
+                            <div class="box_group_from">
+                                <label class="control-label">Chuyên khoa</label>
+                                <select id="formDatLichKhamTheoPhongBan_PhongBan" name="formDatLichKhamTheoPhongBan_PhongBan" class="form-control select2"></select>
+                            </div>
+                            <div class="box_group_from">
+                                <label class="control-label">Bác sĩ</label>
+                                <select id="formDatLichKhamTheoPhongBan_BacSi" name="formDatLichKhamTheoPhongBan_BacSi" class="form-control select2"></select>
+                            </div>
+                            <div class="box_group_from">
+                                <label class="control-label">Ngày khám</label>
+                                <input type="text" class="input-checkin datepicker" name="formDatLichKhamTheoPhongBan_NgayKham" id="formDatLichKhamTheoPhongBan_NgayKham" placeholder="Ngày khám" required autocomplete="off">
+                            </div>
+                            <div class="box_group_from">
+                                <label class="control-label">Giờ khám</label>
+                                <input type="text" class="input-time" readonly onclick="openTimepicker(this)" name="formDatLichKhamTheoPhongBan_ThoiGianKham" id="formDatLichKhamTheoPhongBan_ThoiGianKham" placeholder="Giờ khám" required autocomplete="off">
+                            </div>
+                        </form>
+                        <div class="form-group">
+                            <button id="btnDatLichKhamTheoPhongBan" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐẶT LỊCH KHÁM</button>
+                        </div>
+                    </div>
+                    <div class="formDatLichKhamTheoPhongBanThanhCong d-none frm shopping form-group">
+                        <div class="text-center">
+                            <img src="/Content/Website/Assets/images/logo.svg">
+                        </div>
+                        <h2>ĐẶT LỊCH THÀNH CÔNG</h2>
+                        <p>Bạn đã đăng ký thành công, Bộ phận CSKH sẽ liên hệ bạn trong thời gian sớm nhất</p>
+
+                        <div class="form-group">
+                            <button type="button" data-dismiss="modal" aria-hidden="true" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐÓNG</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="page_contact_time">
     <div class="container">
         <div class="row">
@@ -40,11 +330,4 @@
         </div>
     </div>
 </div>
-
-@*@Html.Partial("Partial/Staff")
-
-
-    @Html.Partial("Partial/Feedback")*@
-
-
 

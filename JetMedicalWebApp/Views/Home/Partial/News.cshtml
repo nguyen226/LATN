@@ -7,252 +7,50 @@
         <div class="row">
             <div class="col-lg-12">
                 <h3 class="title_right">
-                    @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "TIN TỨC VÀ SỰ KIỆN" : "NEWS")
+                    ĐẶT LỊCH KHÁM
                 </h3>
                 <div class="xoamargin">
                     <div class="box_tab_menutt">
                         <div class="xoamargin">
                             <div class="group-tabs">
-                                <!-- Nav tabs -->
-                                <ul class="nav nav-tabs" role="tablist">
 
-                                    <li role="presentation" class="active"><a href="#tintucsukien" aria-controls="tintucsukien" role="tab" data-toggle="tab">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "TIN TỨC - SỰ KIỆN" : "NEWS EVENTS")</a></li>
-                                    <li role="presentation"><a href="#tintucdoanthe" aria-controls="home" role="tab" data-toggle="tab">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "TIN ĐOÀN THỂ" : "NEWS UNION")</a></li>
-                                    <li role="presentation"><a href="#tintucthongbao" aria-controls="tintucthongbao" role="tab" data-toggle="tab">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "THÔNG BÁO" : "NOTIFICATION")</a></li>
-                                </ul>
-                                <!-- Tab panes -->
-                                <div class="tab-content">
-                                    <div role="tabpanel" class="tab-pane active" id="tintucsukien">
-                                        @{
-                                            string newnoibat = "";
-                                            string newchitiet = "";
-
-                                            if (Model.News != null && Model.News.Count() > 0)
-                                            {
-                                                int isNews = 0;
-                                                string scroll = "scrollLeft";
-                                                foreach (var item in Model.News)
-                                                {
-                                                    var loai = "_dt_";
-                                                    var url = "";
-                                                    if (item.TypeCode == CommonConstants.NewsType_Package)
-                                                    {
-                                                        loai = "_pdt_";
-                                                    }
-                                                    else if (item.TypeCode == CommonConstants.NewsType_ChuyenKhoa)
-                                                    {
-                                                        loai = "_ckct_";
-                                                    }
-
-                                                    if (!string.IsNullOrEmpty(item.slug))
-                                                    {
-                                                        url = (item.slug).ToLower() + loai + item.id;
-                                                    }
-                                                    else
-                                                    {
-                                                        url = Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + loai + item.id;
-                                                    }
-
-
-                                                    isNews++;
-                                                    if (isNews > 4)
-                                                    {
-                                                        break;
-                                                    }
-
-                                                    if (isNews == 1)
-                                                    {
-                                                        newnoibat = @"<div class='img_effect'><a href='/" + url + "' " +
-                                                                     " class='title-news' title='" + item.name + "'><img src='" + item.avatar + "' alt='" + item.name + "'></a></div>" +
-                                                                      "<div class='ct_tin'> <h4 class='title_xanh'><a href='/" + url + "'>" + item.name + "</a></h4>" +
-                                                                      "<div class='descript_tt'>" +
-                                                                      "<p>" + item.shorttitle + "</p>" +
-                                                                      "</div>" +
-                                                                      " <div class='time_tin'>" + item.updated_at + "</div>" +
-                                                                      //" <a href='/" + url + "'>Đọc thêm <i class='fa fa-more-next'></i></a>" +
-                                                                      "</div>";
-
-                                                    }
-                                                    else
-                                                    {
-                                                        newchitiet += @" <div class='khung_tintuc'><div class='img_effect'><a href='/" + url + "' " +
-                                                                     " class='title-news' title='" + item.name + "'><img src='" + item.avatar + "' alt='" + item.name + "'></a></div>" +
-                                                                      "<div class='ct_tin'> <h4 class='title_xanh'><a href='/" + url + "'>" + item.name + "</a></h4>" +
-                                                                      "<div class='descript_tt'>" +
-                                                                      "<p>" + item.shorttitle + "</p>" +
-                                                                      "</div>" +
-                                                                      " <div class='time_tin'>" + item.updated_at + "</div>" +
-                                                                      //" <a href='/" + url + "'>Đọc thêm <i class='fa fa-more-next'></i></a>" +
-                                                                      "</div>" +
-                                                                      "</div>";
-                                                    }
-
-                                                }
-                                            }
-                                            <div class="khung_ttto">
-                                                @Html.Raw(newnoibat.ToString())
-                                            </div>
-                                            <div class="khung_tt_dest">
-                                                @Html.Raw(newchitiet.ToString())
-                                            </div>
-                                        }
-
-
+                                <div class="formDatLichKham">
+                                    <form id="formDatLichKham" class="frm shopping form-group">
+                                        <div class="text-center">
+                                            <img src="/Content/Website/Assets/images/logo.svg">
+                                        </div>
+                                        <h2>ĐĂNG KÝ KHÁM</h2>
+                                        <p>Bộ phận CSKH sẽ phản hồi bạn trong thời gian sớm nhất</p>
+                                        <div class="alert d-none" id="formErrorDangKyKhamBenh">
+                                            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                                            <strong>Lỗi!</strong> <span id="formDangKyKhamBenhLabel"></span>.
+                                        </div>
+                                        <div class="box_group_from">
+                                            <select id="formDatLichKham_GoiKham" name="formDatLichKham_GoiKham" class="form-control select2"></select>
+                                        </div>
+                                        <div class="box_group_from">
+                                            <select id="formDatLichKham_BacSi" name="formDatLichKham_BacSi" class="form-control select2"></select>
+                                        </div>
+                                        <div class="box_group_from">
+                                            <input type="text" class="datepicker" name="formDatLichKham_NgayKham" id="formDatLichKham_NgayKham" placeholder="Ngày khám" required autocomplete="off">
+                                        </div>
+                                        <div class="box_group_from">
+                                            <input type="text" readonly onclick="openTimepicker(this)" name="formDatLichKham_ThoiGianKham" id="formDatLichKham_ThoiGianKham" placeholder="Giờ khám" required autocomplete="off">
+                                        </div>
+                                    </form>
+                                    <div class="form-group">
+                                        <button id="btnDatLichKham" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐẶT LỊCH KHÁM</button>
                                     </div>
-                                    <div role="tabpanel" class="tab-pane" id="tintucdoanthe">
-                                        @{
-                                            string tintuoctenb = "";
-                                            string tinquoctecitiet = "";
-
-                                            if (Model.NewsQuocTe != null && Model.News.Count() > 0)
-                                            {
-                                                int isNews = 0;
-                                                string scroll = "scrollLeft";
-                                                foreach (var nitem in Model.NewsQuocTe)
-                                                {
-                                                    var loai = "_dt_";
-                                                    var url = "";
-                                                    if (nitem.TypeCode == CommonConstants.NewsType_Package)
-                                                    {
-                                                        loai = "_pdt_";
-                                                    }
-                                                    else if (nitem.TypeCode == CommonConstants.NewsType_ChuyenKhoa)
-                                                    {
-                                                        loai = "_ckct_";
-                                                    }
-
-
-                                                    if (!string.IsNullOrEmpty(nitem.slug))
-                                                    {
-                                                        url = (nitem.slug).ToLower() + loai + nitem.id;
-                                                    }
-                                                    else
-                                                    {
-                                                        url = Utilities.urlConvert(Utilities.VnConcert(nitem.name).ToLower()) + loai + nitem.id;
-                                                    }
-
-                                                    isNews++;
-                                                    if (isNews > 4)
-                                                    {
-                                                        break;
-                                                    }
-
-                                                    if (isNews == 1)
-                                                    {
-                                                        tintuoctenb = @"<div class='img_effect'><a href='/" +
-
-                                                                        url +
-
-                                                                        "' " +
-                                                                     " class='title-news' title='" + nitem.name + "'><img src='" + nitem.avatar + "' alt='" + nitem.name + "'></a></div>" +
-                                                                      "<div class='ct_tin'> <h4 class='title_xanh'><a href='/" +
-                                                                      url +
-                                                                      "'>" + nitem.name + "</a></h4>" +
-                                                                      "<div class='descript_tt'>" +
-                                                                      "<p>" + nitem.shorttitle + "</p>" +
-                                                                      "</div>" +
-                                                                      " <div class='time_tin'>" + nitem.updated_at + "</div>" +
-                                                                    
-                                                                      "</div>";
-
-                                                    }
-                                                    else
-                                                    {
-                                                        tinquoctecitiet += @" <div class='khung_tintuc'><div class='img_effect'><a href='/" + url + "' " +
-                                                                     " class='title-news' title='" + nitem.name + "'><img src='" + nitem.avatar + "' alt='" + nitem.name + "'></a></div>" +
-                                                                      "<div class='ct_tin'> <h4 class='title_xanh'><a href='/" + url + "'>" + nitem.name + "</a></h4>" +
-                                                                      "<div class='descript_tt'>" +
-                                                                      "<p>" + nitem.shorttitle + "</p>" +
-                                                                      "</div>" +
-                                                                      " <div class='time_tin'>" + nitem.updated_at + "</div>" +
-                                                                    
-                                                                      "</div>" +
-                                                                      "</div>";
-                                                    }
-
-                                                }
-                                            }
-                                            <div class="khung_ttto">
-                                                @Html.Raw(tintuoctenb.ToString())
-                                            </div>
-                                            <div class="khung_tt_dest">
-                                                @Html.Raw(tinquoctecitiet.ToString())
-                                            </div>
-                                        }
+                                </div>
+                                <div class="formDatLichKhamThanhCong d-none frm shopping form-group">
+                                    <div class="text-center">
+                                        <img src="/Content/Website/Assets/images/logo.svg">
                                     </div>
-                                    <div role="tabpanel" class="tab-pane" id="tintucthongbao">
-                                        @{
-                                            string trongnuocnoibat = "";
-                                            string trongnuochictiet = "";
+                                    <h2>ĐẶT LỊCH THÀNH CÔNG</h2>
+                                    <p>Bạn đã đăng ký thành công, Bộ phận CSKH sẽ liên hệ bạn trong thời gian sớm nhất</p>
 
-                                            if (Model.NewsTrongNuoc != null && Model.NewsTrongNuoc.Count() > 0)
-                                            {
-                                                int isNews = 0;
-
-                                                foreach (var item in Model.NewsTrongNuoc)
-                                                {
-                                                    var loai = "_dt_";
-                                                    var url = "";
-                                                    if (item.TypeCode == CommonConstants.NewsType_Package)
-                                                    {
-                                                        loai = "_pdt_";
-                                                    }
-                                                    else if (item.TypeCode == CommonConstants.NewsType_ChuyenKhoa)
-                                                    {
-                                                        loai = "_ckct_";
-                                                    }
-
-                                                    if (!string.IsNullOrEmpty(item.slug))
-                                                    {
-                                                        url = (item.slug).ToLower() + loai + item.id;
-                                                    }
-                                                    else
-                                                    {
-                                                        url = Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + loai + item.id;
-                                                    }
-
-                                                    isNews++;
-                                                    if (isNews > 4)
-                                                    {
-                                                        break;
-                                                    }
-
-                                                    if (isNews == 1)
-                                                    {
-                                                        trongnuocnoibat = @"<div class='img_effect'><a href='/" + url + "' " +
-                                                                     " class='title-news' title='" + item.name + "'><img src='" + item.avatar + "' alt='" + item.name + "'></a></div>" +
-                                                                      "<div class='ct_tin'> <h4 class='title_xanh'><a href='/" + url + "'>" + item.name + "</a></h4>" +
-                                                                      "<div class='descript_tt'>" +
-                                                                      "<p>" + item.shorttitle + "</p>" +
-                                                                      "</div>" +
-                                                                      " <div class='time_tin'>" + item.updated_at + "</div>" +
-                                                                     
-                                                                      "</div>";
-
-                                                    }
-                                                    else
-                                                    {
-                                                        trongnuochictiet += @" <div class='khung_tintuc'><div class='img_effect'><a href='/" + url + "' " +
-                                                                     " class='title-news' title='" + item.name + "'><img src='" + item.avatar + "' alt='" + item.name + "'></a></div>" +
-                                                                      "<div class='ct_tin'> <h4 class='title_xanh'><a href='/" + url + "'>" + item.name + "</a></h4>" +
-                                                                      "<div class='descript_tt'>" +
-                                                                      "<p>" + item.shorttitle + "</p>" +
-                                                                      "</div>" +
-                                                                      " <div class='time_tin'>" + item.updated_at + "</div>" +
-                                                                    
-                                                                      "</div>" +
-                                                                      "</div>";
-                                                    }
-
-                                                }
-                                            }
-                                            <div class="khung_ttto">
-                                                @Html.Raw(trongnuocnoibat.ToString())
-                                            </div>
-                                            <div class="khung_tt_dest">
-                                                @Html.Raw(trongnuochictiet.ToString())
-                                            </div>
-                                        }
+                                    <div class="form-group">
+                                        <button type="button" data-dismiss="modal" aria-hidden="true" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐÓNG</button>
                                     </div>
                                 </div>
                             </div>

@@ -1,0 +1,150 @@
+﻿@{ Layout = null;
+        }
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="@ViewBag.seoDescription">
+    <meta name="keywords" itemprop="keywords" content="@ViewBag.seoKeyword">
+    <title>@ViewBag.seoTitle</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Font Family & Font Icon -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="@Url.Content("~/Content/weather-icons/css/weather-icons.css")" rel="stylesheet" type="text/css">
+    <!-- CSS MAIN -->
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/animition.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/ball.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/date.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/main.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu_drop.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/send_alert.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/tabs.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/swiper.min.css">
+    <!-- Responsive -->
+    <link rel="stylesheet" href="~/Content/Website/Assets/css/responsive/media.css">
+    <link rel="stylesheet" href="~/Content/spinner/css/spinner.css" />
+    <!-- Script -->
+    <script type="text/javascript" src="~/Content/Website/Assets/js/jquery_3.2.1.js"></script>
+
+</head>
+
+<body>
+    <script>
+        $(document).ready(function () {
+            $('#btnDangNhap').click(function () {
+                if (checkFormLogin()) {
+                    var data = {
+                        username: $('#formLogin_Username').val(),
+                        password: $('#formLogin_Password').val()
+                    }
+
+                    sendDataToURL('/member-login', data, true).
+                        then(function (res) {
+                            if (res) {
+                                if (res.success == true) {
+                                    window.location.href = "/Home/Index";
+                                }
+                                else {
+                                    showAlertErrorRegister(res.message);
+                                }
+                            }
+                        })
+                }
+            })
+        });
+
+
+        function showAlertErrorRegister(msg) {
+            $('#formErrorMessage').fadeIn().show();
+            $('#formErrorLabel').text(msg);
+        }
+
+        function checkFormLogin() {
+            var check = true;
+            var error = '';
+
+            hideAlertErrorRegister();
+
+            if (isNullOrEmpty($('#formLogin_Password').val())) {
+                check = false;
+                error = 'Bạn chưa nhập mật khẩu';
+            }
+
+            if (isNullOrEmpty($('#formLogin_Username').val())) {
+                check = false;
+                error = 'Bạn chưa nhập tên đăng nhập';
+            }
+
+            if (!check) {
+                showAlertErrorRegister(error);
+            }
+
+            return check;
+        }
+
+
+        function hideAlertErrorRegister() {
+            $('#formErrorMessage').fadeOut().hide();
+            $('#formErrorLabel').text('');
+        }
+    </script>
+    <div id="wrapper" style="max-width: 1920px;">
+        <div id="page_1">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 khung_register ">
+                        <div class="dang-nhap ">
+                          
+                            <form id="formLogin" class="frm text-center form-group" style="margin-top: 15px;">
+                                <h3 style="text-align:center; position: relative; margin: 0; font-size: 30px; line-height: 35px; color: #0088cc; font-family: Roboto Bold; text-transform: uppercase;">
+                                    ĐĂNG NHẬP
+                                </h3>
+
+                                <div class="alert d-none" id="formErrorMessage">
+                                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                                    <strong>Lỗi!</strong> <span id="formErrorLabel"></span>.
+                                </div>
+
+
+                                <div class="box_group_from">
+                                    <input type="text" class="input-hoten" name="formLogin_Username" id="formLogin_Username" placeholder="Tên truy cập" autocomplete="off">
+                                </div>
+                                <div class="box_group_from">
+                                    <input type="password" class="input-lock" name="formLogin_Password" id="formLogin_Password" placeholder="Mật khẩu" value="" autocomplete="off">
+                                </div>
+                            </form>
+                            <div id="box_send" class="form-group">
+                                <button id="btnDangNhap" class="send_mail btn regs"><i class="fa fa-sign-in "></i> ĐĂNG NHẬP</button>
+                            </div>
+                            <p>Bạn chưa có tài khoản <a href="/Home/Register"><b>Đăng ký ngay</b></a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script type="text/javascript" src="~/Content/Website/Assets/js/init.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/menu_header.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery_ui.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/edit_js.js"></script>
+<script type="text/javascript" src="~/Content/js/jquery.blockUI.js"></script>
+<script src="~/Content/Website/Assets/js/main.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy2.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy1.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.repopup.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/tablist.js"></script>
+<script src="~/Content/spinner/js/spinner.js"></script>
+
+</html>

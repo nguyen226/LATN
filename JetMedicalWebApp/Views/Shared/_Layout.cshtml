@@ -31,24 +31,10 @@
     <!-- Responsive -->
     <link rel="stylesheet" href="~/Content/Website/Assets/css/responsive/media.css">
     <link rel="stylesheet" href="~/Content/spinner/css/spinner.css" />
-    <link href="@Url.Content("~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.css")" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="@Url.Content("~/content/css/select2.min.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/css/customiseSelect2.css")" type="text/css">
     <!-- Script -->
     <script type="text/javascript" src="~/Content/Website/Assets/js/jquery_3.2.1.js"></script>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FZK3M25ES5"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-FZK3M25ES5');
-    </script>
-	@*<script type="text/javascript">        
-        if (window.location.protocol != "https:") {
-           window.location.protocol = "https";
-        }
-    </script>*@
 
 </head>
 
@@ -84,34 +70,7 @@
         @RenderBody()
         @{ Html.RenderAction("_Footer", "Partial", new { area = "", typeCode = JetMedicalWebApp.Common.CommonConstants.NewsType_Guide }); }
     </div>
-    <!-- warper -->
-    <!-- Messenger Plugin chat Code -->
-    <div id="fb-root"></div>
-
-    <!-- Your Plugin chat code -->
-    <div id="fb-customer-chat" class="fb-customerchat">
-    </div>
-
-    <script>
-        var chatbox = document.getElementById('fb-customer-chat');
-        chatbox.setAttribute("page_id", "183751401770975");
-        chatbox.setAttribute("attribution", "biz_inbox");
-
-        window.fbAsyncInit = function () {
-            FB.init({
-                xfbml: true,
-                version: 'v11.0'
-            });
-        };
-
-        (function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = 'https://connect.facebook.net/vi_VN/sdk/xfbml.customerchat.js';
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
+    
 </body>
 
 <script src="~/Content/Website/Assets/js/swiper.min.js"></script>
@@ -134,8 +93,6 @@
         },
     });
 </script>
-<script async src="~/Content/Website/Assets/js/youtube_2.js"></script>
-<script async custom-element="amp-youtube" src="~/Content/Website/Assets/js/youtube_1.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/init.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/menu_header.js"></script>
@@ -152,8 +109,6 @@
 <script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.repopup.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/tablist.js"></script>
 <script src="~/Content/spinner/js/spinner.js"></script>
-<script src="~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
-<script src="~/Content/theme/plugins/bootstrap-timepicker/bootstrap-timepicker.min.js"></script>
 <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
 <script>
@@ -166,35 +121,5 @@
         });
     });
 </script>
-<script type="text/javascript">
-    $(function () {
-        //$('form#formSubmit').on('submit', function (e) {
-        //    e.preventDefault();
-           
-        //    $('#sendmail').hide();
-        //    var _data = $(this).serializeArray();
-        //    var _action = $(this).attr("action");
-        //    var _method = $(this).attr("method").toUpperCase();
-        //    $.ajax({
-        //        url: _action,
-        //        dataType: 'html',
-        //        type: _method,
-        //        data: _data,
-        //        success: function (_data) {
-        //            if (data.success) {
-        //                $('#myModal').hide();
-        //                $('.modal-backdrop').hide();
-        //                alert('Bạn đã đăng ký thành công, Bộ phận CSKH sẽ liên hệ bạn trong thời gian sớm nhất.');
-        //            }
-        //            else
-        //            {
-        //                alert(data.message);
-        //            }
-        //        },
-        //        error: function (_data) {
-        //        },
-        //    });
-        //});
-    });
-</script>
+
 </html>

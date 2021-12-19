@@ -28321,6 +28321,8 @@
     <Content Include="Views\ChuyenKhoa\ChiTietTinTuc.cshtml" />
     <Content Include="Views\Shared\_ChuyenKhoaChiTietLayout.cshtml" />
     <Content Include="Views\ChuyenKhoa\ChiTietBacSi.cshtml" />
+    <Content Include="Views\Home\Login.cshtml" />
+    <Content Include="Views\Home\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

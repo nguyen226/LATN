@@ -1,0 +1,266 @@
+﻿@{ Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="@ViewBag.seoDescription">
+    <meta name="keywords" itemprop="keywords" content="@ViewBag.seoKeyword">
+    <title>@ViewBag.seoTitle</title>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Font Family & Font Icon -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link href="@Url.Content("~/Content/weather-icons/css/weather-icons.css")" rel="stylesheet" type="text/css">
+    <!-- CSS MAIN -->
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/animition.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/ball.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/date.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/main.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/menu_drop.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/send_alert.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/tabs.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" media="all" href="~/Content/Website/Assets/css/swiper.min.css">
+    <!-- Responsive -->
+    <link rel="stylesheet" href="~/Content/Website/Assets/css/responsive/media.css">
+    <link rel="stylesheet" href="~/Content/spinner/css/spinner.css" />
+    <!-- Script -->
+    <script type="text/javascript" src="~/Content/Website/Assets/js/jquery_3.2.1.js"></script>
+
+</head>
+
+<body>
+    <script>
+    $(document).ready(function () {
+
+        $('#formRegister_Register').click(function () {
+            if (checkFormRegister()) {
+                var fields = [
+                   'FirstName',
+                   'LastName',
+                   'SoDienThoai',
+                   'Email',
+                   'Password'
+                ];
+                var values = [
+                    $('#formRegister_FirstName').val(),
+                    $('#formRegister_LastName').val(),
+                    $('#formRegister_SoDienThoai').val(),
+                    $('#formRegister_Email').val(),
+                    $('#formRegister_Password').val()
+                ];
+
+                var data = {
+                    fields: fields,
+                    values: values
+                }
+
+                sendDataToURL('/member-register', data, true).
+                then(function (res) {
+                    if (res) {
+                        if (res.success == true) {
+                            window.location.href = "/Home/Index";
+                        }
+                        else
+                        {
+                            showAlertErrorRegister(res.message);
+                        }
+                    }
+                })
+            }
+        })
+
+
+        $('#btnCapNhatHoSoYTe').click(function () {
+            @*if (!isNullOrEmpty(userId) && parseInt(userId) > 0) {
+                window.location.href = '@Url.Action("Update", "Users", new { area = "Member"})?userId=' + userId;
+            }*@
+        })
+    })
+
+    function checkFormRegister() {
+        var check = true;
+        var error = '';
+
+        hideAlertErrorRegister();
+
+        if (isNullOrEmpty($('#formRegister_FirstName').val())) {
+            check = false;
+            error = 'Bạn chưa nhập first name';
+        }
+
+        if (isNullOrEmpty($('#formRegister_FirstName').val())) {
+            check = false;
+            error = 'Bạn chưa nhập first name';
+        }
+
+        if (isNullOrEmpty($('#formRegister_SoDienThoai').val()) && isNullOrEmpty($('#formRegister_Email').val())) {
+            if (isNullOrEmpty($('#formRegister_SoDienThoai').val())) {
+                check = false;
+                error = 'Bạn chưa nhập số điện thoại';
+            }
+            else if (isNullOrEmpty($('#formRegister_Email').val())) {
+                check = false;
+                error = 'Bạn chưa nhập email';
+            }
+        }
+
+        if (isNullOrEmpty($('#formRegister_Password').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mật khẩu';
+        }
+        else if ($('#formRegister_Password').val() != $('#formRegister_RePassword').val())
+        {
+            check = false;
+            error = 'Mật khẩu không khớp';
+        }
+
+        if (!check) {
+            showAlertErrorRegister(error);
+        }
+
+        return check;
+    }
+
+    function checkFormLogin() {
+        var check = true;
+        var error = '';
+
+        hideAlertErrorRegister();
+
+        if (isNullOrEmpty($('#formLogin_Password').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mật khẩu';
+        }
+
+        if (isNullOrEmpty($('#formLogin_Username').val())) {
+            check = false;
+            error = 'Bạn chưa nhập tên đăng nhập';
+        }
+
+        if (!check) {
+            showAlertErrorRegister(error);
+        }
+
+        return check;
+    }
+
+    function checkFormActivate() {
+        var check = true;
+        var error = '';
+
+        hideAlertErrorRegister();
+
+        if (isNullOrEmpty($('#formActive_ActiveCode').val())) {
+            check = false;
+            error = 'Bạn chưa nhập mã kích hoạt';
+        }
+
+        if (!check) {
+            showAlertErrorRegister(error);
+        }
+
+        return check;
+    }
+
+
+    function hideAlertErrorRegister() {
+        $('#formErrorMessage').fadeOut().hide();
+        $('#formErrorLabel').text('');
+    }
+
+    function showAlertErrorRegister(msg) {
+        $('#formErrorMessage').fadeIn().show();
+        $('#formErrorLabel').text(msg);
+    }
+
+    </script>
+
+    <div id="wrapper" style="max-width: 1920px;">
+        <div id="page_1">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 khung_register ">
+                        <div class="dang-ky">
+                            <div class="row">
+                                <form id="formRegister" class="frm text-center form-group" style="margin-top: 15px;">
+                                    <h3 style="text-align:center; position: relative; margin: 0; font-size: 30px; line-height: 35px; color: #0088cc; font-family: Roboto Bold; text-transform: uppercase;">
+                                        ĐĂNG KÝ TÀI KHOẢN
+                                    </h3>
+
+                                    <div class="alert d-none" id="formErrorMessage">
+                                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                                        <strong>Lỗi!</strong> <span id="formErrorLabel"></span>.
+                                    </div>
+
+                                    <div class="col-md-12 dang-ky-sdt">
+                                        <div class="box_group_from">
+                                            <input type="number" class="input-sdt" name="formRegister_SoDienThoai" id="formRegister_SoDienThoai" placeholder="Số Điện Thoại" value="" maxlength="20" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 dang-ky-email d-none">
+                                        <div class="box_group_from">
+                                            <input type="email" class="input-email" name="formRegister_Email" id="formRegister_Email" placeholder="Email" value="" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box_group_from">
+                                            <input type="text" class="input-hoten" name="formRegister_FirstName" id="formRegister_FirstName" placeholder="First Name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box_group_from">
+                                            <input type="text" class="input-hoten" name="formRegister_LastName" id="formRegister_LastName" placeholder="Last Name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box_group_from">
+                                            <input type="password" class="input-lock" name="formRegister_Password" id="formRegister_Password" placeholder="Mật Khẩu" value="" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="box_group_from">
+                                            <input type="password" class="input-lock" name="formRegister_RePassword" id="formRegister_RePassword" placeholder="Nhập Lại Mật khẩu" value="" required>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <div class="col-md-12 form-group text-center">
+                                    <button id="formRegister_Register" class="send_mail btn regs form-group">ĐĂNG KÝ TÀI KHOẢN</button>
+                                </div>
+
+                                <div class="col-md-12 form-group text-center">
+                                    <p>Bạn đã có tài khoản <a href="/Home/Login"><b>Đăng nhập ngay</b></a></p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script type="text/javascript" src="~/Content/Website/Assets/js/init.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/menu_header.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery_ui.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/edit_js.js"></script>
+<script type="text/javascript" src="~/Content/js/jquery.blockUI.js"></script>
+<script src="~/Content/Website/Assets/js/main.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy2.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/fancy1.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/jquery.boxes.repopup.js"></script>
+<script type="text/javascript" src="~/Content/Website/Assets/js/tablist.js"></script>
+<script src="~/Content/spinner/js/spinner.js"></script>
+
+</html>

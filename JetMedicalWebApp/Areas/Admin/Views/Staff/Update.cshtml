@@ -118,7 +118,7 @@
                 brandname: $('#brandname').val(),
                 position: $('#position').val(),
                 summary: $('#summary').val(),
-                newscategoryid: $('#newscategoryid').val(),
+                departmentid: $('#phongBanId').val(),
                 isactive: $('#active').is(':checked'),
                 Isexamination: $('#Isexamination').is(':checked'),
                 img: $('#imagePreview').attr('src'),
@@ -197,6 +197,45 @@
 
         $('#newscategoryid').select2(dropdownlistSelect2Option);
 
+
+
+         var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
+        dropdownlistSelect2Option.placeholder = "Chọn phòng ban";
+        dropdownlistSelect2Option.ajax = {
+            type: "POST",
+            url: '@Url.Action("Filter", "Department", new { area = "Admin" })',
+            dataType: 'json',
+            contentType: "application/json",
+            delay: 250,
+            data: function (params) {
+                var selectedFields = "id, name, languageId, isActive";
+                var condition = 'isActive == true';
+                if(params.term) {
+                    condition += "AND (name LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                }
+
+                return JSON.stringify({
+                    selectedFields: selectedFields,
+                    stringFilter: condition,
+                    sortCondition: 'name asc',
+                    top: 10,
+                });
+            },
+            processResults: function (res, params) {
+                var data = $.map(res, function (item, i) {
+                    return {
+                        id: item.id,
+                        text: item.name
+                    }
+                });
+                return {
+                    results: data
+                };
+            },
+            cache: true
+        };
+
+        $('#phongBanId').select2(dropdownlistSelect2Option);
     }
 </script>
 
@@ -283,11 +322,11 @@
                                 </div>
 
                                 <div class="col-md-12 mb-2">
-                                    <label for="newscategoryid" class="form-label">@Html.Raw("Chuyên khoa")</label>
-                                    <select id="newscategoryid" class="form-control select2">
+                                    <label for="phongBanId" class="form-label">@Html.Raw("Chuyên khoa")</label>
+                                    <select id="phongBanId" class="form-control select2">
                                         @if (Model.Staff != null)
                                         {
-                                            <option value="@Model.Staff.newscategoryid" selected> @Html.Raw(Model.Staff.newcategoryname) </option>
+                                            <option value="@Model.Staff.departmentid" selected> @Html.Raw(Model.Staff.departmentname) </option>
                                         }
                                     </select>
                                 </div>

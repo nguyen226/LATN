@@ -139,27 +139,6 @@
     <!-- Your Plugin chat code -->
     <div id="fb-customer-chat" class="fb-customerchat">
     </div>
-
-    <script>
-        var chatbox = document.getElementById('fb-customer-chat');
-        chatbox.setAttribute("page_id", "183751401770975");
-        chatbox.setAttribute("attribution", "biz_inbox");
-
-        window.fbAsyncInit = function () {
-            FB.init({
-                xfbml: true,
-                version: 'v11.0'
-            });
-        };
-
-        (function (d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = 'https://connect.facebook.net/vi_VN/sdk/xfbml.customerchat.js';
-            fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
 </body>
 
 <script src="~/Content/Website/Assets/js/swiper.min.js"></script>
@@ -182,8 +161,6 @@
         },
     });
 </script>
-<script async src="~/Content/Website/Assets/js/youtube_2.js"></script>
-<script async custom-element="amp-youtube" src="~/Content/Website/Assets/js/youtube_1.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/init.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/menu_header.js"></script>

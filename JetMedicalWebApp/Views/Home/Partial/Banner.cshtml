@@ -2,53 +2,6 @@
 @model JetMedicalWebApp.Models.BaseViewModel
 @using JetMedicalWebApp.Common
 
-<script>
-    $(document).ready(function () {
-        $('a[name="btnDatLichKhamTheoPhongBan"]').on('click', function () {
-            @if (Model.MemberId > 0)
-              {
-                  <text>
-            resetFormDatLichKhamTheoPhongBan();
-            $('#datLichKhamTheoPhongBanModal').modal();
-            $('.timepicker').timepicker({
-                showMeridian: false,
-                scrollbar: true,
-            });
-
-            </text>
-              }
-              else
-              {
-                  <text>
-            loginForm();
-            </text>
-              }
-        })
-
-        $('a[name="btnDangKyNhanTuVan"]').on('click', function () {
-            hideAlertErrorDangKyNhanTuVan();
-            resetFormDangKyNhanTuVan();
-
-            $('.formDangKyNhanTuVan').fadeIn().show();
-            $('.formDangKyNhanTuVanThanhCong').fadeOut().hide();
-
-            $('#nhanTuVanModal').modal();
-        })
-    });
-</script>
-<script>
-    $(document).ready(function () {
-       
-        $('a[name="dangkyxetnghiemcovid"]').on('click', function () {
-            hideAlertErrorDangKyNhanTuVan();
-            resetFormDangKyNhanTuVan();
-
-            $('.dangkyxetnghiemcovid').fadeIn().show();
-            
-            $('#dangkyxetnghiemcovid').modal();
-        })
-    });
-</script>
 <div id="banner">
     <div id="slider_desktop">
         <div class="swiper-container">
@@ -71,11 +24,6 @@
                                                         <div class="title_sliderhome">
                                                             <h1>@Html.Raw(item.title)</h1>
                                                             <h4>@Html.Raw(item.text)</h4>
-                                                        </div>
-                                                        <div class="button_dk">
-                                                            @*<a href="javascript:void(0)" name="btnDatLichKhamTheoPhongBan" class="more_blue click_view">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "ĐẶT LỊCH KHÁM" : "Appointment")</a>*@
-                                                            <a href="javascript:void(0)"  class="more_blue click_view" name="btnDangKyNhanTuVan"><i class="fas fa-calendar-check"></i>  @Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "ĐẶT LỊCH KHÁM" : "Appointment")</a>
-                                                           
                                                         </div>
                                                     }
                                                 }

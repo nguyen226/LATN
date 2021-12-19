@@ -7,7 +7,7 @@
             <div class="col-lg-12">
                 <div class="xoamargin">
                     <div class="left_fot">
-                        <h3 class="title_fot">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "THÔNG TIN BỆNH VIỆN" : "ADDRESS")</h3>
+                        <h3 class="title_fot">THÔNG TIN BỆNH VIỆN</h3>
                         <div class="contant_fot_1">
                             <p><i class="fas fa-map-marked color_blue"></i> Địa chỉ: Xã Tam Hiệp, Huyện Núi Thành, Tỉnh Quảng Nam</p>
                             <p><i class="fas fa-phone-volume color_blue"></i> Hotline: 0967 951 313</p>
@@ -31,19 +31,13 @@
 
                     </div>
                     <div class="center_fot">
-                        <h3 class="title_fot">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "HƯỚNG DẪN KHÁCH HÀNG" : "CUSTOMER GUIDE")</h3>
+                        <h3 class="title_fot">HƯỚNG DẪN KHÁCH HÀNG</h3>
                         <div class="category">
                             <ul>
-                                @*@if (Model.NewsCategories != null)
-                                {
-                                    foreach (var item in Model.NewsCategories)
-                                    {
-                                        @Html.Raw("<li><a href='/" + Utilities.urlConvert(Utilities.VnConcert(item.typeName)) + "/" + Utilities.urlConvert(Utilities.VnConcert(item.name).ToLower()) + "_hd_" + item.id + "' class='lnk-ft'>" + item.name + "</a></li>");
-                                    }
-                                }*@
+                               
                             </ul>
                         </div>
-                        <h3 class="title_fot">@Html.Raw(Model.LanguageId == CommonConstants.TiengViet ? "MỤC THÀNH VIÊN" : "MEMBER")</h3>
+                        <h3 class="title_fot">MỤC THÀNH VIÊN</h3>
                         <div class="category">
                             <ul>
                                 <li>
@@ -66,8 +60,6 @@
                     </div>
                     <div class="right_fot">
                         <h3 class="title_fot">FANPAGE</h3>
-                        <iframe class="fb_link" allow="encrypted-media" allowtransparency="true" frameborder="0" height="210" scrolling="no" src="https://www.facebook.com/plugins/page.php?href=https://www.facebook.com/bvtwquangnam/&amp;tabs=timeline&amp;height=210&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true&amp;appId"
-                                style="border:none;overflow:hidden"></iframe>
                     </div>
 
                 </div>
