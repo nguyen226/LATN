@@ -1,84 +1,134 @@
 ﻿@model JetMedicalWebApp.Areas.Admin.Models.TopNavigationModels
 @using JetMedicalWebApp.Common
 
-<script>
-    $(document).ready(function () {
-        $('#btnDoiMatKhau').off('click').on('click', function () {
-            $('#formDoiMatKhau')[0].reset();
-            $('#doiMatKhauModal').modal();
-        })
-    })
-</script>
-<header class="header-1" id="header">
-    <div class="vd_top-menu-wrapper">
-        <div class="container ">
-            <div class="vd_top-nav vd_nav-width  ">
-                <div class="vd_panel-header">
-                    <div class="logo">
-                        <a href="/"><img alt="logo" src="@(!string.IsNullOrEmpty(Model.Logo) ? Url.Content(Model.Logo) : null)"></a>
-                    </div>
-                    <!-- logo -->
-                    <div class="vd_panel-menu  hidden-sm hidden-xs" data-intro="<strong>Minimize Left Navigation</strong><br/>Toggle navigation size to medium or small size. You can set both button or one button only. See full option at documentation." data-step=1>
-                        <span class="nav-medium-button menu" data-toggle="tooltip" data-placement="bottom" data-original-title="" data-action="nav-left-medium">
-                            <i class="fa fa-bars"></i>
-                        </span>
-                    </div>
-                    <div class="vd_panel-menu left-pos visible-sm visible-xs">
-                        <span class="menu" data-action="toggle-navbar-left">
-                            <i class="fa fa-ellipsis-v"></i>
-                        </span>
-                    </div>
-                    <div class="vd_panel-menu visible-sm visible-xs">
-                        <span class="menu visible-xs" data-action="submenu">
-                            <i class="fa fa-bars"></i>
-                        </span>
-                        <span class="menu visible-sm visible-xs" data-action="toggle-navbar-right">
-                            <i class="fa fa-comments"></i>
-                        </span>
-                    </div>
-                    <!-- vd_panel-menu -->
-                </div>
-                <!-- vd_panel-header -->
+<div class="topbar d-flex align-items-center">
+    <nav class="navbar navbar-expand">
+        <div class="mobile-toggle-menu">
+            <i class='bx bx-menu'></i>
+        </div>
+        <div class="search-bar flex-grow-1" hidden>
+            <div class="position-relative search-bar-box">
+                <input type="text" class="form-control search-control" placeholder="Type to search..."> <span class="position-absolute top-50 search-show translate-middle-y"><i class='bx bx-search'></i></span>
+                <span class="position-absolute top-50 search-close translate-middle-y"><i class='bx bx-x'></i></span>
             </div>
-            <div class="vd_container">
-                <div class="row">
-                    <div class="col-sm-12 col-xs-12">
-                        <div class="vd_mega-menu-wrapper">
-                            <div class="vd_mega-menu pull-right">
-                                <ul class="mega-ul">
-                                    <li id="top-menu-profile" class="profile mega-li">
-                                        <a href="#" class="mega-link" data-action="click-trigger">
-                                            <span class="mega-image">
-                                                <img src="@if (Model.User != null && !string.IsNullOrEmpty(Model.User.Avartar)) { <text>@Url.Content(Model.User.Avartar)</text>} else { <text>@Url.Content("~/Content/theme/img/avatar/avatar.jpg")</text>}" alt="Avatar" />
-                                            </span>
-                                            <span class="mega-name">@Html.Raw(Model.User != null ? Model.User.HoTen : string.Empty)<i class="fa fa-caret-down fa-fw"></i></span>
-                                        </a>
-                                        <div class="vd_mega-menu-content  width-xs-2  left-xs left-sm" data-action="click-target">
-                                            <div class="child-menu">
-                                                <div class="content-list content-menu">
-                                                    <ul class="list-wrapper pd-lr-10">
-                                                        <li> <a href="@Url.Action("XemChiTiet", "Users", new { area = "Member" })?userId=@(Request.Cookies.Get(CommonConstants.CookieMemberID) != null ? Request.Cookies.Get(CommonConstants.CookieMemberID).Value : "")"> <div class="menu-icon"><i class="fa fa-user"></i></div> <div class="menu-text">Thông tin</div> </a> </li>
-                                                        <li> <a href="#" id="btnDoiMatKhau"> <div class="menu-icon"><i class="fa fa-key"></i></div> <div class="menu-text">Đổi mật khẩu</div> </a> </li>
-                                                        <li>
-                                                            @using (Html.BeginForm("LogOff", "Home", FormMethod.Post, new { area = "Member", id = "logoutForm" }))
-                                                            {
-                                                                @Html.AntiForgeryToken()
-                                                                <a href="javascript:document.getElementById('logoutForm').submit()"> <div class="menu-icon"><i class="fa fa-sign-out"></i></div>  <div class="menu-text">Đăng xuất</div> </a>
-                                                            }
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
+        </div>
+        <div class="top-menu ms-auto">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item mobile-search-icon" hidden>
+                    <a class="nav-link" href="#">
+                        <i class='bx bx-search'></i>
+                    </a>
+                </li>
+                <li class="nav-item dropdown dropdown-large">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class='bx bx-category'></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <div class="row row-cols-3 g-3 p-3">
+                            <div class="col text-center">
+                                <div class="app-box mx-auto bg-gradient-cosmic text-white">
+                                    <i class='bx bx-group'></i>
+                                </div>
+                                <div class="app-title">Teams</div>
+                            </div>
+                            <div class="col text-center">
+                                <div class="app-box mx-auto bg-gradient-burning text-white">
+                                    <i class='bx bx-atom'></i>
+                                </div>
+                                <div class="app-title">Projects</div>
+                            </div>
+                            <div class="col text-center">
+                                <div class="app-box mx-auto bg-gradient-lush text-white">
+                                    <i class='bx bx-shield'></i>
+                                </div>
+                                <div class="app-title">Tasks</div>
+                            </div>
+                            <div class="col text-center">
+                                <div class="app-box mx-auto bg-gradient-kyoto text-dark">
+                                    <i class='bx bx-notification'></i>
+                                </div>
+                                <div class="app-title">Feeds</div>
+                            </div>
+                            <div class="col text-center">
+                                <div class="app-box mx-auto bg-gradient-blues text-dark">
+                                    <i class='bx bx-file'></i>
+                                </div>
+                                <div class="app-title">Files</div>
+                            </div>
+                            <div class="col text-center">
+                                <div class="app-box mx-auto bg-gradient-moonlit text-white">
+                                    <i class='bx bx-filter-alt'></i>
+                                </div>
+                                <div class="app-title">Alerts</div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
+                </li>
+                <li class="nav-item dropdown dropdown-large">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="alert-count">0</span>
+                        <i class='bx bx-bell'></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a href="javascript:;">
+                            <div class="msg-header">
+                                <p class="msg-header-title">Notifications</p>
+                                <p class="msg-header-clear ms-auto">Marks all as read</p>
+                            </div>
+                        </a>
+                        <div class="header-notifications-list">
 
-@Html.Partial("_PartialDoiMatKhauModal")
+                        </div>
+                        <a href="javascript:;">
+                            <div class="text-center msg-footer">View All Notifications</div>
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown dropdown-large">
+                    <a class="nav-link dropdown-toggle dropdown-toggle-nocaret position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="alert-count">0</span>
+                        <i class='bx bx-comment'></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a href="javascript:;">
+                            <div class="msg-header">
+                                <p class="msg-header-title">Messages</p>
+                                <p class="msg-header-clear ms-auto">Marks all as read</p>
+                            </div>
+                        </a>
+                        <div class="header-message-list">
+
+                        </div>
+                        <a href="javascript:;">
+                            <div class="text-center msg-footer">View All Messages</div>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="user-box dropdown">
+            <a class="d-flex align-items-center nav-link dropdown-toggle dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="@if (Model.User != null && !string.IsNullOrEmpty(Model.User.Avartar)) { <text>@Url.Content(Model.User.Avartar)</text>} else { <text>@Url.Content("~/Content/theme/img/avatar/avatar.jpg")</text>}" class="user-img" alt="user avatar">
+                <div class="user-info ps-3">
+                    <p class="user-name mb-0">@Html.Raw(Model.User != null ? Model.User.HoTen : string.Empty)</p>
+                    <p class="designattion mb-0">@Model.User.EmailID</p>
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <a class="dropdown-item" href="@Url.Action("XemChiTiet", "Users", new { area = "Member" })?userId=@(Request.Cookies.Get(CommonConstants.CookieUserID) != null ? Request.Cookies.Get(CommonConstants.CookieUserID).Value : "")"><i class="bx bx-user"></i><span>Hồ sơ cá nhân</span></a>
+                </li>
+                <li>
+                    <div class="dropdown-divider mb-0"></div>
+                </li>
+                <li>
+                    @using (Html.BeginForm("LogOff", "Home", FormMethod.Post, new { area = "Member", id = "logoutForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <a href="javascript:document.getElementById('logoutForm').submit()" class="dropdown-item"> <i class='bx bx-log-out-circle'></i><span>Đăng xuất</span></a>
+                    }
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>

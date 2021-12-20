@@ -27,6 +27,7 @@ namespace JetMedicalWebApp.Areas.Admin.Controllers
         {
             InternalService internalService = new InternalService();
             NewsCategoryService newsCategoryService = new NewsCategoryService();
+            DepartmentService departmentService = new DepartmentService();
 
             StaffViewModels model = (StaffViewModels)internalService.KhoiTaoModel(new StaffViewModels());
             Dictionary<string, string> filters = new Dictionary<string, string>();
@@ -39,7 +40,7 @@ namespace JetMedicalWebApp.Areas.Admin.Controllers
 
             if (id != null)
             {
-                selectedFields = "id, code, img, brandname, fullname, position,summary, description, languageId,";
+                selectedFields = "id, code, img, brandname, departmentid,  fullname, position,summary, description, languageId,";
                 selectedFields += "isactive, Isexamination, newscategoryid, order";
 
                 model.Staff = staffService.GetByIdExposeDto(id.Value, selectedFields);
@@ -53,6 +54,16 @@ namespace JetMedicalWebApp.Areas.Admin.Controllers
                         if (category != null)
                         {
                             model.Staff.newcategoryname = category.name;
+                        }
+                    }
+
+                    if (model.Staff.departmentid > 0)
+                    {
+                        var dep = departmentService.GetByIdExposeDto(model.Staff.departmentid, "id, name");
+
+                        if (dep != null)
+                        {
+                            model.Staff.departmentname = dep.name;
                         }
                     }
                 }

@@ -22,6 +22,21 @@ namespace JetMedicalWebApp.Controllers
                 return Redirect("/Home/Login");
             }
 
+
+
+            string selectedFields = "UserID, Phone,(LastName + \" \" + FirstName) AS HoTen, EmailID ";
+
+            if (Request.Cookies.Get(CommonConstants.CookieMemberID) != null)
+            {
+                UsersService usersService = new UsersService();
+                UsersDto user = usersService.GetByIdExposeDto(Int32.Parse(Request.Cookies.Get(CommonConstants.CookieMemberID).Value), selectedFields);
+                if (user != null)
+                {
+                    ViewBag.User = user;
+                }
+            }
+
+
             ViewBag.MennuSelected = "Home";
             BaseViewModel model = new BaseViewModel();
             ResourceService resourceService = new ResourceService();
@@ -36,7 +51,7 @@ namespace JetMedicalWebApp.Controllers
 
             // banner
             inputParam = new Dictionary<string, string>();
-            string selectedFields = "id, title, text, url, isactive, languageId, position";
+            selectedFields = "id, title, text, url, isactive, languageId, position";
             inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
             inputParam.Add(CommonConstants.StrSortedColumnNames, "position ASC");
             inputParam.Add(CommonConstants.StrStringFilter, "isactive = TRUE AND languageId = " + model.LanguageId.ToString());
@@ -49,22 +64,6 @@ namespace JetMedicalWebApp.Controllers
             BannerService bannerService = new BannerService();
             model.Banners = bannerService.GetListExposeDto(filters, inData, out outData);
 
-            int intValue;
-            model.MemberId = -1;
-
-            HttpCookie cookieMemberID = Request.Cookies[CommonConstants.CookieMemberID];
-            if (cookieMemberID != null)
-            {
-                Int32.TryParse(cookieMemberID.Value, out intValue);
-                model.MemberId = intValue;
-            }
-
-            HttpCookie cookieMemberName = Request.Cookies[CommonConstants.CookieMemberName];
-            if (cookieMemberName != null)
-            {
-                model.MemberName = HttpUtility.UrlDecode(cookieMemberName.Value);
-            }
-            //SEO HOME
             AppConfigService appConfigService = new AppConfigService();
             selectedFields = "ID,Title, Description, Keywords, Logo, CompanyName, Hotline, Facebook,Email";
             AppConfigDto app = appConfigService.GetByIdExposeDto(1, selectedFields);
@@ -109,21 +108,14 @@ namespace JetMedicalWebApp.Controllers
 
                 if (member != null)
                 {
-                    if (member.Active)
+                    if (member.Password == Encryptor.Hash(password))
                     {
-                        if (member.Password == Encryptor.Hash(password))
-                        {
-                            setCookieLogin(member.UserID.ToString(), (member.LastName + " " + member.FirstName), "true");
-                            loginSuccess = true;
-                        }
-                        else
-                        {
-                            resultMessage = "Mật khẩu không chính xác.";
-                        }
+                        setCookieLogin(member.UserID.ToString(), (member.LastName + " " + member.FirstName), "true");
+                        loginSuccess = true;
                     }
                     else
                     {
-                        resultMessage = "Tài khoản chưa kích hoạt.";
+                        resultMessage = "Mật khẩu không chính xác.";
                     }
                 }
                 else
@@ -183,12 +175,8 @@ namespace JetMedicalWebApp.Controllers
                
                 Dictionary<string, string> updatedValues = new Dictionary<string, string>();
 
-                if (string.IsNullOrEmpty(email) && appConfig.PhoneAuthentication == false)
-                {
-                    updatedValues.Add("Active", "true");
-                }
-               
 
+                updatedValues.Add("Active", "true");
                 updatedValues.Add("EmailID", email);
                 updatedValues.Add("Phone", sodienthoai);
                 updatedValues.Add("FirstName", firstName);
@@ -201,43 +189,15 @@ namespace JetMedicalWebApp.Controllers
                 if (Int32.TryParse(resultMessage, out idValue))
                 {
                     registerSuccess = true;
-                    if(appConfig.PhoneAuthentication == false && string.IsNullOrEmpty(email))
-                    {
-                        HttpCookie memberIdCookie = new HttpCookie(CommonConstants.CookieMemberID);
-                        memberIdCookie.Value = resultMessage;
-                        memberIdCookie.Expires = DateTime.Now.AddMonths(1);
-                        Response.Cookies.Add(memberIdCookie);
+                    HttpCookie memberIdCookie = new HttpCookie(CommonConstants.CookieMemberID);
+                    memberIdCookie.Value = resultMessage;
+                    memberIdCookie.Expires = DateTime.Now.AddMonths(1);
+                    Response.Cookies.Add(memberIdCookie);
 
-                        HttpCookie memberNameCookie = new HttpCookie(CommonConstants.CookieMemberName);
-                        memberNameCookie.Value = HttpUtility.UrlEncode(lastName + " " + firstName);
-                        memberNameCookie.Expires = DateTime.Now.AddMonths(1);
-                        Response.Cookies.Add(memberNameCookie);
-                    }
-                    else if(!string.IsNullOrEmpty(email))
-                    {
-                        GmailService gmailService = new GmailService();
-
-                        appConfig.MailAccount = "manhquoc00@gmail.com";
-                        appConfig.MailPass = "manhquoc11a9";
-                        appConfig.MailHost = "smtp.gmail.com";
-                        appConfig.MailPort = "587";
-                        appConfig.MailSSL = true;
-
-                        SmtpConfigurationDto _config = new SmtpConfigurationDto();
-                        _config.Username = appConfig.MailAccount;
-                        _config.Password = appConfig.MailPass;
-                        _config.Host = appConfig.MailHost;
-                        _config.Port = Int32.Parse(appConfig.MailPort);
-                        _config.Ssl = appConfig.MailSSL;
-
-                        EmailMessageDto message = new EmailMessageDto();
-                        message.ToEmail = email;
-                        message.Subject = "Kich hoạt tài khoản ";
-                        message.Body = "Sử dụng mã: " + randomCode + " để kích hoạt tài khoản của bạn";
-                        message.IsHtml = true;
-
-                        resultMessage = gmailService.GuiEmailToiUser(_config, message, string.Empty);
-                    }
+                    HttpCookie memberNameCookie = new HttpCookie(CommonConstants.CookieMemberName);
+                    memberNameCookie.Value = HttpUtility.UrlEncode(lastName + " " + firstName);
+                    memberNameCookie.Expires = DateTime.Now.AddMonths(1);
+                    Response.Cookies.Add(memberNameCookie);
                 }
             }
 

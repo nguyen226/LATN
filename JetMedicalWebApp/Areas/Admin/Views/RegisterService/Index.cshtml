@@ -48,7 +48,8 @@
 
         $('.select2-local').select2();
 
-        let selectedFields = "RegisterID, MA_LK, FullName,DepartmentName, RegisterDate, StrRegisterDate, Phone, Email,TenBacSi, GoiKham, RegisterNote, Status";
+        let selectedFields = "RegisterID, FullName, PhoneNumber,Emaill, DOB, UserID, RegisterNo, \
+            DepartmentName, RegisterDate, StrRegisterDate, TenBacSi, RegisterNote, Status";
 
         var datatableOption = initialDatatableOption();
         datatableOption.ajax.url = '@Url.Action("GetList", "RegisterService", new { area = "Admin" })';
@@ -63,7 +64,7 @@
                     if (!isNullOrEmpty(stringFilter)) {
                         stringFilter += ' AND ';
                     }
-                    stringFilter += "(FullName LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Phone LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Email LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                    stringFilter += "(FullName LIKE N'%" + $('#quickSearch').val().trim() + "%' OR PhoneNumber LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Emaill LIKE N'%" + $('#quickSearch').val().trim() + "%')";
                 }
 
                 if (!isNullOrEmpty($('#FilterTheoNamBieuDo').val())) {
@@ -77,7 +78,6 @@
             }
         };
 
-
         datatableOption.drawCallback = function (settings) {
             table.columns.adjust();
         };
@@ -90,12 +90,12 @@
                 "orderable": false
             },
             {
-                "targets": [3],
-                className: 'dt-body-right text-uppercase',
+                "targets": [5],
+                className: 'dt-body-center',
                 "searchable": false
             },
             {
-                "targets": [11],
+                "targets": [10],
                 className: 'dt-body-center menu-action',
                 "orderable": false,
                 "searchable": false,
@@ -110,13 +110,12 @@
 
         datatableOption.columns = [
             { "data": "RegisterID", "name": "RegisterID", "autoWidth": true, "title": "Id" },
-            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "Mã lượt khám" },
+            { "data": "RegisterNo", "name": "RegisterNo", "autoWidth": true, "title": "Lượt khám" },
             { "data": "FullName", "name": "FullName", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "PhoneNumber", "name": "PhoneNumber", "autoWidth": true, "title": "Số điện thoại" },
+            { "data": "Emaill", "name": "Email", "autoWidth": true, "title": "Email" },
             { "data": "StrRegisterDate", "name": "StrRegisterDate", "autoWidth": true, "title": "Ngày giờ khám" },
             { "data": "DepartmentName", "name": "DepartmentName", "autoWidth": true, "title": "Tên phòng khám" },
-            { "data": "Phone", "name": "Phone", "autoWidth": true, "title": "Số điện thoại" },
-            { "data": "Email", "name": "Email", "autoWidth": true, "title": "Email" },
-            { "data": "GoiKham", "name": "GoiKham", "autoWidth": true, "title": "Gói dịch vụ" },
             { "data": "TenBacSi", "name": "TenBacSi", "autoWidth": true, "title": "Bác sĩ" },
             { "data": "RegisterNote", "name": "RegisterNote", "autoWidth": true, "title": "Ghi chú" },
             {

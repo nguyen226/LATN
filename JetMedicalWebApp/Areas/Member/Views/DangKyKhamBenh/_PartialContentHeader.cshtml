@@ -1,4 +1,4 @@
-﻿<div class="vd_head-section clearfix">
+﻿@*<div class="vd_head-section clearfix">
     <div class="vd_panel-header">
         <ul class="breadcrumb">
             <li><a href="index.html">@Html.Raw("Trang chủ")</a> </li>
@@ -6,4 +6,23 @@
         </ul>
         @Html.Partial("_PartialContentHeaderMenu")
     </div>
+</div>*@
+
+
+
+
+
+<div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+    <div class="breadcrumb-title pe-3">@Html.Raw("Trang chủ")</div>
+    <div class="ps-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 p-0">
+                <li class="breadcrumb-item">
+                    <a href="javascript:;"><i class="bx bx-home-alt"></i></a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page"><a href="@Url.Action("Index", "DangKyKhamBenh", new { area = "Member" })">@Html.Raw("Đăng ký khám bệnh")</a></li>
+            </ol>
+        </nav>
+    </div>
+
 </div>

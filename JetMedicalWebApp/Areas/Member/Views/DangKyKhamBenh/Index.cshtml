@@ -1,10 +1,9 @@
 ﻿@using JetMedicalWebApp.Common
 @model JetMedicalWebApp.Areas.Admin.Models.RegisterServiceViewModels
 @{
+    ViewBag.Title = "Đăng ký khám bệnh";
     Layout = "~/Areas/Member/Views/Shared/_Layout.cshtml";
-    ViewBag.Title = "Đăng ký dịch vụ";
 }
-
 @section Vendors_CSS{
     <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/jquery.dataTables.min.css")" type="text/css">
     <link rel="stylesheet" href="@Url.Content("~/Content/DataTables/DataTables-1.10.18/css/dataTables.bootstrap4.min.css")" type="text/css">
@@ -26,11 +25,14 @@
     <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
 }
 
+
 <script type="text/javascript" charset="utf-8">
     var selectedDataRow = null;
     var table;
-    var selectedId = null;
-    let userId ='@Model.UsersID';
+    var dataListId = [];
+    let userId = '@Model.UsersID';
+
+
 
     $(document).ready(function () {
         let resizeObserver = new ResizeObserver(() => {
@@ -42,7 +44,8 @@
 
         $('.select2-local').select2();
 
-        let selectedFields = "RegisterID, UserID, MA_LK, FullName, StrRegisterDate, DepartmentName, Phone, Email, TenBacSi, GoiKham, RegisterNote, Status";
+        let selectedFields = "RegisterID, FullName, PhoneNumber,Emaill, DOB, UserID, RegisterNo, \
+            DepartmentName, RegisterDate, StrRegisterDate, TenBacSi, RegisterNote, Status";
 
         var datatableOption = initialDatatableOption();
         datatableOption.ajax.url = '@Url.Action("GetList", "DangKyKhamBenh", new { area = "Member" })';
@@ -57,32 +60,38 @@
                     if (!isNullOrEmpty(stringFilter)) {
                         stringFilter += ' AND ';
                     }
-                    stringFilter += "(FullName LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Phone LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Email LIKE N'%" + $('#quickSearch').val().trim() + "%')";
+                    stringFilter += "(FullName LIKE N'%" + $('#quickSearch').val().trim() + "%' OR PhoneNumber LIKE N'%" + $('#quickSearch').val().trim() + "%' OR Emaill LIKE N'%" + $('#quickSearch').val().trim() + "%')";
                 }
 
-                if (!isNullOrEmpty(stringFilter)) {
-                    stringFilter += ' AND ';
+                if (!isNullOrEmpty($('#FilterTheoNamBieuDo').val())) {
+                    if (!isNullOrEmpty(stringFilter)) {
+                        stringFilter += ' AND ';
+                    }
+                    stringFilter += "(YEAR(RegisterDate) = " + $('#FilterTheoNamBieuDo').val() + ")";
                 }
-
-                stringFilter += "UserID = " + userId;
 
                 return stringFilter;
             }
         };
 
-
         datatableOption.drawCallback = function (settings) {
             table.columns.adjust();
         };
 
-        datatableOption.order = [0, "DESC"];
+        datatableOption.order = [0,"DESC"];
         datatableOption.columnDefs = [
             {
                 "targets": "_all",
+                "className": "text-uppercase",
                 "orderable": false
             },
             {
-                "targets": [9,8,10],
+                "targets": [5],
+                className: 'dt-body-center',
+                "searchable": false
+            },
+            {
+                "targets": [10],
                 className: 'dt-body-center menu-action',
                 "orderable": false,
                 "searchable": false,
@@ -90,12 +99,13 @@
         ];
 
         datatableOption.columns = [
-            { "data": "RegisterID", "name": "RegisterID", "autoWidth": true, "title": "Register ID" },
-            { "data": "MA_LK", "name": "MA_LK", "autoWidth": true, "title": "Mã lượt khám" },
+            { "data": "RegisterID", "name": "RegisterID", "autoWidth": true, "title": "Id" },
+            { "data": "RegisterNo", "name": "RegisterNo", "autoWidth": true, "title": "Lượt khám" },
             { "data": "FullName", "name": "FullName", "autoWidth": true, "title": "Họ và tên" },
+            { "data": "PhoneNumber", "name": "PhoneNumber", "autoWidth": true, "title": "Số điện thoại" },
+            { "data": "Emaill", "name": "Email", "autoWidth": true, "title": "Email" },
             { "data": "StrRegisterDate", "name": "StrRegisterDate", "autoWidth": true, "title": "Ngày giờ khám" },
-            { "data": "DepartmentName", "name": "DepartmentName", "autoWidth": true, "title": "Phòng khám" },
-            { "data": "GoiKham", "name": "GoiKham", "autoWidth": true, "title": "Gói dịch vụ" },
+            { "data": "DepartmentName", "name": "DepartmentName", "autoWidth": true, "title": "Chuyên khoa" },
             { "data": "TenBacSi", "name": "TenBacSi", "autoWidth": true, "title": "Bác sĩ" },
             { "data": "RegisterNote", "name": "RegisterNote", "autoWidth": true, "title": "Ghi chú" },
             {
@@ -120,33 +130,9 @@
             },
             {
                 "data": "Status", "name": "Status", "title": "Action", "mRender": function (data, type, row, meta) {
-                    var content = '';
-                    switch (data) {
-                        case @CommonConstants.RegisterService_DangKy:
-                            content ='<a href="@Url.Action("Update", "DangKyKhamBenh", new { area = "Member" })?id=' + row.RegisterID + '" class="btn menu-icon vd_bg-yellow" href="#!"> <i class="fa fa-pencil"></i> </a>';
-                            break;
-
-                        default:
-                            content = '';
-                            break;
-                    }
+                    var content = '<div class="d-flex order-actions"><a data-original-title="edit" data-toggle="tooltip" data-placement="top" class="btnEdit" href="javascript:void(0)"> <i class="bx bxs-edit"></i> </a></div>';
                     return content;
                 }, width: "30px"
-            },
-            {
-                "data": "Status", "name": "Status", "title": "Action", "mRender": function (data, type, row, meta) {
-                    let content='';
-                    switch (data) {
-                        case @CommonConstants.RegisterService_DangKy:
-                            content ='<a class="btn menu-icon vd_bg-red" onclick=deleteDataRow(' + row.RegisterID + ')> <i class="fa fa-trash-o"></i> </a>';
-                            break;
-
-                        default:
-                            content = '';
-                            break;
-                    }
-                    return content ;
-                }, "name": "btnDelete", width: "30px"
             }
         ]
 
@@ -162,43 +148,10 @@
             }
         });
 
-        //$('#dtTable tbody').on('click', 'tr td > .btnDelete', function () {
-        //    selectedDataRow = table.row($(this).parents('tr')).data();
-        //    deleteDataRow(selectedDataRow.RegisterID)
-        //});
-
-
-        $('#btnAdd').click(function () {
-            window.location.href = '@Url.Action("Update", "DangKyKhamBenh", new { area = "Member" })';
+        $('#FilterTheoNamBieuDo').change(function () {
+            resetCheckboxAndDatatable();
         });
-
-        $('#btnExecuteDeleted').click(function (e) {
-            e.preventDefault();
-
-            var data = { id: selectedId };
-            var url = "@Url.Action("DeleteById", "DangKyKhamBenh", new { area = "Member" })";
-
-            sendDataToURL(url, data, true, null)
-            .then(function (res) {
-                if (res) {
-                    notification("topright", "error", "fa fa-exclamation-triangle vd_yellow", "", res);
-                }
-                else {
-                    $('#confirmDeleteDataRowModal').modal('hide');
-                    notification("topright", "success", "fa fa-check-circle vd_green", "", "Xóa thành công");
-                    resetCheckboxAndDatatable();
-                    selectedId = null;
-                }
-            });
-        });
-
     });
-
-    
-    function deleteDataRow(id) {
-        selectedId = id;
-        $('#confirmDeleteDataRowModal').modal();
-    }
 
     function resetCheckboxAndDatatable() {
         table.draw();
@@ -206,35 +159,48 @@
     }
 </script>
 
+@Html.Partial("_PartialContentHeader")
 
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <div id="example_wrapper" class="dataTables_wrapper dt-bootstrap5">
 
-
-<div class="vd_content clearfix">
-    @Html.Partial("_PartialContentHeader")
-
-    <div class="vd_content-section clearfix">
-        <div class="row">
-            <div class="col-md-12 mgbt-md-20 mgbt-lg-0">
-                <div class="panel widget light-widget">
-                    <div class="panel-heading no-title">
-                        <div class="vd_menu-search table-search input-group input-border">
-                            <input type="text" id="quickSearch"  class="form-control" placeholder="Tìm kiếm" onchange="resetCheckboxAndDatatable()">
-                            <span class="input-group-addon no-bd no-bg"><i class="fa fa-search"></i> </span>
-                        </div>
-                        <div class="vd_panel-menu">
-                            <div id="btnRefreshData" class="menu entypo-icon largerFont" data-placement="bottom" data-toggle="tooltip" data-original-title="Làm mới"> <i class="icon-cycle"></i> </div>
-                            <div id="btnAdd" class="menu entypo-icon largerFont vd_green" data-placement="bottom" data-toggle="tooltip" data-original-title="Thêm"> <i class="icon-plus3"></i> </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="dt-buttons btn-group">
+                            <div id="example2_filter" class="dataTables_filter mr-2">
+                                <label>
+                                    Search:
+                                    <input type="search" class="form-control " placeholder="" aria-controls="example2" id="quickSearch" onchange="resetCheckboxAndTable()">
+                                </label>
+                            </div>
+                            <select id="FilterTheoNamBieuDo" class="form-select select2-local ml-2 mr-2">
+                                @for (int i = DateTime.Now.Year; i >= Model.NamBatDauSuDungPhamMem; i--)
+                                {
+                                    <option value="@i" @(i == DateTime.Now.Year ? "selected" : "")>@i</option>
+                                }
+                            </select>
                         </div>
                     </div>
-                    <div class="panel-body" id="panelBody">
-                        <div class="row">
-                            <table id="dtTable" class="table table-bordered dt-responsive table-hover nowrap" cellspacing="0"></table>
+
+
+
+                    <div class="col-sm-12 col-md-6">
+                        <div id="example2_filter" class="dataTables_filter">
+                            <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="dtTable" class="table table-bordered dataTable" cellspacing="0"></table>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
 
-@Html.Partial("PartialConfirmDeleteModal")

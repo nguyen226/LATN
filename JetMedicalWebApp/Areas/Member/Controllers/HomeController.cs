@@ -57,29 +57,22 @@ namespace JetMedicalWebApp.Areas.Member.Controllers
 
                 if (member != null)
                 {
-                    if (member.Active)
+                    if (member.Password == Encryptor.Hash(model.Password))
                     {
-                        if (member.Password == Encryptor.Hash(model.Password))
-                        {
-                            setCookieLogin(member.UserID.ToString(), (member.LastName + " " + member.FirstName), "true");
+                        setCookieLogin(member.UserID.ToString(), (member.LastName + " " + member.FirstName), "true");
 
-                            if (!string.IsNullOrEmpty(returnUrl))
-                            {
-                                return RedirectToLocal(returnUrl);
-                            }
-                            else
-                            {
-                                return RedirectToAction("Index", "Home", new { area = "Member" });
-                            }
+                        if (!string.IsNullOrEmpty(returnUrl))
+                        {
+                            return RedirectToLocal(returnUrl);
                         }
                         else
                         {
-                            model.Message = "Mật khẩu không chính xác.";
+                            return RedirectToAction("Index", "Home", new { area = "Member" });
                         }
                     }
                     else
                     {
-                        model.Message = "Tài khoản chưa kích hoạt.";
+                        model.Message = "Mật khẩu không chính xác.";
                     }
 
                 }
@@ -117,7 +110,7 @@ namespace JetMedicalWebApp.Areas.Member.Controllers
         public ActionResult LogOff()
         {
             Session[CommonConstants.SessionName_Menu] = null;
-            return RedirectToAction("Login", "Home", new { area = "Member" });
+            return RedirectToAction("Login", "Home", new { area = "" });
         }
 
         public void setCookieLogin(string memberId, string memberName, string isAdmin)

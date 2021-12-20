@@ -27,6 +27,11 @@ namespace JetMedicalWebApp.Entities.Entity
         public string MA_LK { set; get; }
         public DateTime CreateDate { set; get; }
         public DateTime ModifiedDate { set; get; }
+        public DateTime? DOB { set; get; }
+        public string Emaill { set; get; }
+        public string PhoneNumber { set; get; }
+        public string FullName { set; get; }
+        public int RegisterNo { set; get; }
         public virtual Users ModifiedUsers { set; get; }
         public virtual Users CreatedUsers { set; get; }
     }

@@ -1,74 +1,48 @@
 ﻿@using JetMedicalWebApp.Common
-<script>
-    $(document).ready(function () {
-    })
-</script>
-
-<div class="vd_navbar vd_nav-width vd_navbar-tabs-menu vd_navbar-left" id="vdMenu">
-    <div class="navbar-menu clearfix">
-        <h3 class="menu-title hide-nav-medium hide-nav-small">Menu</h3>
-        <div class="vd_menu">
-            <ul>
-                <li>
-                    <a href="@Url.Action("Index","ThongBao", new { area = "Member" })">
-                        <span class="menu-icon"><i class="fa fa-bell"></i></span>
-                        <span class="menu-text">@Html.Raw("Thông báo")</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="@Url.Action("Index","DangKyKhamBenh", new { area = "Member" })">
-                        <span class="menu-icon"><i class="fa fa-calendar"></i></span>
-                        <span class="menu-text">@Html.Raw("Đăng ký khám bệnh")</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="@Url.Action("Index", "NhanTuVan", new { area = "Member" })">
-                        <span class="menu-icon"><i class="fa fa-history"></i></span>
-                        <span class="menu-text">@Html.Raw("Yêu cầu tư vấn")</span>
-                    </a>
-                </li>
 
 
-                <li>
-                    <a href="@Url.Action("XemChiTiet", "Users", new { area = "Member" })?userId=@(Request.Cookies.Get(CommonConstants.CookieMemberID) != null ? Request.Cookies.Get(CommonConstants.CookieMemberID).Value : "")">
-                            <span class="menu-icon"><i class="fa fa-history"></i></span>
-                            <span class="menu-text">@Html.Raw("Lịch sử khám cá nhân")</span>
-                        </a>
-                    </li>
+<div class="sidebar-header">
+    <div>
+        <a href="/"><img class="logo-icon" alt="Snail Soft" src="~/Content/snailsoft/assets/images/logo.png"></a>
 
-                @*<li>
-                    <a href="@Url.Action("XemChiTietNhanVien","XML1", new { area = "Member" })">
-                        <span class="menu-icon"><i class="fa fa-users"></i></span>
-                        <span class="menu-text">@Html.Raw("Lịch sử khám nhân viên")</span>
-                    </a>
-                </li>*@
-
-                <li>
-                    <a href="@Url.Action("Update", "Users", new { area = "Member" })?userId=@(Request.Cookies.Get(CommonConstants.CookieMemberID) != null ? Request.Cookies.Get(CommonConstants.CookieMemberID).Value : "")">
-                        <span class="menu-icon"><i class="fa fa-user"></i></span>
-                        <span class="menu-text">@Html.Raw("Thông tin cá nhân")</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
     </div>
-    <div class="navbar-spacing clearfix">
+    <div>
+        <h4 class="logo-text">My Hospital</h4>
     </div>
-    <div class="vd_menu vd_navbar-bottom-widget">
-        <ul>
-            <li>
-                @using (Html.BeginForm("LogOff", "Home", "Member", FormMethod.Post, new { id = "logoutForm" }))
-                {
-                    @Html.AntiForgeryToken()
-
-                    <a href="javascript:document.getElementById('logoutForm').submit()" style="padding:15px;">
-                        <span class="menu-icon"><i class="fa fa-sign-out"></i></span>
-                        <span class="menu-text">Đăng xuất</span>
-                    </a>
-                }
-            </li>
-        </ul>
+    <div class="toggle-icon ms-auto">
+        <i class='bx bx-arrow-to-left'></i>
     </div>
 </div>
+<!--navigation-->
+<ul class="metismenu" id="menu">
+    <li>
+        <a href="@Url.Action("Index","DangKyKhamBenh", new { area = "Member" })">
+            <div class="parent-icon">
+                <i class='bx bx-calendar'></i>
+            </div>
+            <div class="menu-title">Đăng ký khám bệnh</div>
+        </a>
+    </li>
+
+    <li>
+        <a href="@Url.Action("Update", "Users", new { area = "Member" })?userId=@(Request.Cookies.Get(CommonConstants.CookieMemberID) != null ? Request.Cookies.Get(CommonConstants.CookieMemberID).Value : "")">
+            <div class="parent-icon">
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="menu-title">Thông tin cá nhân</div>
+        </a>
+    </li>
+    <li>
+        @using (Html.BeginForm("LogOff", "Home", "Member", FormMethod.Post, new { id = "logoutForm" }))
+        {
+            @Html.AntiForgeryToken()
+            <a href="javascript:document.getElementById('logoutForm').submit()" style="padding:15px;">
+                <div class="parent-icon">
+                    <i class='bx bx-log-out'></i>
+                </div>
+                <div class="menu-title">Đăng xuất</div>
+            </a>
+        }
+    </li>
+    <!--end navigation-->
+</ul>

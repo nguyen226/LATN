@@ -36,6 +36,9 @@
     <!-- Script -->
     <script type="text/javascript" src="~/Content/Website/Assets/js/jquery_3.2.1.js"></script>
 
+
+    <link rel="stylesheet" href="@Url.Content("~/content/bootstrap-datepicker-1-6-4/css/bootstrap-datepicker3.css")" />
+
 </head>
 
 <body>
@@ -48,21 +51,7 @@
     @Html.Partial("_PartialChonThoiGianKhamBenh")
 
     <div id="wrapper" style="max-width: 1920px;">
-        <div class="app_top">
-            <div class="img_app">
-                <img src="~/Content/Website/Assets/images/banner_header.png" alt="">
-            </div>
-            <div class="app_bv">
-                <a target="_blank" href="https://apps.apple.com" alt="">
-                    <img src="~/Content/Website/Assets/images/appstore.png" alt="">
-                </a>
-                </a>
-                <a target="_blank" href="https://play.google.com/store/apps">
-                    <img src="~/Content/Website/Assets/images/ggplay.png" alt="">
-                </a>
 
-            </div>
-        </div>
         <div id="gop_top">
             @{ Html.RenderAction("_Header", "Partial", new { area = "" }); }
             @RenderSection("banner", required: false)
@@ -70,7 +59,7 @@
         @RenderBody()
         @{ Html.RenderAction("_Footer", "Partial", new { area = "", typeCode = JetMedicalWebApp.Common.CommonConstants.NewsType_Guide }); }
     </div>
-    
+
 </body>
 
 <script src="~/Content/Website/Assets/js/swiper.min.js"></script>
@@ -96,7 +85,7 @@
 <script type="text/javascript" src="~/Content/Website/Assets/js/init.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/bootstrap/bootstrap.min.js"></script>
 <script type="text/javascript" src="~/Content/Website/Assets/js/menu_header.js"></script>
-<script type="text/javascript" src="~/Content/Website/Assets/js/jquery_ui.js"></script>
+@*<script type="text/javascript" src="~/Content/Website/Assets/js/jquery_ui.js"></script>*@
 <script type="text/javascript" src="~/Content/Website/Assets/js/edit_js.js"></script>
 <script type="text/javascript" src="~/Content/js/jquery.blockUI.js"></script>
 <script src="~/Content/Website/Assets/js/slick.min.js"></script>
@@ -111,15 +100,10 @@
 <script src="~/Content/spinner/js/spinner.js"></script>
 <script type="text/javascript" src="@Url.Content("~/content/js/select2.min.js")"></script>
 <script type="text/javascript" src="@Url.Content("~/Content/js/customiseSelect2.js")"></script>
-<script>
-    $(document).ready(function () {
-        $(".monica").monica({
-            settings: {
-                upTime: "fast",
-                downTime: "fast"
-            }
-        });
-    });
-</script>
+
+<script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/js/bootstrap-datepicker.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/content/bootstrap-datepicker-1-6-4/locales/bootstrap-datepicker.vi.min.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/content/js/customisedatepicker.js")"></script>
+
 
 </html>

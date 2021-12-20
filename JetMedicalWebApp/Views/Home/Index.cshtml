@@ -1,7 +1,11 @@
 ﻿@model JetMedicalWebApp.Models.BaseViewModel
 @using JetMedicalWebApp.Common
+
+@using JetMedicalWebApp.Entities.EntityDto
+
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = (UsersDto)ViewBag.User;
 }
 
 @section banner {
@@ -10,9 +14,12 @@
     </div>
 }
 
+
+
 <script>
     $(document).ready(function () {
         hideAlertErrorDatLichKhamTheoPhongBan();
+        $('.datepicker').datepicker(initialDatepickerOption());
 
         var dropdownlistSelect2Option = initialDropdownlistSelect2Option();
         dropdownlistSelect2Option.placeholder = "Chọn chuyên khoa";
@@ -96,14 +103,24 @@
                 var url = "@Url.Action("AddOrUpdate", "DangKyKhamBenh", new { area = "Member" })";
 
                 var fields = [
+                    'RegisterDate',
                     'DepartmentId',
+                    'RegisterNote',
                     'StaffId',
-                    'RegisterDate'
+                    'FullName',
+                    'PhoneNumber',
+                    'Emaill',
+                    'DOB'
                 ];
                 var values = [
+                    $('#formDatLichKhamTheoPhongBan_NgayKham').val() + " " + $('#formDatLichKhamTheoPhongBan_ThoiGianKham').val(),
                     $('#formDatLichKhamTheoPhongBan_PhongBan').val(),
+                    $('#formDatLichKhamTheoPhongBan_GhiChu').val(),
                     $('#formDatLichKhamTheoPhongBan_BacSi').val(),
-                    $('#formDatLichKhamTheoPhongBan_NgayKham').val() + " " + $('#formDatLichKhamTheoPhongBan_ThoiGianKham').val()
+                    $('#formDatLichKhamTheoPhongBan_HoVaTen').val(),
+                    $('#formDatLichKhamTheoPhongBan_SoDienThoai').val(),
+                    $('#formDatLichKhamTheoPhongBan_Email').val(),
+                    $('#formDatLichKhamTheoPhongBan_NgaySinh').val()
                 ];
 
                 var data = {
@@ -200,6 +217,16 @@
         var check = true;
         var error = '';
 
+        if (isNullOrEmpty($('#formDatLichKhamTheoPhongBan_HoVaTen').val())) {
+            check = false;
+            error = 'Bạn chưa nhập họ tên';
+        }
+
+        if (isNullOrEmpty($('#formDatLichKhamTheoPhongBan_SoDienThoai').val())) {
+            check = false;
+            error = 'Bạn chưa nhập số điện thoại';
+        }
+
         if (isNullOrEmptySelect2($('#formDatLichKhamTheoPhongBan_PhongBan').val())) {
             check = false;
             error = 'Bạn chưa chọn gói khám';
@@ -242,26 +269,23 @@
 
                             <div class="box_group_from">
                                 <label class="control-label">Họ và tên</label>
-                                <input type="text" class="input-hoten" name="formDatLichKhamTheoPhongBan_HoVaTen" id="formDatLichKhamTheoPhongBan_HoVaTen" placeholder="Họ và tên" required="">
+                                <input type="text" class="input-hoten" name="formDatLichKhamTheoPhongBan_HoVaTen" id="formDatLichKhamTheoPhongBan_HoVaTen" placeholder="Họ và tên" required="" value="@(user != null ? user.HoTen :"")">
                             </div>
 
                             <div class="box_group_from">
                                 <label class="control-label">Số điện thoại</label>
-                                    <input type="text" class="input-sdt" name="formDatLichKhamTheoPhongBan_SoDienThoai" id="formDatLichKhamTheoPhongBan_SoDienThoai" placeholder="Số điện thoại" required="">
+                                <input type="text" class="input-sdt" name="formDatLichKhamTheoPhongBan_SoDienThoai" id="formDatLichKhamTheoPhongBan_SoDienThoai" placeholder="Số điện thoại" required="" value="@(user != null ? user.Phone :"")">
                             </div>
-
 
                             <div class="box_group_from">
                                 <label class="control-label">Email</label>
-                                    <input type="text" class="input-email" name="formDatLichKhamTheoPhongBan_Email" id="formDatLichKhamTheoPhongBan_Email" placeholder="Email" required="">
+                                <input type="text" class="input-email" name="formDatLichKhamTheoPhongBan_Email" id="formDatLichKhamTheoPhongBan_Email" placeholder="Email" value="@(user != null ? user.EmailID :"")">
                             </div>
-
 
                             <div class="box_group_from">
                                 <label class="control-label">Ngày sinh</label>
-                                <input type="text" class="input-checkin datepicker" name="formDatLichKhamTheoPhongBan_NgaySinh" id="formDatLichKhamTheoPhongBan_NgaySinh" placeholder="Ngày Sinh" required autocomplete="off">
+                                <input type="text" class="input-checkin datepicker" name="formDatLichKhamTheoPhongBan_NgaySinh" id="formDatLichKhamTheoPhongBan_NgaySinh" placeholder="Ngày Sinh" autocomplete="off">
                             </div>
-
 
                             <div class="box_group_from">
                                 <label class="control-label">Chuyên khoa</label>
@@ -279,20 +303,21 @@
                                 <label class="control-label">Giờ khám</label>
                                 <input type="text" class="input-time" readonly onclick="openTimepicker(this)" name="formDatLichKhamTheoPhongBan_ThoiGianKham" id="formDatLichKhamTheoPhongBan_ThoiGianKham" placeholder="Giờ khám" required autocomplete="off">
                             </div>
+                            <div class="box_group_from">
+                                <label class="control-label">Ghi chú</label>
+                                <textarea name="formDatLichKhamTheoPhongBan_GhiChu" rows="3" class="form-control" id="formDatLichKhamTheoPhongBan_GhiChu" placeholder="Ghi chú"></textarea>
+                            </div>
                         </form>
                         <div class="form-group">
                             <button id="btnDatLichKhamTheoPhongBan" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐẶT LỊCH KHÁM</button>
                         </div>
                     </div>
-                    <div class="formDatLichKhamTheoPhongBanThanhCong d-none frm shopping form-group">
+                    <div class="formDatLichKhamTheoPhongBanThanhCong d-none frm form-group">
                         <div class="text-center">
-                            <img src="/Content/Website/Assets/images/logo.svg">
+                            <h2>ĐẶT LỊCH THÀNH CÔNG</h2>
                         </div>
-                        <h2>ĐẶT LỊCH THÀNH CÔNG</h2>
-                        <p>Bạn đã đăng ký thành công, Bộ phận CSKH sẽ liên hệ bạn trong thời gian sớm nhất</p>
-
                         <div class="form-group">
-                            <button type="button" data-dismiss="modal" aria-hidden="true" class="send_mail btn regs"><i class="fa fa-dk"></i> ĐÓNG</button>
+                            <a href="/Member/DangKyKhamBenh" class="send_mail btn regs"><i class="fa fa-dk"></i> Xem thông tin đặt khám bệnh</a>
                         </div>
                     </div>
                 </div>

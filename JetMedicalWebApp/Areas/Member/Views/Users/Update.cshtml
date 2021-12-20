@@ -396,185 +396,234 @@
 </script>
 
 
-<div class="vd_content clearfix">
-    @Html.Partial("_PartialContentHeader")
 
-    <div class="vd_content-section clearfix">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="panel widget light-widget">
-                    <div class="panel-body">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <h3 class="mgbt-xs-15">Thông Tin User</h3>
-                                <form class="form-horizontal" action="#" role="form">
-                                    <div class="form-group row">
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Họ</div>
-                                            <input type="text" id="lastName" class="form-control" placeholder="Họ" value="@(Model.Users != null ? Model.Users.LastName : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Tên</div>
-                                            <input type="text" id="firstName" class="form-control" placeholder="Tên" value="@(Model.Users != null ? Model.Users.FirstName : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Email</div>
-                                            <input type="email" id="email" class="form-control" placeholder="email" value="@(Model.Users != null ? Model.Users.EmailID : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Số điện thoại</div>
-                                            <input type="text" id="phone" class="form-control" placeholder="số điện thoại" value="@(Model.Users != null ? Model.Users.Phone : "")">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Mật khẩu</div>
-                                            <input type="password" id="password" class="form-control" placeholder="mật khẩu" value="">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Xác nhận mật khẩu</div>
-                                            <input type="password" id="confrimPassword" class="form-control" placeholder="xác nhận mật khẩu" value="">
-                                        </div>
-                                    </div>
-                                    <div class="row text-right">
-                                        <div class="col-xs-12 text-right">
-                                            <button class="btn vd_btn vd_bg-green" id="btnCapNhatUser"><span class="menu-icon"><i class="fa fa-fw fa-check"></i></span> Cập nhật user</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+<div class="card">
+    <div class="card-body">
+        <ul class="nav nav-tabs nav-primary" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-bs-toggle="tab" href="#primaryUser" role="tab" aria-selected="true">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon">
+                            <i class='bx bx-user font-18 me-1'></i>
                         </div>
-                        <hr />
+                        <div class="tab-title">Thông tin user</div>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" data-bs-toggle="tab" href="#primaryprofile" role="tab" aria-selected="false">
+                    <div class="d-flex align-items-center">
+                        <div class="tab-icon">
+                            <i class='bx bx-user-pin font-18 me-1'></i>
+                        </div>
+                        <div class="tab-title">Hồ sơ y tế</div>
+                    </div>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content py-3">
+            <div class="tab-pane fade show active" id="primaryUser" role="tabpanel">
+                <div class="d-flex">
+                    <div class="col-sm-3 mb-2">
                         <div class="row">
-
-                            <div class="col-sm-12">
-                                <h3 class="mgbt-xs-15">Hồ sơ y tế</h3>
-                                <form class="form-horizontal" action="#" role="form">
-                                    <div class="form-group row">
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Ngày sinh</div>
-                                            <input type="email" id="dateOfBirthUserInfo" class="form-control datepicker" placeholder="ngày sinh" value="@(Model.UserInfo != null ? Model.UserInfo.DateOfBirth : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">BHYT</div>
-                                            <input type="text" id="baoHiemYTeUserInfo" class="form-control" placeholder="BHYT" value="@(Model.UserInfo != null ? Model.UserInfo.BHYT : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">CMND</div>
-                                            <input type="text" id="cmndUserInfo" class="form-control" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.CMND : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Nhóm máu</div>
-                                            <select id="nhomMau" name="nhomMau" class="form-control select2">
-                                                @if (Model.BloodType != null)
-                                                {
-                                                    <option value="@Model.BloodType.BloodTypeID" selected>@Html.Raw(Model.BloodType.BloodName)</option>
-                                                }
-                                            </select>
-                                        </div>
-                                      
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <div class="col-sm-3">
-                                            <br />
-                                            <div class="vd_radio radio-success">
-                                                <input type="radio" @(Model.UserInfo != null ? (Model.UserInfo.Sex == true ? "checked" : "") : "checked") value="True" id="gioiTinhNam" name="gender">
-                                                <label for="gioiTinhNam"> Nam </label>
-                                                <input type="radio" @(Model.UserInfo != null ? (Model.UserInfo.Sex == false ? "checked" : "") : "") value="False" id="gioiTinhNu" name="gender">
-                                                <label for="gioiTinhNu"> Nữ </label>
-                                            </div>
-                                        </div>
-
-                                      
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Tỉnh</div>
-                                            <select id="tinh" name="tinh" class="form-control select2">
-                                                @if (Model.Province != null)
-                                                {
-                                                    <option value="@Model.Province.ProvinceID" selected>@Html.Raw(Model.Province.ProvinceName)</option>
-                                                }
-                                            </select>
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Huyện/Xã</div>
-                                            <select id="huyen" name="huyen" class="form-control select2">
-                                                @if (Model.District != null)
-                                                {
-                                                    <option value="@Model.District.DistrictID" selected>@Html.Raw(Model.District.DistrictName)</option>
-                                                }
-                                            </select>
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Địa chỉ</div>
-                                            <input type="text" id="diaChi" class="form-control" placeholder="Địa chỉ" value="@(Model.UserInfo != null ? Model.UserInfo.Address : "")">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row">
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Chiều cao(cm)</div>
-                                            <input type="number" id="chieuCao" class="form-control" placeholder="Chiều cao(cm)" value="@(Model.UserInfo != null ? Model.UserInfo.Height.ToString() : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Câng nặng(kg)</div>
-                                            <input type="number" id="cangNang" class="form-control" placeholder="Câng nặng(kg)" value="@(Model.UserInfo != null ? Model.UserInfo.weight.ToString() : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Nghề nghiệp</div>
-                                            <input type="text" id="ngheNghiep" class="form-control" placeholder="Nghề nghiệp" value="@(Model.UserInfo != null ? Model.UserInfo.Occupation : "")">
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <div class="form-label">Công ty</div>
-                                            <select id="congTy" name="congTy" class="form-control select2">
-                                                @if (Model.Company != null)
-                                                {
-                                                    <option value="@Model.Company.CompanyID" selected>@Html.Raw(Model.Company.ComCode + " - " + Model.Company.ComName)</option>
-                                                }
-                                            </select>
-                                        </div>
-
-                                        <div class="col-sm-3">
-                                            <br />
-                                            <div class="vd_checkbox checkbox-success">
-                                                <input type="checkbox" id="hoSoMacDinh" value="1" checked disabled>
-                                                <label for="checkbox-3"> Hồ sơ mặc định</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row text-right">
-                                        <div class="col-xs-12 text-right">
-                                            <button class="btn vd_btn vd_bg-green" id="btnCapNhatUserInfo"><span class="menu-icon"><i class="fa fa-fw fa-check"></i></span> Cập nhật hồ sơ y tế</button>
-                                        </div>
-                                    </div>
-                                </form>
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <img alt="example image" id="imagesPreview" src="@(Model.Users != null && !string.IsNullOrEmpty(Model.Users.Avartar) ?  Model.Users.Avartar : CommonConstants.FileNoImage)">
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-center mt-2">
+                                <label class="btn btn-primary" for="images"><i class="bx bx-cloud-upload mr-1"></i>Upload</label>
+                                <input id="images" type="file" name="files[]" class="form-control form-control-sm" hidden accept="image/*">
                             </div>
                         </div>
                     </div>
-                    <!-- col-sm-12 -->
+                    <div class="col-sm-9 mb-2">
+                        <div class="row d-flex">
+                            <div class="col-sm-3 mb-2">
+                                <label for="lastName" class="form-label">@Html.Raw("Họ")</label>
+                                <input class="form-control" id="lastName" name="lastName" placeholder="Họ" value="@(Model.Users != null ? Model.Users.LastName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="firstName" class="form-label">@Html.Raw("Tên")</label>
+                                <input class="form-control" id="firstName" name="firstName" placeholder="Tên" value="@(Model.Users != null ? Model.Users.FirstName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="email" class="form-label">@Html.Raw("Email")</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="@(Model.Users != null ? Model.Users.EmailID : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="phone" class="form-label">@Html.Raw("Số điện thoại")</label>
+                                <input class="form-control" id="phone" name="phone" placeholder="Số điện thoại" value="@(Model.Users != null ? Model.Users.Phone : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="nhomNguoiDung" class="form-label">@Html.Raw("Nhóm người dùng")</label>
+                                <select id="nhomNguoiDung" name="nhomNguoiDung" class="form-control select2">
+                                    @if (Model.Groups != null)
+                                    {
+                                        <option value="@Model.Groups.GroupID" selected>@Html.Raw(Model.Groups.GroupName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="password" class="form-label">@Html.Raw("Mật khẩu")</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu" value="">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="confrimPassword" class="form-label">@Html.Raw("Xác nhận mật khẩu")</label>
+                                <input type="password" class="form-control" id="confrimPassword" name="confrimPassword" placeholder="Xác nhận mật khẩu" value="">
+                            </div>
+                            <div class="col-sm-3 mb-2 d-flex align-items-end pb-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="active" @(Model.Users != null ? Model.Users.Active ? "checked" : "" : "")>
+                                    <label class="form-check-label" for="active">@Html.Raw("Kích hoạt")</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2 d-flex align-items-end pb-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="activeMobile" @(Model.Users != null ? Model.Users.IsMobile ? "checked" : "" : "")>
+                                    <label class="form-check-label" for="activeMobile">@Html.Raw("Kích hoạt số điện thoại người dùng")</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2 d-flex justify-content-end">
+                                @if ((Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.AllowUpdate) || (Model.Users != null && Request.Cookies.Get(CommonConstants.CookieUserID) != null && Model.Users.UserID.ToString() == Request.Cookies.Get(CommonConstants.CookieUserID).Value.ToString()))
+                                {
+                                    <button class="btn buttons-excel buttons-html5 btn-primary ml-2" id="btnCapNhatUser" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-check"></i><span> Cập nhật user</span></button>
+                                }
+                                @if (Model.Menu_GroupPermission != null && Model.Menu_GroupPermission.AllowDelete)
+                                {
+                                    <button class="btn buttons-excel buttons-html5 btn-danger ml-2" id="btnXoa" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-trash-alt"></i><span> Xoá</span></button>
+                                }
+
+                                <button class="btn buttons-excel buttons-html5 btn-secondary ml-2" id="btnTroLai" type="button"><i class="fadeIn animated bx bx-arrow-back"></i>@Html.Raw(" Trở lại danh sách")</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- row -->
+            </div>
+            <div class="tab-pane fade" id="primaryprofile" role="tabpanel">
+                <div class="d-flex">
+                    <div class="col-sm-3 mb-2">
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <img alt="example image" id="imagesPreviewUserInfo" src="@(Model.UserInfo != null && !string.IsNullOrEmpty(Model.UserInfo.Avartar) ?  Model.UserInfo.Avartar : CommonConstants.FileNoImage)">
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-center mt-2">
+                                <label class="btn btn-primary" for="imagesUserInfo"><i class="bx bx-cloud-upload mr-1"></i>Upload</label>
+                                <input id="imagesUserInfo" type="file" name="files[]" class="form-control form-control-sm" hidden accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-9 mb-2">
+                        <div class="row d-flex">
+                            <div class="col-sm-3 mb-2">
+                                <label for="maUserInfo" class="form-label">@Html.Raw("Mã BN")</label>
+                                <input class="form-control" id="maUserInfo" name="maUserInfo" placeholder="Mã BN" value="@(Model.UserInfo != null ? Model.UserInfo.MA_BN : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="lastNameUserInfo" class="form-label">@Html.Raw("Họ")</label>
+                                <input class="form-control" id="lastNameUserInfo" name="lastNameUserInfo" placeholder="Họ" value="@(Model.UserInfo != null ? Model.UserInfo.LastName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="firstNameUserInfo" class="form-label">@Html.Raw("Tên")</label>
+                                <input class="form-control" id="firstNameUserInfo" name="firstNameUserInfo" placeholder="Tên" value="@(Model.UserInfo != null ? Model.UserInfo.FirstName : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="dateOfBirthUserInfo" class="form-label">@Html.Raw("Ngày sinh")</label>
+                                <input class="form-control datepicker" id="dateOfBirthUserInfo" name="dateOfBirthUserInfo" placeholder="Ngày sinh" value="@(Model.UserInfo != null ? Model.UserInfo.DateOfBirth : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="baoHiemYTeUserInfo" class="form-label">@Html.Raw("BHYT")</label>
+                                <input class="form-control" id="baoHiemYTeUserInfo" name="baoHiemYTeUserInfo" placeholder="BHYT" value="@(Model.UserInfo != null ? Model.UserInfo.BHYT : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="baoHiemYTeUserInfo" class="form-label">@Html.Raw("CMND")</label>
+                                <input class="form-control" id="baoHiemYTeUserInfo" name="baoHiemYTeUserInfo" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.BHYT : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="cmndUserInfo" class="form-label">@Html.Raw("CMND")</label>
+                                <input class="form-control" id="cmndUserInfo" name="cmndUserInfo" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.CMND : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="cmndUserInfo" class="form-label">@Html.Raw("CMND")</label>
+                                <input class="form-control" id="cmndUserInfo" name="cmndUserInfo" placeholder="CMND" value="@(Model.UserInfo != null ? Model.UserInfo.CMND : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="nhomMau" class="form-label">@Html.Raw("Nhóm máu")</label>
+                                <select id="nhomMau" name="nhomMau" class="form-control select2">
+                                    @if (Model.BloodType != null)
+                                    {
+                                        <option value="@Model.BloodType.BloodTypeID" selected>@Html.Raw(Model.BloodType.BloodName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end pb-1">
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" @(Model.UserInfo != null ? (Model.UserInfo.Sex == true ? "checked" : "") : "checked") value="True" id="gioiTinhNam" name="gender">
+                                    <label class="form-check-label" for="gioiTinhNam">Nam</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" @(Model.UserInfo != null ? (Model.UserInfo.Sex == false ? "checked" : "") : "") value="False" id="gioiTinhNu" name="gender">
+                                    <label class="form-check-label" for="gioiTinhNu">Nữ</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="tinh" class="form-label">@Html.Raw("Tỉnh")</label>
+                                <select id="tinh" name="tinh" class="form-control select2">
+                                    @if (Model.Province != null)
+                                    {
+                                        <option value="@Model.Province.ProvinceID" selected>@Html.Raw(Model.Province.ProvinceName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="huyen" class="form-label">@Html.Raw("Huyện/Xã")</label>
+                                <select id="huyen" name="huyen" class="form-control select2">
+                                    @if (Model.District != null)
+                                    {
+                                        <option value="@Model.District.DistrictID" selected>@Html.Raw(Model.District.DistrictName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="diaChi" class="form-label">@Html.Raw("Địa chỉ")</label>
+                                <input class="form-control" id="diaChi" name="diaChi" placeholder="Địa chỉ" value="@(Model.UserInfo != null ? Model.UserInfo.Address : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="chieuCao" class="form-label">@Html.Raw("Chiều cao(cm)")</label>
+                                <input type="number" class="form-control" id="chieuCao" name="chieuCao" placeholder="Chiều cao(cm)" value="@(Model.UserInfo != null ? Model.UserInfo.Height.ToString() : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="cangNang" class="form-label">@Html.Raw("Cân nặng(kg)")</label>
+                                <input type="number" class="form-control" id="cangNang" name="cangNang" placeholder="Cân nặng(kg)" value="@(Model.UserInfo != null ? Model.UserInfo.weight.ToString() : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="ngheNghiep" class="form-label">@Html.Raw("Nghề nghiệp")</label>
+                                <input class="form-control" id="ngheNghiep" name="ngheNghiep" placeholder="Nghề nghiệp" value="@(Model.UserInfo != null ? Model.UserInfo.Occupation : "")">
+                            </div>
+                            <div class="col-sm-3 mb-2">
+                                <label for="congTy" class="form-label">@Html.Raw("Công ty")</label>
+                                <select id="congTy" name="congTy" class="form-control select2">
+                                    @if (Model.Company != null)
+                                    {
+                                        <option value="@Model.Company.CompanyID" selected>@Html.Raw(Model.Company.ComCode + " - " + Model.Company.ComName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-sm-3 mb-2 d-flex align-items-end pb-1">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="hoSoMacDinh" value="1" checked disabled>
+                                    <label class="form-check-label" for="hoSoMacDinh">@Html.Raw("Hồ sơ mặc định")</label>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-2 d-flex justify-content-end">
+                                <button class="btn buttons-excel buttons-html5 btn-primary" id="btnCapNhatUserInfo" tabindex="0" aria-controls="example2" type="button"><i class="fadeIn animated bx bx-check"></i><span> Cập nhật user info</span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- Panel Widget -->
     </div>
-    <!-- col-sm-12-->
 </div>
+
 
 @Html.Partial("_PartialNotificationModal")
 @Html.Partial("_PartialNotificationAndAskOperationModal")

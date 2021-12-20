@@ -378,11 +378,18 @@ namespace JetMedicalWebApp.Services
                 {
                     nguoiSuDungCapNhat = internalService.GetNguoiSuDungCapNhat(unitOfWork);
                     int userIDValue, departmentIdValue, packageIdValue, statusValue;
-                    DateTime registerDateValue;
+                    DateTime registerDateValue, dobValue;
+
+                    registerDateValue = updatedValues.ContainsKey("RegisterDate") ? (DateTime.TryParseExact(updatedValues["RegisterDate"], CommonConstants.DateTimeFormat, null, DateTimeStyles.None, out registerDateValue) ? registerDateValue : DateTime.Now) : DateTime.Now;
                     registerService = new RegisterService()
                     {
+                        RegisterNo = GetRegisterNoLastest(registerDateValue),
+                        Emaill = updatedValues.ContainsKey("Emaill") ? updatedValues["Emaill"] : string.Empty,
+                        PhoneNumber = updatedValues.ContainsKey("PhoneNumber") ? updatedValues["PhoneNumber"] : string.Empty,
+                        FullName = updatedValues.ContainsKey("FullName") ? updatedValues["FullName"] : string.Empty,
+                        DOB = updatedValues.ContainsKey("DOB") ? (DateTime.TryParseExact(updatedValues["DOB"], CommonConstants.DateFormat, null, DateTimeStyles.None, out dobValue) ? dobValue : new Nullable<DateTime>()) : new Nullable<DateTime>(),
                         UserID = updatedValues.ContainsKey("UserID") ? (Int32.TryParse(updatedValues["UserID"], out userIDValue) ? userIDValue : -1) : -1,
-                        RegisterDate = updatedValues.ContainsKey("RegisterDate") ? (DateTime.TryParseExact(updatedValues["RegisterDate"], CommonConstants.DateTimeFormat, null, DateTimeStyles.None, out registerDateValue) ? registerDateValue : DateTime.Now) : DateTime.Now,
+                        RegisterDate = registerDateValue,
                         DepartmentId = updatedValues.ContainsKey("DepartmentId") ? (Int32.TryParse(updatedValues["DepartmentId"], out departmentIdValue) ? departmentIdValue : new Nullable<Int32>()) : new Nullable<Int32>(),
                         RegisterNote = updatedValues.ContainsKey("RegisterNote") ? updatedValues["RegisterNote"] : string.Empty,
                         PackageId = updatedValues.ContainsKey("PackageId") ? (Int32.TryParse(updatedValues["PackageId"], out packageIdValue) ? packageIdValue : new Nullable<Int32>()) : new Nullable<Int32>(),
@@ -413,6 +420,12 @@ namespace JetMedicalWebApp.Services
             }
 
             return resultMessage;
+        }
+
+
+        public int GetRegisterNoLastest(DateTime registerDate)
+        {
+            return unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day && registerDate.Month == registerDate.Month && registerDate.Year == registerDate.Year) + 1;
         }
     }
 }
