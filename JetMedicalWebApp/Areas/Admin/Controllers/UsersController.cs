@@ -232,36 +232,13 @@ namespace JetMedicalWebApp.Areas.Admin.Controllers
                 inputParam.Add(CommonConstants.StrSelectedFields, selectedFields);
             }
 
-            var company_GroupPermission = (List<Company_GroupPermissionDto>)System.Web.HttpContext.Current.Session[CommonConstants.Session_CurrentUser_Company_GroupPermission];
             string isAdminString = string.Empty;
             if (System.Web.HttpContext.Current.Request.Cookies[CommonConstants.CookieUserAdmin] != null)
             {
                 isAdminString = System.Web.HttpContext.Current.Request.Cookies.Get(CommonConstants.CookieUserAdmin).Value;
             }
 
-            if (company_GroupPermission != null && !string.IsNullOrEmpty(isAdminString) && isAdminString == "false")
-            {
-                if (company_GroupPermission.Count() > 0)
-                {
-                    string filterCongTy = string.Empty;
-                    if (!string.IsNullOrEmpty(stringFilter))
-                    {
-                        stringFilter += " AND ";
-                    }
-                    stringFilter += " CompanyId IN (";
-
-                    for (int i = 0; i < company_GroupPermission.Count(); i++)
-                    {
-                        stringFilter += company_GroupPermission[i].CompanyId.ToString();
-                        if (i != company_GroupPermission.Count() - 1)
-                        {
-                            stringFilter += ",";
-                        }
-                    }
-                    stringFilter += " )";
-                }
-            }
-
+           
             inputParam.Add(CommonConstants.StrStringFilter, stringFilter);
 
 

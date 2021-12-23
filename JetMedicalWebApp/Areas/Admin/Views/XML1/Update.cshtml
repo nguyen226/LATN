@@ -130,7 +130,7 @@
                     'TEN_BENH',
                     'KET_QUA_DTRI',
                     'TINH_TRANG_RV',
-                    'MA_KHOA',
+                    'DepartmentId',
                     'CHUAN_DOAN',
                     'PPDIEUTRI',
                     'LOIDANTHAYTHUOC',
@@ -247,26 +247,26 @@
         dropdownlistSelect2Option.placeholder = "Chọn khoa";
         dropdownlistSelect2Option.ajax = {
             type: "POST",
-            url: '@Url.Action("Filter", "Khoa", new { area = "Admin" })',
+            url: '@Url.Action("Filter", "Department", new { area = "Admin" })',
             dataType: 'json',
             contentType: "application/json",
             delay: 250,
             data: function (params) {
-                var selectedFields = 'Id, Code, Name';
-                var condition = params.term ? ' (Code.Contains(\\' + params.term.trim() + '\\) OR Name.Contains(\\' + params.term.trim() + '\\))' : '';
+                var selectedFields = 'id, name, languageId, isActive';
+                var condition = params.term ? ' (name.Contains(\\' + params.term.trim() + '\\))' : '';
 
                 return JSON.stringify({
                     selectedFields: selectedFields,
                     stringFilter: condition,
-                    sortCondition: 'Code asc, Name asc',
+                    sortCondition: 'name asc',
                     top: 10,
                 });
             },
             processResults: function (res, params) {
                 var data = $.map(res, function (item, i) {
                     return {
-                        id: item.Code,
-                        text: item.Name
+                        id: item.id,
+                        text: item.name
                     }
                 });
                 return {
@@ -498,7 +498,7 @@
                                 <select id="FormUpdate_MA_KHOA" name="FormUpdate_MA_KHOA" class="form-control select2">
                                     @if (Model.XML1 != null)
                                     {
-                                        <option value="@Model.XML1.MA_KHOA" selected>@Html.Raw(Model.XML1.TEN_KHOA)</option>
+                                        <option value="@Model.XML1.DepartmentId" selected>@Html.Raw(Model.XML1.DepartmentName)</option>
                                     }
                                 </select>
                             </div>

@@ -22,6 +22,7 @@ namespace JetMedicalWebApp.Entities.Entity
         public int STT { set; get; }//1 bệnh nhân có rất nhiều lượt khám, cái này + thời gian vào là oder của sắp xếp trên bảng, ngày mới nhất + STT trên cùng
         public string MA_BN { set; get; } //Mã bệnh nhân, chỗ này chính là mã MA_BN trong UserInfo
         public int BENH_ID { set; get; }
+        public int? DepartmentId { set; get; }
         public string TEN_BENH { set; get; }
         public string MA_BENH { set; get; }
         public string MA_BENHKHAC { set; get; }

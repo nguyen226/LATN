@@ -350,7 +350,7 @@ namespace JetMedicalWebApp.Services
         }
 
 
-        public string AddOrUpdate(string id, Dictionary<string, string> updatedValues)
+        public string AddOrUpdate(string id, Dictionary<string, string> updatedValues, out bool res)
         {
             RegisterService registerService = null;
             string resultMessage = string.Empty;
@@ -359,6 +359,7 @@ namespace JetMedicalWebApp.Services
             AppHistoryService appHistoryServiceService = new AppHistoryService();
             InternalService internalService = new InternalService();
             Users nguoiSuDungCapNhat;
+            res = false;
             try
             {
                 if (!string.IsNullOrEmpty(id))
@@ -377,41 +378,107 @@ namespace JetMedicalWebApp.Services
                 else
                 {
                     nguoiSuDungCapNhat = internalService.GetNguoiSuDungCapNhat(unitOfWork);
-                    int userIDValue, departmentIdValue, packageIdValue, statusValue;
                     DateTime registerDateValue, dobValue;
+                    var registerUser = updatedValues.ContainsKey("CreatedUserID") ? (Int32.TryParse(updatedValues["CreatedUserID"], out memberIdValue) ? unitOfWork.UsersRepository.GetByID(memberIdValue) : nguoiSuDungCapNhat) : nguoiSuDungCapNhat;
+                    var uf = unitOfWork.UserInfoRepository.Get(x=>x.UserID == registerUser.UserID).FirstOrDefault();
+                    if(uf == null)
+                    {
+                        UserInfo userInfo = new UserInfo()
+                        {
+                            UserID = registerUser.UserID,
+                            MA_BN = "BN_" + registerUser.UserID,
+                            FirstName = registerUser.FirstName,
+                            LastName = registerUser.LastName,
+                            DateOfBirth = updatedValues.ContainsKey("DOB") ? (DateTime.TryParseExact(updatedValues["DOB"], CommonConstants.DateFormat, null, DateTimeStyles.None, out dobValue) ? dobValue :DateTime.Now) : DateTime.Now,
+                            CMND = updatedValues.ContainsKey("CMND") ? updatedValues["CMND"] : string.Empty,
+                            BHYT = updatedValues.ContainsKey("BHYT") ? updatedValues["BHYT"] : string.Empty,
+                            Occupation = updatedValues.ContainsKey("Occupation") ? updatedValues["Occupation"] : string.Empty,
+                            Avartar = updatedValues.ContainsKey("Avartar") ? updatedValues["Avartar"] : string.Empty,
+                            Sex =  false,
+                            Height =  0,
+                            weight =  0,
+                            Address =  string.Empty,
+                            BloodTypeID =0,
+                            ProvinceID = string.Empty,
+                            DistrictID =  string.Empty,
+                            IsDefault = true,
+                            Ma_Cong_Ty =  0,
+                        };
+                        unitOfWork.UserInfoRepository.Insert(userInfo);
+                        unitOfWork.Save();
+                    }
 
+                    int userIDValue, departmentIdValue, packageIdValue, statusValue;
                     registerDateValue = updatedValues.ContainsKey("RegisterDate") ? (DateTime.TryParseExact(updatedValues["RegisterDate"], CommonConstants.DateTimeFormat, null, DateTimeStyles.None, out registerDateValue) ? registerDateValue : DateTime.Now) : DateTime.Now;
-                    registerService = new RegisterService()
+                    int lk = GetRegisterNoLastest(registerDateValue);
+                    if (lk == 0)
                     {
-                        RegisterNo = GetRegisterNoLastest(registerDateValue),
-                        Emaill = updatedValues.ContainsKey("Emaill") ? updatedValues["Emaill"] : string.Empty,
-                        PhoneNumber = updatedValues.ContainsKey("PhoneNumber") ? updatedValues["PhoneNumber"] : string.Empty,
-                        FullName = updatedValues.ContainsKey("FullName") ? updatedValues["FullName"] : string.Empty,
-                        DOB = updatedValues.ContainsKey("DOB") ? (DateTime.TryParseExact(updatedValues["DOB"], CommonConstants.DateFormat, null, DateTimeStyles.None, out dobValue) ? dobValue : new Nullable<DateTime>()) : new Nullable<DateTime>(),
-                        UserID = updatedValues.ContainsKey("UserID") ? (Int32.TryParse(updatedValues["UserID"], out userIDValue) ? userIDValue : -1) : -1,
-                        RegisterDate = registerDateValue,
-                        DepartmentId = updatedValues.ContainsKey("DepartmentId") ? (Int32.TryParse(updatedValues["DepartmentId"], out departmentIdValue) ? departmentIdValue : new Nullable<Int32>()) : new Nullable<Int32>(),
-                        RegisterNote = updatedValues.ContainsKey("RegisterNote") ? updatedValues["RegisterNote"] : string.Empty,
-                        PackageId = updatedValues.ContainsKey("PackageId") ? (Int32.TryParse(updatedValues["PackageId"], out packageIdValue) ? packageIdValue : new Nullable<Int32>()) : new Nullable<Int32>(),
-                        StaffId = updatedValues.ContainsKey("StaffId") ? (Int32.TryParse(updatedValues["StaffId"], out staffIdValue) ? staffIdValue : -1) : -1,
-                        Status = updatedValues.ContainsKey("Status") ? (Int32.TryParse(updatedValues["Status"], out statusValue) ? statusValue : CommonConstants.RegisterService_DangKy) : CommonConstants.RegisterService_DangKy,
-                        MA_LK = updatedValues.ContainsKey("MA_LK") ? updatedValues["MA_LK"] : string.Empty,
-                        ModifiedDate = DateTime.Now,
-                        ModifiedUsers = updatedValues.ContainsKey("CreatedUserID") ? (Int32.TryParse(updatedValues["CreatedUserID"], out memberIdValue) ? unitOfWork.UsersRepository.GetByID(memberIdValue) : nguoiSuDungCapNhat) :  nguoiSuDungCapNhat,
-                        CreateDate = DateTime.Now,
-                        CreatedUsers = updatedValues.ContainsKey("CreatedUserID") ? (Int32.TryParse(updatedValues["CreatedUserID"], out memberIdValue) ? unitOfWork.UsersRepository.GetByID(memberIdValue) : nguoiSuDungCapNhat) :  nguoiSuDungCapNhat,
-                    };
-
-                    registerService = unitOfWork.RegisterServiceRepository.Insert(registerService);
-
-                    appHistoryServiceService.Add(new AppHistory()
+                        resultMessage = "Số lượt khám khung giờ này đã đủ vui lòng chọn khung giờ khác";
+                    }
+                    else
                     {
-                        Ma = maTable,
-                        Ten = tenTable,
-                        ThaoTac = Common.CommonConstants.ThaoTacThemMoiDuLieu,
-                    });
+                        registerService = new RegisterService()
+                        {
+                            RegisterNo = lk,
+                            Emaill = updatedValues.ContainsKey("Emaill") ? updatedValues["Emaill"] : string.Empty,
+                            PhoneNumber = updatedValues.ContainsKey("PhoneNumber") ? updatedValues["PhoneNumber"] : string.Empty,
+                            FullName = updatedValues.ContainsKey("FullName") ? updatedValues["FullName"] : string.Empty,
+                            DOB = updatedValues.ContainsKey("DOB") ? (DateTime.TryParseExact(updatedValues["DOB"], CommonConstants.DateFormat, null, DateTimeStyles.None, out dobValue) ? dobValue : new Nullable<DateTime>()) : new Nullable<DateTime>(),
+                            UserID = updatedValues.ContainsKey("UserID") ? (Int32.TryParse(updatedValues["UserID"], out userIDValue) ? userIDValue : -1) : -1,
+                            RegisterDate = registerDateValue,
+                            DepartmentId = updatedValues.ContainsKey("DepartmentId") ? (Int32.TryParse(updatedValues["DepartmentId"], out departmentIdValue) ? departmentIdValue : new Nullable<Int32>()) : new Nullable<Int32>(),
+                            RegisterNote = updatedValues.ContainsKey("RegisterNote") ? updatedValues["RegisterNote"] : string.Empty,
+                            PackageId = updatedValues.ContainsKey("PackageId") ? (Int32.TryParse(updatedValues["PackageId"], out packageIdValue) ? packageIdValue : new Nullable<Int32>()) : new Nullable<Int32>(),
+                            StaffId = updatedValues.ContainsKey("StaffId") ? (Int32.TryParse(updatedValues["StaffId"], out staffIdValue) ? staffIdValue : -1) : -1,
+                            Status = updatedValues.ContainsKey("Status") ? (Int32.TryParse(updatedValues["Status"], out statusValue) ? statusValue : CommonConstants.RegisterService_DangKy) : CommonConstants.RegisterService_DangKy,
+                            MA_LK = updatedValues.ContainsKey("MA_LK") ? updatedValues["MA_LK"] : string.Empty,
+                            ModifiedDate = DateTime.Now,
+                            ModifiedUsers = updatedValues.ContainsKey("CreatedUserID") ? (Int32.TryParse(updatedValues["CreatedUserID"], out memberIdValue) ? unitOfWork.UsersRepository.GetByID(memberIdValue) : nguoiSuDungCapNhat) : nguoiSuDungCapNhat,
+                            CreateDate = DateTime.Now,
+                            CreatedUsers = updatedValues.ContainsKey("CreatedUserID") ? (Int32.TryParse(updatedValues["CreatedUserID"], out memberIdValue) ? unitOfWork.UsersRepository.GetByID(memberIdValue) : nguoiSuDungCapNhat) : nguoiSuDungCapNhat,
+                        };
+                        registerService = unitOfWork.RegisterServiceRepository.Insert(registerService);
+                        appHistoryServiceService.Add(new AppHistory()
+                        {
+                            Ma = maTable,
+                            Ten = tenTable,
+                            ThaoTac = Common.CommonConstants.ThaoTacThemMoiDuLieu,
+                        });
+                        unitOfWork.Save();
 
-                    unitOfWork.Save();
+                        XML1 xml1 = new XML1()
+                        {
+                            MA_LK = registerService.RegisterDate.ToString("dd/MM/yyyy_HH:mm_") + lk.ToString(),
+                            STT = lk,
+                            MA_BN = uf.MA_BN,
+                            BENH_ID =  -1,
+                            TEN_BENH =  string.Empty,
+                            MA_BENH = string.Empty,
+                            MA_BENHKHAC = string.Empty,
+                            NGAY_VAO = registerDateValue,
+                            NGAY_RA =  new Nullable<DateTime>(),
+                            NGAY_TAI_KHAM =new Nullable<DateTime>(),
+                            KET_QUA_DTRI =  0,
+                            TINH_TRANG_RV =  0,
+                            DepartmentId = registerService.DepartmentId,
+                            MA_KHOA =  string.Empty,
+                            CHUAN_DOAN = string.Empty,
+                            PPDIEUTRI = string.Empty,
+                            LOIDANTHAYTHUOC = string.Empty,
+                            GHICHU =  string.Empty,
+                            XML1_File =  string.Empty,
+                            ModifiedDate = DateTime.Now,
+                            ModifiedUsers = nguoiSuDungCapNhat,
+                            CreatedDate = DateTime.Now,
+                            CreatedUsers = nguoiSuDungCapNhat
+                        };
+                        unitOfWork.XML1Repository.Insert(xml1);
+                        unitOfWork.Save();
+
+                        resultMessage = registerService.RegisterDate.ToString("dd/MM/yyyy HH:mm") + "," + registerService.RegisterNo;
+
+                        res = true;
+                    }
                 }
             }
             catch (Exception ex)
@@ -425,7 +492,60 @@ namespace JetMedicalWebApp.Services
 
         public int GetRegisterNoLastest(DateTime registerDate)
         {
-            return unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day && registerDate.Month == registerDate.Month && registerDate.Year == registerDate.Year) + 1;
+            int total = unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day
+                                                            && x.RegisterDate.Month == registerDate.Month
+                                                            && x.RegisterDate.Year == registerDate.Year
+                                                            && x.RegisterDate.Hour == registerDate.Hour);
+            return total == 20 ? 0 : total + 1;
+        }
+
+        public Dictionary<string, int> GetRegisterNoLastestByTime(DateTime registerDate)
+        {
+            var updatedValues = new Dictionary<string, int>();
+          
+            updatedValues.Add("07:00", unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day
+                                                            && x.RegisterDate.Month == registerDate.Month
+                                                            && x.RegisterDate.Year == registerDate.Year
+                                                            && x.RegisterDate.Hour == 7));
+            updatedValues.Add("09:00", unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day
+                                                            && x.RegisterDate.Month == registerDate.Month
+                                                            && x.RegisterDate.Year == registerDate.Year
+                                                            && x.RegisterDate.Hour == 9));
+            updatedValues.Add("11:00", unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day
+                                                            && x.RegisterDate.Month == registerDate.Month
+                                                            && x.RegisterDate.Year == registerDate.Year
+                                                            && x.RegisterDate.Hour == 11));
+            updatedValues.Add("13:00", unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day
+                                                            && x.RegisterDate.Month == registerDate.Month
+                                                            && x.RegisterDate.Year == registerDate.Year
+                                                            && x.RegisterDate.Hour == 13));
+            updatedValues.Add("15:00", unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day
+                                                            && x.RegisterDate.Month == registerDate.Month
+                                                            && x.RegisterDate.Year == registerDate.Year
+                                                            && x.RegisterDate.Hour == 15));
+            updatedValues.Add("17:00", unitOfWork.RegisterServiceRepository.CountDataRow(x => x.RegisterDate.Day == registerDate.Day
+                                                            && x.RegisterDate.Month == registerDate.Month
+                                                            && x.RegisterDate.Year == registerDate.Year
+                                                            && x.RegisterDate.Hour == 17));
+
+            return updatedValues;
+        }
+
+
+
+        public RegisterService GetRegisterServiceApi(DateTime registerDate)
+        {
+            var reg = unitOfWork.RegisterServiceRepository.Get(x => x.Status == 1 
+            && x.RegisterDate.Year == registerDate.Year
+            && x.RegisterDate.Month == registerDate.Month 
+            && x.RegisterDate.Day == registerDate.Day).OrderBy(m => new { m.RegisterDate, m.RegisterNo }).FirstOrDefault();
+            if(reg != null)
+            {
+                reg.Status = 0;
+                unitOfWork.Save();
+            }
+
+            return reg;
         }
     }
 }

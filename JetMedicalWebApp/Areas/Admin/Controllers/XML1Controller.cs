@@ -64,7 +64,7 @@ namespace JetMedicalWebApp.Areas.Admin.Controllers
 
             if (!string.IsNullOrEmpty(maLK))
             {
-                selectedFields = "MA_LK, STT, MA_BN, FIRSTNAME, LASTNAME, BENH_ID, TEN_BENH, MA_BENH, MA_BENHKHAC, NGAY_VAO, STRNGAY_VAO, NGAY_RA, STRNGAY_RA, NGAY_TAI_KHAM, ";
+                selectedFields = "MA_LK, STT, MA_BN,DepartmentId, DepartmentName,  FIRSTNAME, LASTNAME, BENH_ID, TEN_BENH, MA_BENH, MA_BENHKHAC, NGAY_VAO, STRNGAY_VAO, NGAY_RA, STRNGAY_RA, NGAY_TAI_KHAM, ";
                 selectedFields += "STRNGAY_TAI_KHAM, KET_QUA_DTRI, TINH_TRANG_RV, MA_KHOA, TEN_KHOA, CHUAN_DOAN, PPDIEUTRI, LOIDANTHAYTHUOC, XML1_File, GHICHU";
 
                 Dictionary<string, string> filters = new Dictionary<string, string>();
@@ -108,7 +108,7 @@ namespace JetMedicalWebApp.Areas.Admin.Controllers
 
             if (!string.IsNullOrEmpty(maLK))
             {
-                selectedFields = "MA_LK, STT, MA_BN, FIRSTNAME, LASTNAME, BENH_ID, TEN_BENH, MA_BENH, MA_BENHKHAC, NGAY_VAO, STRNGAY_VAO, NGAY_RA, STRNGAY_RA, NGAY_TAI_KHAM, ";
+                selectedFields = "MA_LK, STT, MA_BN, DepartmentId, DepartmentName, FIRSTNAME, LASTNAME, BENH_ID, TEN_BENH, MA_BENH, MA_BENHKHAC, NGAY_VAO, STRNGAY_VAO, NGAY_RA, STRNGAY_RA, NGAY_TAI_KHAM, ";
                 selectedFields += "STRNGAY_TAI_KHAM, KET_QUA_DTRI, TINH_TRANG_RV, MA_KHOA, TEN_KHOA, CHUAN_DOAN, PPDIEUTRI, LOIDANTHAYTHUOC, XML1_File, GHICHU";
 
                 Dictionary<string, string> filters = new Dictionary<string, string>();

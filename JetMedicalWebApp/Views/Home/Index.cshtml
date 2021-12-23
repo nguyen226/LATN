@@ -15,9 +15,16 @@
 }
 
 
-
 <script>
+    var listKhungGioKham = null;
+
     $(document).ready(function () {
+
+        $('#formDatLichKhamTheoPhongBan_NgayKham').change(function () {
+            getKhungGioKham();
+
+        });
+
         hideAlertErrorDatLichKhamTheoPhongBan();
         $('.datepicker').datepicker(initialDatepickerOption());
 
@@ -131,10 +138,13 @@
 
                 sendDataToURL(url, data, true)
                 .then(function (res) {
-                    if (res) {
-                        showAlertErrorDatLichKhamTheoPhongBan(res);
+                    if (res && !res.success) {
+                        showAlertErrorDatLichKhamTheoPhongBan(res.data);
                     }
                     else {
+                        var resData = res.data.split(',');
+                        $('#thongTinLuotKham_Ngay').text('Thời gian khám : ' + resData[0]);
+                        $('#thongTinLuotKham_Luot').text('Lượt khám thứ : ' + resData[1]);
                         $('.formDatLichKhamTheoPhongBanThanhCong').fadeIn().show();
                         $('.formDatLichKhamTheoPhongBan').fadeOut().hide();
                     }
@@ -191,6 +201,18 @@
         })
     });
 
+    function getKhungGioKham() {
+
+
+        var url = "@Url.Action("KhungGioKhamBenh", "DangKyKhamBenh", new { area = "Member" })";
+
+        var data = { ngay: $('#formDatLichKhamTheoPhongBan_NgayKham').val() };
+
+        sendDataToURL(url, data, false)
+            .then(function (res) {
+                listKhungGioKham = res;
+            });
+    }
     function resetFormDatLichKhamTheoPhongBan() {
         hideAlertErrorDatLichKhamTheoPhongBan();
         $('.formDatLichKhamTheoPhongBan').fadeIn().show();
@@ -297,7 +319,7 @@
                             </div>
                             <div class="box_group_from">
                                 <label class="control-label">Ngày khám</label>
-                                <input type="text" class="input-checkin datepicker" name="formDatLichKhamTheoPhongBan_NgayKham" id="formDatLichKhamTheoPhongBan_NgayKham" placeholder="Ngày khám" required autocomplete="off">
+                                <input type="text" class="input-checkin datepicker" name="formDatLichKhamTheoPhongBan_NgayKham" id="formDatLichKhamTheoPhongBan_NgayKham" placeholder="Ngày khám" required autocomplete="off" value="@(DateTime.Now.ToString("dd/MM/yyyy"))">
                             </div>
                             <div class="box_group_from">
                                 <label class="control-label">Giờ khám</label>
@@ -315,7 +337,10 @@
                     <div class="formDatLichKhamTheoPhongBanThanhCong d-none frm form-group">
                         <div class="text-center">
                             <h2>ĐẶT LỊCH THÀNH CÔNG</h2>
+                            <span id="thongTinLuotKham_Ngay" style=" text-align: center; position: relative; margin: 0; font-size: 30px; line-height: 35px; color: red; font-family: Roboto Bold; text-transform: uppercase;">Ngày khám : </span><br />
+                            <span id="thongTinLuotKham_Luot" style=" text-align: center; position: relative; margin: 0; font-size: 30px; line-height: 35px; color: red; font-family: Roboto Bold; text-transform: uppercase;">Lượt khám thứ : </span>
                         </div>
+
                         <div class="form-group">
                             <a href="/Member/DangKyKhamBenh" class="send_mail btn regs"><i class="fa fa-dk"></i> Xem thông tin đặt khám bệnh</a>
                         </div>

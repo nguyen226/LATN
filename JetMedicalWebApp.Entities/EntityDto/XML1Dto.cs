@@ -22,6 +22,8 @@ namespace JetMedicalWebApp.Entities.EntityDto
         public string GT_THE_TU { set; get; }
         public string GT_THE_DEN { set; get; }
         public int BENH_ID { set; get; }
+        public string DepartmentName { set; get; }
+        public int DepartmentId { set; get; }
         public string TEN_BENH { set; get; }
         public string MA_BENH { set; get; }
         public string MA_BENHKHAC { set; get; }

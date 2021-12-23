@@ -26,22 +26,21 @@
 
     function openTimepicker(that) {
         selectedTimeInputElement = $(that);
-
         var contentHtml = ''
         $.each(timeDatas, function (i, v) {
             contentHtml += '<div class="time-picker">';
             contentHtml += '<label class="form-control-label time-label"><i class="' + v.icon + ' ' + v.iconClass + '"></i> ' + v.name + '</label>';
             contentHtml += '<div class="d-flex">';
             contentHtml += '<div class="mb-1">';
-
             $.each(v.times, function (i_item, v_item) {
                 if (i_item % 4 == 0 && i_item > 0) {
                     contentHtml += '</div>';
                     contentHtml += '<div class="mb-1">';
                 }
-                contentHtml += '<a href="javascript:void(0)" class="button-time' + (selectedTimeInputElement.val() == v_item ? ' active' : '')+'" data-time="' + v_item + '" onclick="selectedTime(this)">' + v_item + '</a>';
+                if ((listKhungGioKham != null && listKhungGioKham[v_item] < 20) || listKhungGioKham == null || listKhungGioKham == undefined) {
+                    contentHtml += '<a href="javascript:void(0)" class="button-time' + (selectedTimeInputElement.val() == v_item ? ' active' : '') + '" data-time="' + v_item + '" onclick="selectedTime(this)">' + v_item + '</a>';
+                }
             });
-
             contentHtml += '</div>';
             contentHtml += '</div>';
             contentHtml += '</div>';

@@ -106,10 +106,22 @@ namespace JetMedicalWebApp.Areas.Member.Controllers
                 updatedValues.Add("UserID", authCookie.Value);
                 updatedValues.Add("CreatedUserID", authCookie.Value);
             }
+            bool res = false;
+            resultMessage = registerServiceService.AddOrUpdate(id, updatedValues, out res);
 
-            resultMessage = registerServiceService.AddOrUpdate(id, updatedValues);
+            return Json(new { success = res , data = resultMessage }, JsonRequestBehavior.AllowGet);
+        }
 
-            return Json(resultMessage, JsonRequestBehavior.AllowGet);
+
+        [HttpPost]
+        public ActionResult KhungGioKhamBenh(string ngay)
+        {
+            string resultMessage = string.Empty;
+            Dictionary<string, int> updatedValues = new Dictionary<string, int>();
+            DateTime ngayValue;
+            ngayValue = (DateTime.TryParseExact(ngay, CommonConstants.DateTimeFormat, null, DateTimeStyles.None, out ngayValue) ? ngayValue : DateTime.Now);
+            updatedValues = registerServiceService.GetRegisterNoLastestByTime(ngayValue);
+            return Json(updatedValues, JsonRequestBehavior.AllowGet);
         }
 
 

@@ -427,7 +427,7 @@ namespace JetMedicalWebApp.Services
             isError = false;
             XML1 xML1 = null;
             string resultMessage = string.Empty;
-            int bENHIDValue;
+            int bENHIDValue, depId;
             Dictionary<string, Dictionary<string, string>> updatedData;
             AppHistoryService appHistoryServiceService = new AppHistoryService();
             InternalService internalService = new InternalService();
@@ -477,6 +477,7 @@ namespace JetMedicalWebApp.Services
                         MA_BENH = updatedValues.ContainsKey("MA_BENH") ? updatedValues["MA_BENH"] : string.Empty,
                         MA_BENHKHAC = updatedValues.ContainsKey("MA_BENHKHAC") ? updatedValues["MA_BENHKHAC"] : string.Empty,
                         NGAY_VAO = ngayVaoValue,
+                        DepartmentId = updatedValues.ContainsKey("DepartmentId") ? (Int32.TryParse(updatedValues["DepartmentId"], out depId) ? unitOfWork.DepartmentRepository.GetByID(depId).id : new Nullable<int>()) : null,
                         NGAY_RA = updatedValues.ContainsKey("NGAY_RA") ? (DateTime.TryParseExact(updatedValues["NGAY_RA"], CommonConstants.DateTimeFormat, null, DateTimeStyles.None, out ngayRaValue) ? ngayRaValue : new Nullable<DateTime>()) : new Nullable<DateTime>(),
                         NGAY_TAI_KHAM = updatedValues.ContainsKey("NGAY_TAI_KHAM") ? (DateTime.TryParseExact(updatedValues["NGAY_TAI_KHAM"], CommonConstants.DateTimeFormat, null, DateTimeStyles.None, out ngayTaiKhamValue) ? ngayTaiKhamValue : new Nullable<DateTime>()) : new Nullable<DateTime>(),
                         KET_QUA_DTRI = updatedValues.ContainsKey("KET_QUA_DTRI") ? (decimal.TryParse(updatedValues["KET_QUA_DTRI"], out ketQuaDieuTriValue) ? ketQuaDieuTriValue : 0) : 0,

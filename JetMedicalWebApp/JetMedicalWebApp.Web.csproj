@@ -236,6 +236,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
+    <Compile Include="Areas\Admin\Controllers\Api\LuotKhamController.cs" />
     <Compile Include="Areas\Admin\Controllers\KSK_XNNTController.cs" />
     <Compile Include="Areas\Admin\Controllers\KSK_XNKController.cs" />
     <Compile Include="Areas\Admin\Controllers\KSK_XNCTMController.cs" />

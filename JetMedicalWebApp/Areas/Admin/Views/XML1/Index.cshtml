@@ -362,7 +362,7 @@
                 "orderable": false
             },
             {
-                "targets": [9,10],
+                "targets": [9],
                 className: 'dt-body-center menu-action',
                 "orderable": false,
                 "searchable": false,
@@ -401,16 +401,6 @@
                     return html;
                 }, "title": "Sửa"
             },
-            {
-                "data": "MA_LK", "mRender": function (data, type, row, meta) {
-                    let html = '';
-                    if (xemHeThong == true || (xemCaNhan == true && row.CreatedUserID == userId)) {
-                        html = '<div class="d-flex order-actions"><a data-original-title="delete" data-toggle="tooltip" data-placement="top" class="btn " onclick=xemChiTiet(this) href="#!" data-malk=' + row.MA_LK + ' data-mabn=' + row.MA_BN + '><i class="bx bxs-user"></i> </a></div>';
-                    }
-
-                    return html;
-                }, "title": "Chi tiết"
-            }
         ]
 
         table = $('#dtTable').DataTable(datatableOption);
@@ -693,41 +683,6 @@
         });
 
 
-        $('#btnTaoNhom').click(function (e) {
-            e.preventDefault();
-            dataListId = [];
-            dataListId = $(table.$('input:checkbox[name="checkboxSelected"]').map(function () {
-                return $(this).prop("checked") ? table.rows($(this).closest('tr')).data()[0].UserID : null;
-            })).toArray();
-
-            if (dataListId.length > 0) {
-
-                fields  = ['Name','Note'];
-                values  = [$('#tenNhom').val(),$('#ghiChu').val()];
-                var data = {
-                    id:null,
-                    fields : fields,
-                    values : values,
-                    userIDs: dataListId.length == 1 ? dataListId[0] : dataListId,
-                    companyIDs: null,
-                };
-                var url = "@Url.Action("AddOrUpdate", "PatientGroup", new { area = "Admin" })";
-
-                sendDataToURL(url, data, true, null)
-                .then(function (res) {
-                    if (res) {
-                        notification("topleft", "notify", "fa fa-exclamation-triangle vd_yellow", "", res);
-                    }
-                    else {
-                        notification("top right", "success", "fadeIn animated bx bx-check-circle", "", "Tạo thành công.");
-                        $('#formTaoNhom')[0].reset();
-                        resetCheckboxAndDatatable();
-                    }
-                });
-            } else {
-                notification("top right", "info", "fadeIn animated bx bx-info-circle", "", "Bạn chưa chọn user để tạo nhóm.");
-            }
-        });
 
         $('#quickSearchMaBenh').tagsInput({
             placeholder: 'Chọn mã bệnh',
@@ -1328,17 +1283,8 @@
             @if (Model.Menu_GroupPermission.SystemEdit == true || Model.Menu_GroupPermission.PersonalEdit == true)
             {
                 <form id="formTaoNhom" class="row mb-2">
-                    <div class="col-sm-12 col-md-4 col-lg-4">
-                        <input type="text" id="tenNhom" class="form-control" placeholder="Tên nhóm" value="">
-                    </div>
-                    <div class="col-sm-12 col-md-4 col-lg-4">
-                        <input type="text" id="ghiChu" class="form-control" placeholder="ghi chú" value="">
-                    </div>
-
                     <div class="col-sm-12 col-md-4">
-                        <button class="btn buttons-excel buttons-html5 btn-primary" id="btnTaoNhom" tabindex="0" aria-controls="example2" type="button"><span>Tạo</span></button>
                         <button class="btn buttons-excel buttons-html5 btn-primary" id="btnRefreshData" tabindex="0" aria-controls="example2" type="button"><span>Refresh</span></button>
-
                         <a class="btn buttons-excel buttons-html5 btn-primary dropdown-toggle dropdown-toggle-nocaret" href="#" data-bs-toggle="dropdown" aria-expanded="true">
                             Hiển thị lọc
                         </a>
@@ -1460,9 +1406,6 @@
                         </ul>
                     </div>
                 </form>
-
-
-              
             }
 
             <div class="row">

@@ -116,8 +116,8 @@ namespace JetMedicalWebApp.Areas.Admin.Controllers
             {
                 updatedValues.Add(fields[n], values[n]);
             }
-
-            resultMessage = registerServiceService.AddOrUpdate(id, updatedValues);
+            bool success = false;
+            resultMessage = registerServiceService.AddOrUpdate(id, updatedValues, out success);
 
             return Json(resultMessage, JsonRequestBehavior.AllowGet);
         }

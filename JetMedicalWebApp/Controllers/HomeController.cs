@@ -22,8 +22,6 @@ namespace JetMedicalWebApp.Controllers
                 return Redirect("/Home/Login");
             }
 
-
-
             string selectedFields = "UserID, Phone,(LastName + \" \" + FirstName) AS HoTen, EmailID ";
 
             if (Request.Cookies.Get(CommonConstants.CookieMemberID) != null)
@@ -35,7 +33,6 @@ namespace JetMedicalWebApp.Controllers
                     ViewBag.User = user;
                 }
             }
-
 
             ViewBag.MennuSelected = "Home";
             BaseViewModel model = new BaseViewModel();
@@ -219,163 +216,6 @@ namespace JetMedicalWebApp.Controllers
             }
 
             return Redirect(returnUrl);
-        }
-        public JsonResult GuiLaiActivateCode(int userId)
-        {
-            UsersService usersService = new UsersService();
-            UserInfoService userInfoService = new UserInfoService();
-
-            string resultMessage = string.Empty;
-            int idValue = -1;
-
-            AppConfigService appConfigService = new AppConfigService();
-            GmailService gmailService = new GmailService();
-
-            AppConfigDto appConfig = appConfigService.GetByActiveExposeDto("Id, Active, Email, MailAccount, MailPass, MailPort, MailHost, MailSSL");
-            UsersDto users = usersService.GetByIdExposeDto(userId, "Id, EmailID");
-
-            if (users != null)
-            {
-                string randomCode = Utilities.GenerateRandomCode(6, 100000);
-
-                Dictionary<string, string> updatedValues = new Dictionary<string, string>();
-                updatedValues.Add("ActivationCode", randomCode);
-
-                resultMessage = usersService.AddOrUpdate(userId.ToString(), updatedValues);
-
-                if (Int32.TryParse(resultMessage, out idValue))
-                {
-                    SmtpConfigurationDto _config = new SmtpConfigurationDto();
-                    _config.Username = appConfig.MailAccount;
-                    _config.Password = appConfig.MailPass;
-                    _config.Host = appConfig.MailHost;
-                    _config.Port = Int32.Parse(appConfig.MailPort);
-                    _config.Ssl = appConfig.MailSSL;
-
-                    EmailMessageDto message = new EmailMessageDto();
-                    message.ToEmail = users.EmailID;
-                    message.Subject = "Kich hoạt tài khoản ";
-                    message.Body = "Sử dụng mã: " + randomCode + " để kích hoạt tài khoản của bạn";
-                    message.IsHtml = true;
-
-                    resultMessage = gmailService.GuiEmailToiUser(_config, message, string.Empty);
-                }
-            }
-            else
-            {
-                resultMessage = "Không tìm thấy User";
-            }
-
-            return Json(new { message = resultMessage, userId = idValue }, JsonRequestBehavior.AllowGet);
-        }
-
-        public JsonResult ActivateCode(int? userId, string activeCode)
-        {
-            UsersService usersService = new UsersService();
-            UserInfoService userInfoService = new UserInfoService();
-
-            string resultMessage = string.Empty;
-            bool active = false, check = true;
-
-            if (userId != null)
-            {
-                AppConfigService appConfigService = new AppConfigService();
-                GmailService gmailService = new GmailService();
-
-                AppConfigDto appConfig = appConfigService.GetByActiveExposeDto("Id, Active, Email, MailAccount, MailPass, MailPort, MailHost, MailSSL");
-                UsersDto users = usersService.GetByIdExposeDto(userId.Value, "UserID, FirstName, LastName, ActivationCode");
-
-                if (string.IsNullOrEmpty(activeCode))
-                {
-                    check = false;
-                    resultMessage = "Bạn chưa nhập mã kích hoạt";
-                }
-
-                if (check)
-                {
-                    if (users != null)
-                    {
-                        active = users.ActivationCode.Equals(activeCode);
-
-                        if (active == false)
-                        {
-                            resultMessage = "Mã kích hoạt không đúng";
-                        }
-                        else
-                        {
-                            Dictionary<string, string> updatedValues = new Dictionary<string, string>();
-                            updatedValues.Add("Active", active.ToString());
-
-                            resultMessage = usersService.AddOrUpdate(userId.ToString(), updatedValues);
-
-                            int intValue;
-                            if (Int32.TryParse(resultMessage, out intValue))
-                            {
-                                HttpCookie memberIdCookie = new HttpCookie(CommonConstants.CookieMemberID);
-                                memberIdCookie.Value = resultMessage;
-                                memberIdCookie.Expires = DateTime.Now.AddMonths(1);
-                                Response.Cookies.Add(memberIdCookie);
-
-                                HttpCookie memberNameCookie = new HttpCookie(CommonConstants.CookieMemberName);
-                                memberNameCookie.Value = HttpUtility.UrlEncode(users.LastName + " " + users.FirstName); 
-                                memberNameCookie.Expires = DateTime.Now.AddMonths(1);
-                                Response.Cookies.Add(memberNameCookie);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return Json(new { success = active, message = resultMessage }, JsonRequestBehavior.AllowGet);
-        }
-        public JsonResult SDTEmailActivateCode(string username, string activeCode)
-        {
-            UsersService usersService = new UsersService();
-            UserInfoService userInfoService = new UserInfoService();
-
-            string resultMessage = string.Empty;
-            bool active = false;
-
-            UsersDto users = usersService.GetByEmailOrPhoneExposeDto(username, "UserID, Phone, EmailID, FirstName, LastName, ActivationCode");
-
-            if (users != null)
-            {
-                active = users.ActivationCode.Equals(activeCode);
-
-                if (active == false)
-                {
-                    resultMessage = "Mã kích hoạt không đúng";
-                }
-                else
-                {
-                    Dictionary<string, string> updatedValues = new Dictionary<string, string>();
-                    updatedValues.Add("Active", active.ToString());
-
-                    resultMessage = usersService.AddOrUpdate(users.UserID.ToString(), updatedValues);
-
-                    int intValue;
-                    if (Int32.TryParse(resultMessage, out intValue))
-                    {
-                        HttpCookie memberIdCookie = new HttpCookie(CommonConstants.CookieMemberID);
-                        memberIdCookie.Value = resultMessage;
-                        memberIdCookie.Expires = DateTime.Now.AddMonths(1);
-                        Response.Cookies.Add(memberIdCookie);
-
-                        HttpCookie memberNameCookie = new HttpCookie(CommonConstants.CookieMemberName);
-                        memberNameCookie.Value = HttpUtility.UrlEncode(users.LastName + " " + users.FirstName);
-                        memberNameCookie.Expires = DateTime.Now.AddMonths(1);
-                        Response.Cookies.Add(memberNameCookie);
-                    }
-                }
-            }
-
-            return Json(new {
-                success = active,
-                message = resultMessage,
-                userId = users != null ? users.UserID : -1,
-                userFirstName = users != null ? users.FirstName : string.Empty,
-                userlastName = users != null ? users.LastName : string.Empty,
-            }, JsonRequestBehavior.AllowGet);
         }
         public void setCookieLogin(string memberId, string memberName, string isAdmin)
         {
